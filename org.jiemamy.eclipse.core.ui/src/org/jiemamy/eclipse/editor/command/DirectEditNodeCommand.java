@@ -29,6 +29,7 @@ import org.jiemamy.eclipse.editor.DisplayStatus;
 import org.jiemamy.eclipse.extension.IllegalImplementationException;
 import org.jiemamy.model.Mode;
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
 import org.jiemamy.transaction.SavePoint;
 
 /**

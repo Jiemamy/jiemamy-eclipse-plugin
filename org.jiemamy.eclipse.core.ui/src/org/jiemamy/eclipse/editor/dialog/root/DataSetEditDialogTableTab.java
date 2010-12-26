@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
 import org.jiemamy.model.attribute.ColumnModel;
 import org.jiemamy.model.dataset.DataSetModel;
@@ -91,7 +92,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		table.setLinesVisible(true);
 		table.setData(tableModel);
 		
-		List<ColumnModel> columns = tableModel.findColumns();
+		List<ColumnModel> columns = tableModel.getColumns();
 		for (ColumnModel columnModel : columns) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setWidth(COL_WIDTH);
@@ -130,7 +131,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 			List<String> data = CollectionsUtil.newArrayList();
 			for (TableColumn tableColumn : table.getColumns()) {
 				ColumnModel columnModel = (ColumnModel) tableColumn.getData();
-				ColumnRef columnRef = factory.newReference(columnModel);
+				EntityRef<? extends ColumnModel> columnRef = columnModel.toReference();
 				String string = recordModel.getValues().get(columnRef);
 				data.add(string);
 			}

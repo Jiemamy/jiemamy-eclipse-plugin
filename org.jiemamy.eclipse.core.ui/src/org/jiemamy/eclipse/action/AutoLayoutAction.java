@@ -44,6 +44,7 @@ import org.eclipse.ui.presentations.PresentationUtil;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.editpart.diagram.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.editor.editpart.diagram.RootEditPart;
 import org.jiemamy.model.ConnectionModel;
@@ -157,7 +158,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			this.x = x;
 			this.y = y;
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.get(diagramIndex);
+			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
 			NodeModel nodeProfile = presentation.getNodeProfiles().get(target);
 			JmRectangle boundary = nodeProfile.getBoundary();
 			oldX = boundary.x;
@@ -167,7 +168,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void execute() {
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.get(diagramIndex);
+			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
 			PresentationUtil.setBoundary(presentation, target, new JmRectangle(x, y, -1, -1));
 			oldBendpoints.clear();
 			for (ConnectionModel conn : target.getSourceConnections()) {
@@ -181,7 +182,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void undo() {
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.get(diagramIndex);
+			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
 			for (ConnectionModel conn : target.getSourceConnections()) {
 				ConnectionModel connectionProfile = presentation.getConnectionProfiles().get(conn);
 				List<JmPoint> bendpoints = connectionProfile.getBendpoints();

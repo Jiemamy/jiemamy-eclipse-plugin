@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.editor.dialog.AbstractEditListener;
 import org.jiemamy.eclipse.editor.dialog.EditListener;
 import org.jiemamy.eclipse.ui.AbstractTableEditor;
@@ -54,6 +55,7 @@ import org.jiemamy.eclipse.ui.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.ui.helper.TextSelectionAdapter;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
 import org.jiemamy.model.dataset.DataSetModel;
+import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.transaction.SavePoint;
@@ -123,14 +125,19 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 			dataSetTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
+		public void commandExecuted(Command command) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 		@Override
 		public void dispose() {
 			logger.debug(LogMarker.LIFECYCLE, "DataSetContentProvider: disposed");
 			super.dispose();
 		}
 		
-		public JiemamyElement getTargetModel() {
-			return (JiemamyElement) viewer.getInput();
+		public JiemamyEntity getTargetModel() {
+			return (JiemamyEntity) viewer.getInput();
 		}
 		
 		@Override
@@ -175,7 +182,7 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
-		private final Jiemamy jiemamy;
+		private final JiemamyContext jiemamy;
 		
 		private Text txtDataSetName;
 		
@@ -324,7 +331,7 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performAddItem() {
+		protected JiemamyEntity performAddItem() {
 			Table table = getTableViewer().getTable();
 			JiemamyFactory factory = jiemamy.getFactory();
 			DataSetModel dataSetModel = factory.newModel(DataSetModel.class);
@@ -343,7 +350,7 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performInsertItem() {
+		protected JiemamyEntity performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
@@ -393,7 +400,7 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performRemoveItem() {
+		protected JiemamyEntity performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();

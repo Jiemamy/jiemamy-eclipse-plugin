@@ -48,13 +48,18 @@ public class ColumnTreeEditPart extends AbstractModelTreeEditPart {
 		setModel(attributeModel);
 	}
 	
+	public void commandExecuted(Command arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	@Override
 	public ColumnModel getModel() {
 		return (ColumnModel) super.getModel();
 	}
 	
-	public JiemamyElement getTargetModel() {
-		AttributeModel model = getModel();
+	public ColumnModel getTargetModel() {
+		ColumnModel model = getModel();
 		return model;
 	}
 	
@@ -81,10 +86,5 @@ public class ColumnTreeEditPart extends AbstractModelTreeEditPart {
 		
 		ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 		setWidgetImage(ir.get(Images.ICON_COLUMN));
-	}
-	
-	public void commandExecuted(Command arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

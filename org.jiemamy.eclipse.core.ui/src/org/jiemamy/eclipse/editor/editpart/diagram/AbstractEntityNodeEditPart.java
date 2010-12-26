@@ -27,11 +27,14 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.figure.EntityFigure;
 import org.jiemamy.eclipse.editor.tools.NodeCellEditorLocator;
 import org.jiemamy.eclipse.utils.ConvertUtil;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
 import org.jiemamy.model.geometory.JmRectangle;
 import org.jiemamy.utils.LogMarker;
 
@@ -55,7 +58,7 @@ public abstract class AbstractEntityNodeEditPart extends AbstractJmNodeEditPart 
 		super(nodeAdapter);
 	}
 	
-	public JiemamyElement getTargetModel() {
+	public JiemamyEntity getTargetModel() {
 		NodeModel node = getModel();
 		DatabaseObjectModel entityModel = node.unwrap();
 		return entityModel;
@@ -79,14 +82,13 @@ public abstract class AbstractEntityNodeEditPart extends AbstractJmNodeEditPart 
 		}
 		
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		NodeModel node = getModel();
-		NodeProfile nodeProfile = presentation.getNodeProfiles().get(node);
-		if (nodeProfile == null) {
+		if (node == null) {
 			// 表示しない
 		} else {
-			JmRectangle boundary = nodeProfile.getBoundary();
+			JmRectangle boundary = node.getBoundary();
 			editPart.setLayoutConstraint(this, getFigure(), ConvertUtil.convert(boundary));
 		}
 		updateFigure(getFigure());

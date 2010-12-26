@@ -28,6 +28,7 @@ import org.eclipse.gef.requests.CreateRequest;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.JiemamyEntity;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.ChangeNodeConstraintCommand;
 import org.jiemamy.eclipse.editor.command.CreateNodeCommand;
 import org.jiemamy.model.NodeModel;

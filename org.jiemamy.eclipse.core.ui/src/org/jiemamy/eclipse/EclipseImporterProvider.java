@@ -20,7 +20,7 @@ package org.jiemamy.eclipse;
 
 import org.eclipse.core.runtime.CoreException;
 
-import org.jiemamy.composer.ImportConfig;
+import org.jiemamy.ServiceLocator;
 import org.jiemamy.composer.Importer;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
 
@@ -29,11 +29,11 @@ import org.jiemamy.eclipse.utils.ExceptionHandler;
  * 
  * @author daisuke
  */
-public class EclipseImporterProvider implements InstanceProvider<Importer<ImportConfig>> {
+public class EclipseImporterProvider implements ServiceLocator {
 	
-	public Importer<ImportConfig> getInstance(String fqcn) {
+	public <T>T getService(Class<T> clazz, String fqcn) throws ClassNotFoundException {
 		try {
-			return JiemamyCorePlugin.getImporterResolver().getInstance(fqcn);
+			return clazz.cast(JiemamyCorePlugin.getImporterResolver().getInstance(fqcn));
 		} catch (CoreException e) {
 			ExceptionHandler.handleException(e);
 		}

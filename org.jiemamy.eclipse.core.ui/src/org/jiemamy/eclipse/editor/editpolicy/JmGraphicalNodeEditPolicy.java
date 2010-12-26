@@ -25,6 +25,7 @@ import org.eclipse.gef.requests.ReconnectRequest;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.JiemamyEntity;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.CreateConnectionCommand;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.NodeModel;

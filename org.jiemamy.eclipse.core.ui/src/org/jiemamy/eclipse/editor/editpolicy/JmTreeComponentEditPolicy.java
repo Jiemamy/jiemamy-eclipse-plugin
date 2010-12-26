@@ -23,6 +23,7 @@ import org.eclipse.gef.editpolicies.ComponentEditPolicy;
 import org.eclipse.gef.requests.GroupRequest;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.JiemamyEditor;
 import org.jiemamy.eclipse.editor.command.DeleteNodeCommand;
 import org.jiemamy.eclipse.utils.EditorUtil;
@@ -41,9 +42,9 @@ public class JmTreeComponentEditPolicy extends ComponentEditPolicy {
 		if (getHost().getModel() instanceof DatabaseObjectModel) {
 			// THINK ActiveEditorは必ずDiagramEditorか？
 			JiemamyEditor editor = (JiemamyEditor) EditorUtil.getActiveEditor();
-			JiemamyContext rootModel = editor.getJiemamyContext();
+			JiemamyContext context = editor.getJiemamyContext();
 			NodeModel nodeAdapter = (NodeModel) getHost().getModel();
-			DeleteNodeCommand command = new DeleteNodeCommand(rootModel, Migration.DIAGRAM_INDEX, nodeAdapter);
+			DeleteNodeCommand command = new DeleteNodeCommand(context, Migration.DIAGRAM_INDEX, nodeAdapter);
 			
 			return command;
 //		} else if (getHost().getModel() instanceof AbstractRelationModel) {

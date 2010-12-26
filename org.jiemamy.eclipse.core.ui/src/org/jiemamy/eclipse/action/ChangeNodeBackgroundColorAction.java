@@ -29,6 +29,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.ChangeNodeColorCommand;
 import org.jiemamy.eclipse.editor.editpart.diagram.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.utils.ConvertUtil;

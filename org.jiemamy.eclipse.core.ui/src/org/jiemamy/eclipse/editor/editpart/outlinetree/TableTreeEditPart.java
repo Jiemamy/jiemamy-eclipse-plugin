@@ -34,6 +34,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.DisplayPlace;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.table.TableEditDialog;
@@ -62,6 +63,11 @@ public class TableTreeEditPart extends AbstractEntityTreeEditPart {
 	public TableTreeEditPart(TableModel tableModel) {
 		Validate.notNull(tableModel);
 		setModel(tableModel);
+	}
+	
+	public void commandExecuted(org.jiemamy.transaction.Command arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	@Override
@@ -130,10 +136,5 @@ public class TableTreeEditPart extends AbstractEntityTreeEditPart {
 		
 		ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 		setWidgetImage(ir.get(Images.ICON_TABLE));
-	}
-	
-	public void commandExecuted(org.jiemamy.transaction.Command arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

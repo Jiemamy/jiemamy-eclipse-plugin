@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.DisplayPlace;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.view.ViewEditDialog;
@@ -121,8 +122,8 @@ public class ViewEditPart extends AbstractEntityNodeEditPart {
 		ViewFigure viewFigure = (ViewFigure) figure;
 		
 		String labelString = LabelStringUtil.getString(rootModel, viewModel, DisplayPlace.FIGURE);
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		NodeProfile nodeProfile = presentation.getNodeProfiles().get(node);
 		
 		viewFigure.setEntityName(labelString);
@@ -137,5 +138,10 @@ public class ViewEditPart extends AbstractEntityNodeEditPart {
 		viewFigure.removeAllColumns();
 		
 		// TODO カラム部の表示
+	}
+	
+	public void commandExecuted(org.jiemamy.transaction.Command command) {
+		// TODO Auto-generated method stub
+		
 	}
 }

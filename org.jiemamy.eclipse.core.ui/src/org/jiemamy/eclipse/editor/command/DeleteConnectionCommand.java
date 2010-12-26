@@ -22,6 +22,7 @@ import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.attribute.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.dbo.TableModel;
 import org.jiemamy.transaction.SavePoint;
 
@@ -56,7 +57,7 @@ public class DeleteConnectionCommand extends Command {
 	
 	@Override
 	public void execute() {
-		ForeignKey foreignKey = connection.unwrap();
+		ForeignKeyConstraintModel foreignKey = connection.unwrap();
 		TableModel definedTable = foreignKey.findDeclaringTable();
 		
 		save = jiemamyFacade.save();

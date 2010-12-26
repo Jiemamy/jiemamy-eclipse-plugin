@@ -24,6 +24,7 @@ import org.eclipse.gef.requests.DirectEditRequest;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.DisplayStatus;
 import org.jiemamy.eclipse.editor.command.DirectEditNodeCommand;
 import org.jiemamy.model.DiagramModel;
@@ -41,8 +42,8 @@ public class JmDirectEditPolicy extends DirectEditPolicy {
 		JiemamyContext rootModel = (JiemamyContext) getHost().getRoot().getContents().getModel();
 		NodeModel nodeAdapter = (NodeModel) getHost().getModel();
 		
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		DisplayStatus displayStatus = DisplayStatus.find(presentation);
 		
 		DirectEditNodeCommand command = new DirectEditNodeCommand(rootModel, displayStatus, nodeAdapter);

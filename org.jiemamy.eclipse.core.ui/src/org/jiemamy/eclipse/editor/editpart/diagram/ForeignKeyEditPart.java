@@ -35,12 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.editor.DisplayPlace;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.foreignkey.ForeignKeyEditDialog;
 import org.jiemamy.eclipse.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.editor.utils.LabelStringUtil;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.attribute.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.transaction.SavePoint;
 import org.jiemamy.utils.LogMarker;
 
@@ -66,9 +68,14 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		logger.debug(LogMarker.LIFECYCLE, "construct");
 	}
 	
-	public JiemamyElement getTargetModel() {
+	public void commandExecuted(org.jiemamy.transaction.Command command) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public JiemamyEntity getTargetModel() {
 		ConnectionModel connection = getModel();
-		ForeignKey foreignKey = connection.unwrap();
+		ForeignKeyConstraintModel foreignKey = connection.unwrap();
 		return foreignKey;
 	}
 	
@@ -77,7 +84,7 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
 		ConnectionModel connection = getModel();
-		ForeignKey foreignKey = connection.unwrap();
+		ForeignKeyConstraintModel foreignKey = connection.unwrap();
 		
 		// 編集前のスナップショットを保存
 		JiemamyFacade facade = rootModel.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
@@ -137,7 +144,7 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		}
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
 		ConnectionModel connection = getModel();
-		ForeignKey foreignKey = connection.unwrap();
+		ForeignKeyConstraintModel foreignKey = connection.unwrap();
 		
 		String labelString = LabelStringUtil.getString(rootModel, foreignKey, DisplayPlace.FIGURE);
 		label.setText(labelString);

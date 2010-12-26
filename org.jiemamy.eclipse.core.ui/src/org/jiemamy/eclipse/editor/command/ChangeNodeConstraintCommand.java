@@ -79,8 +79,8 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		this.rootModel = rootModel;
 		this.diagramIndex = diagramIndex;
 		this.nodeAdapter = nodeAdapter;
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentationModel = diagramPresentations.get(diagramIndex);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentationModel = diagramPresentations.getDiagrams().get(diagramIndex);
 		oldBoundary = presentationModel.getNodeProfiles().get(nodeAdapter).getBoundary();
 		this.boundary = boundary;
 		this.viewer = viewer;
@@ -141,8 +141,8 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		for (ConnectionModel connection : nodeAdapter.getSourceConnections()) {
 			if (selectedModels.contains(connection.getSource()) && selectedModels.contains(connection.getTarget())) {
 				JiemamyViewFacade jiemamyFacade = getJiemamyFacade();
-				DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-				DiagramModel presentationModel = diagramPresentations.get(diagramIndex);
+				DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+				DiagramModel presentationModel = diagramPresentations.getDiagrams().get(diagramIndex);
 				List<JmPoint> bendpoints = presentationModel.getConnectionProfiles().get(connection).getBendpoints();
 				for (JmPoint bendpoint : bendpoints) {
 					int bendpointIndex = bendpoints.indexOf(bendpoint);

@@ -47,6 +47,9 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.editor.dialog.AbstractEditListener;
 import org.jiemamy.eclipse.editor.dialog.EditListener;
 import org.jiemamy.eclipse.ui.AbstractTableEditor;
@@ -58,6 +61,7 @@ import org.jiemamy.model.dbo.TableModel;
 import org.jiemamy.model.dbo.index.IndexColumnModel;
 import org.jiemamy.model.dbo.index.IndexColumnModel.SortOrder;
 import org.jiemamy.model.dbo.index.IndexModel;
+import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.utils.LogMarker;
@@ -136,8 +140,8 @@ public class TableEditDialogIndexTab extends AbstractTab {
 			logger.debug(LogMarker.LIFECYCLE, "IndexColumnContentProvider: dispose");
 		}
 		
-		public JiemamyElement getTargetModel() {
-			return (JiemamyElement) viewer.getInput();
+		public JiemamyEntity getTargetModel() {
+			return (JiemamyEntity) viewer.getInput();
 		}
 		
 		@Override
@@ -167,7 +171,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 			ReferenceResolver referenceResolver = indexColumnModel.getJiemamy().getReferenceResolver();
 			switch (columnIndex) {
 				case 0:
-					ColumnRef columnRef = indexColumnModel.getColumnRef();
+					EntityRef<? extends ColumnModel> columnRef = indexColumnModel.getColumnRef();
 					ColumnModel columnModel = referenceResolver.resolve(columnRef);
 					return columnModel.getName();
 				case 1:
@@ -188,7 +192,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		
 		private final EditListener editListener = new IndexColumnEditListenerImpl();
 		
-		private final Jiemamy jiemamy;
+		private final JiemamyContext jiemamy;
 		
 		private Button radSortNone;
 		
@@ -352,18 +356,18 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performAddItem() {
+		protected JiemamyEntity performAddItem() {
 			Table table = getTableViewer().getTable();
 			int indexIndex = indexesTableEditor.getTableViewer().getTable().getSelectionIndex();
 			
-			List<ColumnModel> columns = tableModel.findColumns();
+			List<ColumnModel> columns = tableModel.getColumns();
 			ColumnSelectDialog dialog = new ColumnSelectDialog(table.getShell(), columns);
 			
 			if (dialog.open() == Dialog.OK && dialog.getResult() != null && indexIndex != -1) {
 				JiemamyFactory factory = jiemamy.getFactory();
 				IndexColumnModel indexColumnModel = factory.newModel(IndexColumnModel.class);
 				
-				ColumnRef newColumnRef = factory.newReference(dialog.getResult());
+				EntityRef<? extends ColumnModel> newColumnRef = factory.newReference(dialog.getResult());
 				jiemamyFacade.changeModelProperty(indexColumnModel, IndexColumnProperty.columnRef, newColumnRef);
 				
 				IndexModel indexModel = tableModel.getIndexes().get(indexIndex);
@@ -380,18 +384,18 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performInsertItem() {
+		protected JiemamyEntity performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			int indexIndex = indexesTableEditor.getTableViewer().getTable().getSelectionIndex();
-			List<ColumnModel> columns = tableModel.findColumns();
+			List<ColumnModel> columns = tableModel.getColumns();
 			ColumnSelectDialog dialog = new ColumnSelectDialog(table.getShell(), columns);
 			
 			if (dialog.open() == Dialog.OK && dialog.getResult() != null && indexIndex != -1) {
 				JiemamyFactory factory = jiemamy.getFactory();
 				IndexColumnModel indexColumnModel = factory.newModel(IndexColumnModel.class);
 				
-				ColumnRef columnRef = factory.newReference(dialog.getResult());
+				EntityRef<? extends ColumnModel> columnRef = factory.newReference(dialog.getResult());
 				jiemamyFacade.changeModelProperty(indexColumnModel, IndexColumnProperty.columnRef, columnRef);
 				
 				IndexModel indexModel = tableModel.getIndexes().get(indexIndex);
@@ -446,7 +450,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performRemoveItem() {
+		protected JiemamyEntity performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();
@@ -521,8 +525,8 @@ public class TableEditDialogIndexTab extends AbstractTab {
 			super.dispose();
 		}
 		
-		public JiemamyElement getTargetModel() {
-			return (JiemamyElement) viewer.getInput();
+		public JiemamyEntity getTargetModel() {
+			return (JiemamyEntity) viewer.getInput();
 		}
 		
 		@Override
@@ -572,7 +576,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		
 		private final EditListener editListener = new IndexEditListenerImpl();
 		
-		private final Jiemamy jiemamy;
+		private final JiemamyContext jiemamy;
 		
 		private Text txtIndexName;
 		
@@ -692,7 +696,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performAddItem() {
+		protected JiemamyEntity performAddItem() {
 			Table table = getTableViewer().getTable();
 			JiemamyFactory factory = jiemamy.getFactory();
 			IndexModel indexModel = factory.newModel(IndexModel.class);
@@ -712,7 +716,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performInsertItem() {
+		protected JiemamyEntity performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
@@ -766,7 +770,7 @@ public class TableEditDialogIndexTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performRemoveItem() {
+		protected JiemamyEntity performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();

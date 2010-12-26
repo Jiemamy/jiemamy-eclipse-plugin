@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.DisplayPlace;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.table.TableEditDialog;
@@ -67,6 +68,11 @@ public class TableEditPart extends AbstractEntityNodeEditPart {
 	 */
 	public TableEditPart(NodeModel nodeAdapter) {
 		super(nodeAdapter);
+	}
+	
+	public void commandExecuted(org.jiemamy.transaction.Command command) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	public void openEditDialog() {
@@ -132,8 +138,8 @@ public class TableEditPart extends AbstractEntityNodeEditPart {
 		
 		String labelString = LabelStringUtil.getString(rootModel, tableModel, DisplayPlace.FIGURE);
 		
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		NodeProfile nodeProfile = presentation.getNodeProfiles().get(node);
 		
 		tableFigure.setTableName(labelString);
@@ -147,7 +153,7 @@ public class TableEditPart extends AbstractEntityNodeEditPart {
 		
 		tableFigure.removeAllColumns();
 		
-		for (ColumnModel columnModel : tableModel.findColumns()) {
+		for (ColumnModel columnModel : tableModel.getColumns()) {
 			ColumnFigure[] columnFigure = createColumnFigure(columnModel);
 			tableFigure.add(columnFigure[0], columnFigure[1]);
 		}
@@ -156,8 +162,8 @@ public class TableEditPart extends AbstractEntityNodeEditPart {
 	private ColumnFigure[] createColumnFigure(ColumnModel columnModel) {
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
 		
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		
 		if (presentation.getLevel() == Level.ENTITY) {
 			return new ColumnFigure[0];

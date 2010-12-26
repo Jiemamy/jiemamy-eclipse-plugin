@@ -33,7 +33,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.ide.IDE;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SqlFacet;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
 
@@ -128,13 +130,12 @@ public final class NewDiagramWizard extends Wizard implements INewWizard {
 		
 		@Override
 		protected InputStream getInitialContents() {
-			Jiemamy jiemamy = Jiemamy.newInstance(new Artemis(new ArtemisView()));
-			JiemamyContext rootModel = jiemamy.getFactory().getJiemamyContext();
+			JiemamyContext context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 			
 			ByteArrayOutputStream out = null;
 			try {
 				out = new ByteArrayOutputStream();
-				jiemamy.getSerializer().serialize(rootModel, out);
+				JiemamyContext.findSerializer().serialize(context, out);
 				return new ByteArrayInputStream(out.toByteArray());
 			} catch (Exception e) {
 				ExceptionHandler.handleException(e);

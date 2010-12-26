@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.utils.EditorUtil;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
 import org.jiemamy.model.DefaultDiagramModel;
@@ -240,7 +241,8 @@ public class JmContributor extends ActionBarContributor {
 				}
 				JiemamyContext rootModel = ((JiemamyEditor) editor).getJiemamyContext();
 				DiagramFacet presentations = rootModel.getFacet(DiagramFacet.class);
-				DefaultDiagramModel presentation = presentations.get(Migration.DIAGRAM_INDEX);
+				DefaultDiagramModel presentation =
+						(DefaultDiagramModel) presentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 				for (DisplayStatus displayStatus : DisplayStatus.values()) {
 					if (displayStatus.ordinal() == index) {
 						presentation.setMode(displayStatus.getMode());

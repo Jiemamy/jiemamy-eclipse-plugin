@@ -39,7 +39,9 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.root.RootEditDialog;
 import org.jiemamy.eclipse.editor.editpart.EditDialogSupport;
@@ -93,11 +95,6 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 		//		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}
 	
-	public void commandExecuted(Command arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	@Override
 	public void deactivate() {
 		logger.debug(LogMarker.LIFECYCLE, "deactivate");
@@ -115,7 +112,7 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 		return (JiemamyContext) super.getModel();
 	}
 	
-	public JiemamyElement getTargetModel() {
+	public JiemamyEntity getTargetModel() {
 		JiemamyContext rootModel = getModel();
 		return rootModel;
 	}
@@ -182,7 +179,7 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 	protected List<NodeModel> getModelChildren() {
 		JiemamyContext rootModel = getModel();
 		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		return CollectionsUtil.newArrayList(diagramPresentationModel.getNodeProfiles().keySet());
 	}
 	

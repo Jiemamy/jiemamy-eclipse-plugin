@@ -21,7 +21,6 @@ package org.jiemamy.eclipse.editor.editpart.diagram;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.ChopboxAnchor;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.editor.editpolicy.JmComponentEditPolicy;
 import org.jiemamy.eclipse.editor.editpolicy.JmDirectEditPolicy;
@@ -46,6 +46,7 @@ import org.jiemamy.eclipse.editor.editpolicy.JmGraphicalNodeEditPolicy;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.utils.LogMarker;
 import org.jiemamy.utils.collection.CollectionsUtil;
@@ -78,7 +79,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		super.activate();
 		
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		rootModel.getJiemamy().getEventBroker().addListener(this);
+		rootModel.getEventBroker().addListener(this);
 		logger.debug("activate");
 	}
 	
@@ -91,7 +92,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	@Override
 	public void deactivate() {
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		rootModel.getJiemamy().getEventBroker().removeListener(this);
+		rootModel.getEventBroker().removeListener(this);
 		
 		super.deactivate();
 		logger.debug("deactivate");
@@ -175,16 +176,16 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 			return Collections.emptyList();
 		}
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.get(Migration.DIAGRAM_INDEX);
-		Map<ConnectionModel, ConnectionProfile> connectionProfiles = diagramPresentationModel.getConnectionProfiles();
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		
 		List<ConnectionModel> result = CollectionsUtil.newArrayList();
-		Collection<ConnectionModel> connections = getModel().getSourceConnections();
+		Collection<? extends ConnectionModel> connections = getModel().getSourceConnections();
 		for (ConnectionModel connectionAdapter : connections) {
-			if (connectionProfiles.containsKey(connectionAdapter)) {
-				result.add(connectionAdapter);
-			}
+			// FIXME
+//			if (connectionProfiles.containsKey(connectionAdapter)) {
+//				result.add(connectionAdapter);
+//			}
 		}
 		logger.debug(getModel() + " sourceConnections = " + result);
 		return result;
@@ -196,16 +197,16 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 			return Collections.emptyList();
 		}
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.get(Migration.DIAGRAM_INDEX);
-		Map<ConnectionModel, ConnectionProfile> connectionProfiles = diagramPresentationModel.getConnectionProfiles();
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		
 		List<ConnectionModel> result = CollectionsUtil.newArrayList();
-		Collection<ConnectionModel> connections = getModel().getTargetConnections();
+		Collection<? extends ConnectionModel> connections = getModel().getTargetConnections();
 		for (ConnectionModel connectionAdapter : connections) {
-			if (connectionProfiles.containsKey(connectionAdapter)) {
-				result.add(connectionAdapter);
-			}
+			// FIXME
+//			if (connectionProfiles.containsKey(connectionAdapter)) {
+//				result.add(connectionAdapter);
+//			}
 		}
 		logger.debug(getModel() + " targetConnections = " + result);
 		return result;

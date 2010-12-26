@@ -45,6 +45,9 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
 import org.jiemamy.eclipse.editor.dialog.AbstractEditListener;
@@ -54,7 +57,10 @@ import org.jiemamy.eclipse.ui.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.ui.helper.TextSelectionAdapter;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
 import org.jiemamy.model.attribute.ColumnModel;
+import org.jiemamy.model.attribute.constraint.DefaultUniqueKeyConstraintModel;
+import org.jiemamy.model.attribute.constraint.UniqueKeyConstraintModel;
 import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.utils.LogMarker;
@@ -131,8 +137,8 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			super.dispose();
 		}
 		
-		public JiemamyElement getTargetModel() {
-			return (JiemamyElement) viewer.getInput();
+		public JiemamyEntity getTargetModel() {
+			return (JiemamyEntity) viewer.getInput();
 		}
 		
 		@Override
@@ -188,7 +194,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 					
 				case 2:
 					List<String> columnNames = CollectionsUtil.newArrayList();
-					for (ColumnRef columnRef : localKey.getKeyColumns()) {
+					for (EntityRef<? extends ColumnModel> columnRef : localKey.getKeyColumns()) {
 						columnNames.add(resolver.resolve(columnRef).getName());
 					}
 					return StringUtils.join(columnNames, ", ");
@@ -207,7 +213,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
-		private final Jiemamy jiemamy;
+		private final JiemamyContext jiemamy;
 		
 		private Text txtKeyConstraintName;
 		
@@ -360,12 +366,12 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			
 			// 現在値の設定
 			txtKeyConstraintName.setText(JiemamyPropertyUtil.careNull(localKey.getName()));
-			List<ColumnRef> keyColumns = localKey.getKeyColumns();
-			List<ColumnModel> columns = tableModel.findColumns();
+			List<EntityRef<? extends ColumnModel>> keyColumns = localKey.getKeyColumns();
+			List<ColumnModel> columns = tableModel.getColumns();
 			for (ColumnModel columnModel : columns) {
 				lstKeyColumns.add(columnModel.getName());
 				boolean found = false;
-				for (ColumnRef columnRef : keyColumns) {
+				for (EntityRef<? extends ColumnModel> columnRef : keyColumns) {
 					if (columnRef.getReferenceId().equals(columnModel.getId())) {
 						found = true;
 						break;
@@ -380,10 +386,9 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performAddItem() {
+		protected JiemamyEntity performAddItem() {
 			Table table = getTableViewer().getTable();
-			JiemamyFactory factory = jiemamy.getFactory();
-			UniqueKey uniqueKey = factory.newModel(UniqueKey.class);
+			UniqueKeyConstraintModel uniqueKey = new DefaultUniqueKeyConstraintModel(null, null, null, null, null);
 			
 			jiemamyFacade.addAttribute(tableModel, uniqueKey);
 			
@@ -396,12 +401,11 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performInsertItem() {
+		protected JiemamyEntity performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
-			JiemamyFactory factory = jiemamy.getFactory();
-			UniqueKey uniqueKey = factory.newModel(UniqueKey.class);
+			UniqueKeyConstraintModel uniqueKey = new DefaultUniqueKeyConstraintModel(null, null, null, null, null);
 			
 			if (index < 0 || index > table.getItemCount()) {
 				jiemamyFacade.addAttribute(tableModel, uniqueKey);
@@ -460,7 +464,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performRemoveItem() {
+		protected JiemamyEntity performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();
@@ -481,7 +485,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			}
 			table.setFocus();
 			
-			return (JiemamyElement) subject;
+			return (JiemamyEntity) subject;
 		}
 		
 		private void updateModel() {
@@ -494,10 +498,10 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			JiemamyFactory factory = jiemamy.getFactory();
 			LocalKeyConstraint localKey = tableModel.findAttributes(LocalKeyConstraint.class).get(editIndex);
 			localKey.setName(JiemamyPropertyUtil.careNull(txtKeyConstraintName.getText(), true));
-			List<ColumnRef> keyColumns = localKey.getKeyColumns();
+			List<EntityRef<? extends ColumnModel>> keyColumns = localKey.getKeyColumns();
 			keyColumns.clear();
 			for (int selectionIndex : lstKeyColumns.getSelectionIndices()) {
-				ColumnModel columnModel = tableModel.findColumns().get(selectionIndex);
+				ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);
 				keyColumns.add(factory.newReference(columnModel));
 			}
 		}

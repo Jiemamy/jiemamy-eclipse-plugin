@@ -24,6 +24,7 @@ import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.CellEditor;
 
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
 
 /**
  * エンティティのダイレクト編集マネージャ。

@@ -24,6 +24,7 @@ import org.eclipse.gef.editpolicies.BendpointEditPolicy;
 import org.eclipse.gef.requests.BendpointRequest;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.CreateBendpointCommand;
 import org.jiemamy.eclipse.editor.command.DeleteBendpointCommand;
 import org.jiemamy.eclipse.editor.command.MoveBendpointCommand;

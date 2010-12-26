@@ -18,6 +18,8 @@
  */
 package org.jiemamy.eclipse.editor;
 
+import java.util.UUID;
+
 import org.eclipse.gef.palette.CombinedTemplateCreationEntry;
 import org.eclipse.gef.palette.ConnectionCreationToolEntry;
 import org.eclipse.gef.palette.MarqueeToolEntry;
@@ -31,12 +33,12 @@ import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gef.requests.CreationFactory;
 import org.eclipse.jface.resource.ImageRegistry;
 
-import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
-import org.jiemamy.eclipse.utils.EditorUtil;
-import org.jiemamy.model.dbo.TableModel;
-import org.jiemamy.model.dbo.ViewModel;
+import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.attribute.constraint.DefaultForeignKeyConstraintModel;
+import org.jiemamy.model.dbo.DefaultTableModel;
+import org.jiemamy.model.dbo.DefaultViewModel;
 
 /**
  * エディタパレットのファクトリー
@@ -128,22 +130,34 @@ public final class DiagramEditorPaletteFactory {
 	private static PaletteContainer createEntityDrawer(PaletteRoot palette) {
 		PaletteDrawer drawer = new PaletteDrawer("エンティティ"); // RESOURCE
 		
-		CombinedTemplateCreationEntry tableCreationEntry =
-				new CombinedTemplateCreationEntry(
-						"テーブル", // RESOURCE
-						"新しいテーブルを作成します", // RESOURCE
-						new JiemamyModelCreationFactory(TableModel.class),
-						imageRegistry.getDescriptor(Images.BUTTON_TABLE),
-						imageRegistry.getDescriptor(Images.BUTTON_TABLE));
+		CombinedTemplateCreationEntry tableCreationEntry = new CombinedTemplateCreationEntry("テーブル", // RESOURCE
+				"新しいテーブルを作成します", // RESOURCE
+				new CreationFactory() {
+					
+					public Object getNewObject() {
+						return new DefaultTableModel(UUID.randomUUID());
+					}
+					
+					public Object getObjectType() {
+						return DefaultTableModel.class;
+					}
+					
+				}, imageRegistry.getDescriptor(Images.BUTTON_TABLE), imageRegistry.getDescriptor(Images.BUTTON_TABLE));
 		drawer.add(tableCreationEntry);
 		
-		CombinedTemplateCreationEntry viewCreationEntry =
-				new CombinedTemplateCreationEntry(
-						"ビュー", // RESOURCE
-						"新しいビューを作成します。", // RESOURCE
-						new JiemamyModelCreationFactory(ViewModel.class),
-						imageRegistry.getDescriptor(Images.BUTTON_VIEW),
-						imageRegistry.getDescriptor(Images.BUTTON_VIEW));
+		CombinedTemplateCreationEntry viewCreationEntry = new CombinedTemplateCreationEntry("ビュー", // RESOURCE
+				"新しいビューを作成します。", // RESOURCE
+				new CreationFactory() {
+					
+					public Object getNewObject() {
+						return new DefaultViewModel(UUID.randomUUID());
+					}
+					
+					public Object getObjectType() {
+						return DefaultViewModel.class;
+					}
+					
+				}, imageRegistry.getDescriptor(Images.BUTTON_VIEW), imageRegistry.getDescriptor(Images.BUTTON_VIEW));
 		drawer.add(viewCreationEntry);
 		
 		return drawer;
@@ -152,13 +166,19 @@ public final class DiagramEditorPaletteFactory {
 	private static PaletteContainer createOtherDrawer(PaletteRoot palette) {
 		PaletteDrawer drawer = new PaletteDrawer("その他"); // RESOURCE
 		
-		CombinedTemplateCreationEntry stickyCreationEntry =
-				new CombinedTemplateCreationEntry(
-						"メモ", // RESOURCE
-						"新しいメモを作成します。", // RESOURCE
-						new JiemamyModelCreationFactory(StickyModel.class),
-						imageRegistry.getDescriptor(Images.BUTTON_VIEW),
-						imageRegistry.getDescriptor(Images.BUTTON_VIEW));
+		CombinedTemplateCreationEntry stickyCreationEntry = new CombinedTemplateCreationEntry("メモ", // RESOURCE
+				"新しいメモを作成します。", // RESOURCE
+				new CreationFactory() {
+					
+					public Object getNewObject() {
+						return new StickyNodeModel(UUID.randomUUID());
+					}
+					
+					public Object getObjectType() {
+						return StickyNodeModel.class;
+					}
+					
+				}, imageRegistry.getDescriptor(Images.BUTTON_VIEW), imageRegistry.getDescriptor(Images.BUTTON_VIEW));
 		drawer.add(stickyCreationEntry);
 		
 		return drawer;
@@ -167,11 +187,21 @@ public final class DiagramEditorPaletteFactory {
 	private static PaletteContainer createRelationDrawer(PaletteRoot palette) {
 		PaletteDrawer drawer = new PaletteDrawer("コネクション"); // RESOURCE
 		
-		ConnectionCreationToolEntry foreignKeyCreationEntry =
-				new ConnectionCreationToolEntry("外部キー", // RESOURCE
-						"新しい外部キーを定義します。", // RESOURCE
-						new JiemamyModelCreationFactory(ForeignKey.class),
-						imageRegistry.getDescriptor(Images.BUTTON_FK), imageRegistry.getDescriptor(Images.BUTTON_FK));
+		ConnectionCreationToolEntry foreignKeyCreationEntry = new ConnectionCreationToolEntry("外部キー", // RESOURCE
+				"新しい外部キーを定義します。", // RESOURCE
+				new CreationFactory() {
+					
+					public Object getNewObject() {
+						// FIXME
+						return new DefaultForeignKeyConstraintModel(UUID.randomUUID(), null, null, null, null, null,
+								null, null, null, null);
+					}
+					
+					public Object getObjectType() {
+						return DefaultTableModel.class;
+					}
+					
+				}, imageRegistry.getDescriptor(Images.BUTTON_FK), imageRegistry.getDescriptor(Images.BUTTON_FK));
 		drawer.add(foreignKeyCreationEntry);
 		
 		return drawer;
@@ -183,35 +213,4 @@ public final class DiagramEditorPaletteFactory {
 	private DiagramEditorPaletteFactory() {
 	}
 	
-
-	/**
-	 * Jiemamyのモデルインスタンスを生成するファクトリ。
-	 * 
-	 * @author daisuke
-	 */
-	private static class JiemamyModelCreationFactory implements CreationFactory {
-		
-		private Class<? extends JiemamyElement> type;
-		
-
-		/**
-		 * インスタンスを生成する。
-		 * 
-		 * @param type 生成するモデルの型
-		 */
-		public JiemamyModelCreationFactory(Class<? extends JiemamyElement> type) {
-			this.type = type;
-		}
-		
-		public Object getNewObject() {
-			JiemamyEditor activeEditor = (JiemamyEditor) EditorUtil.getActiveEditor();
-			JiemamyContext rootModel = activeEditor.getJiemamyContext();
-			return rootModel.getJiemamy().getFactory().newModel(type);
-		}
-		
-		public Object getObjectType() {
-			return type;
-		}
-		
-	}
 }

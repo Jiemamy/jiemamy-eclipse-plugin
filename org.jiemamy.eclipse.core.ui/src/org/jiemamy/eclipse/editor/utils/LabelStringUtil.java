@@ -55,8 +55,7 @@ public class LabelStringUtil {
 	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
 	 */
-	public static String getString(JiemamyContext rootModel, DataType dataType, DisplayPlace place) {
-		ReferenceResolver resolver = rootModel.getJiemamy().getReferenceResolver();
+	public static String getString(JiemamyContext context, DataType dataType, DisplayPlace place) {
 		try {
 			Dialect dialect = rootModel.findDialect();
 			List<Token> tokens = dialect.getDataTypeResolver().resolveDataType(dataType, resolver);
@@ -78,10 +77,10 @@ public class LabelStringUtil {
 	}
 	
 	/**
-	 * JiemamyElementに対する表示用文字列を取得する。
+	 * JiemamyEntityに対する表示用文字列を取得する。
 	 * 
 	 * @param context ルートモデル
-	 * @param targetElement 表示対象JiemamyElement
+	 * @param targetElement 表示対象JiemamyEntity
 	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
 	 */
@@ -103,7 +102,7 @@ public class LabelStringUtil {
 				sb.append(primaryKey.getName());
 			}
 			sb.append("(");
-			sb.append(KeyConstraintUtil.toStringKeyColumns(primaryKey));
+			sb.append(primaryKey.getKeyColumns().toString());
 			sb.append(")");
 			return sb.toString();
 		} else if (targetElement instanceof ForeignKeyConstraintModel) {

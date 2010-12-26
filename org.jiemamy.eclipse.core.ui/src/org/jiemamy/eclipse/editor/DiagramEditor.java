@@ -23,7 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EventObject;
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.collect.Lists;
@@ -96,9 +96,8 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.JiemamyEntity;
+import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
-import org.jiemamy.eclipse.EclipseDialectProvider;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.editor.editpart.DiagramEditPartFactory;
 import org.jiemamy.eclipse.editor.editpart.OutlineTreeEditPartFactory;
@@ -251,7 +250,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 		ByteArrayInputStream in = null;
 		try {
 			out = new ByteArrayOutputStream();
-			context.getSerializer().serialize(context, out);
+			JiemamyContext.findSerializer().serialize(context, out);
 			
 			in = new ByteArrayInputStream(out.toByteArray());
 			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
@@ -290,7 +289,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 							ByteArrayInputStream in = null;
 							try {
 								out = new ByteArrayOutputStream();
-								context.getSerializer().serialize(context, out);
+								JiemamyContext.findSerializer().serialize(context, out);
 								
 								in = new ByteArrayInputStream(out.toByteArray());
 								file.create(in, true, monitor);
@@ -342,7 +341,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 		return tabIndex;
 	}
 	
-	public JiemamyEntity getTargetModel() {
+	public JiemamyContext getTargetModel() {
 		return context;
 	}
 	
@@ -350,18 +349,13 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);
 		
-		context = Jiemamy.newInstance(new Artemis(new ArtemisView()), new EclipseDialectProvider());
+		context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 		
 		// FIXME 無差別ディスパッチになってる。
 		context.getEventBroker().setStrategy(new DispatchStrategy() {
 			
 			public boolean needToDispatch(CommandListener listener, Command command) {
 				return true;
-			}
-			
-			public boolean needToDispatch(CommandListener arg0, Command arg1) {
-				// TODO Auto-generated method stub
-				return false;
 			}
 			
 		});
@@ -550,8 +544,8 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 		// 最上位モデルの設定
 		IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 		try {
-			context = context.getSerializer().deserialize(file.getContents());
-			context.normalize();
+			context = JiemamyContext.findSerializer().deserialize(file.getContents());
+//			context.normalize();
 		} catch (SerializationException e) {
 			ExceptionHandler.handleException(e, "Data file is broken.");
 		} catch (CoreException e) {
@@ -560,22 +554,18 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e);
 		} finally {
-			JiemamyFactory factory = context.getFactory();
-			if (context == null) {
-				context = factory.getJiemamyContext();
-			}
 			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
-			if (diagramPresentations.size() < 1) {
+			if (diagramPresentations.getDiagrams().size() < 1) {
 				DefaultDiagramModel presentationModel = new DefaultDiagramModel(UUID.randomUUID());
 				presentationModel.setName("default");
-				diagramPresentations.add(presentationModel);
+				diagramPresentations.store(presentationModel);
 			}
 		}
 		
 		// 初回のバリデータ起動
 		commandExecuted(null);
 		
-		SortedSet<DatabaseObjectModel> entities = context.getEntities();
+		Set<DatabaseObjectModel> entities = context.getDatabaseObjects();
 		for (DatabaseObjectModel entityModel : entities) {
 			entityModel.registerAdapter(new EntityPropertySource(entityModel));
 //			if (entityModel instanceof TableModel) {
@@ -740,11 +730,5 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 			// グラフィカル・エディタのルート・モデルをツリー・ビューワにも設定
 			setContents(context);
 		}
-	}
-	
-
-	public void commandExecuted(Command arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

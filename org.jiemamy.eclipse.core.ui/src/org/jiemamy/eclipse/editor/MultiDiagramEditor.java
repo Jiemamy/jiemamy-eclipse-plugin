@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SqlFacet;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DiagramModel;
@@ -87,7 +88,7 @@ public class MultiDiagramEditor extends MultiPageEditorPart implements IResource
 		ByteArrayInputStream in = null;
 		try {
 			out = new ByteArrayOutputStream();
-			context.getSerializer().serialize(context, out);
+			JiemamyContext.findSerializer().serialize(context, out);
 			
 			in = new ByteArrayInputStream(out.toByteArray());
 			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
@@ -129,7 +130,7 @@ public class MultiDiagramEditor extends MultiPageEditorPart implements IResource
 							ByteArrayInputStream in = null;
 							try {
 								out = new ByteArrayOutputStream();
-								context.getSerializer().serialize(context, out);
+								JiemamyContext.findSerializer().serialize(context, out);
 								
 								in = new ByteArrayInputStream(out.toByteArray());
 								file.create(in, true, monitor);
@@ -183,28 +184,24 @@ public class MultiDiagramEditor extends MultiPageEditorPart implements IResource
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);
 		
-		context = Jiemamy.newInstance(new Artemis(new ArtemisView()));
+		context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 		
 		// 最上位モデルの設定
 		IFile file = ((IFileEditorInput) input).getFile();
 		try {
-			context = context.getSerializer().deserialize(file.getContents());
-			context.normalize();
+			context = JiemamyContext.findSerializer().deserialize(file.getContents());
+//			context.normalize();
 //			rootModel.setDisplayMode(DatabaseModel.MODE_PHYSICAL_ATTRTYPE);
 		} catch (SerializationException e) {
 			ExceptionHandler.handleException(e, "Data file is broken.");
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e);
 		} finally {
-			JiemamyFactory factory = context.getFactory();
-			if (context == null) {
-				context = factory.getJiemamyContext();
-			}
 			DiagramFacet presentations = context.getFacet(DiagramFacet.class);
-			if (presentations.size() == 0) {
+			if (presentations.getDiagrams().size() == 0) {
 				DefaultDiagramModel presentationModel = new DefaultDiagramModel(UUID.randomUUID());
 				presentationModel.setName("default");
-				presentations.add(presentationModel);
+				presentations.store(presentationModel);
 			}
 		}
 		setPartName(input.getName());

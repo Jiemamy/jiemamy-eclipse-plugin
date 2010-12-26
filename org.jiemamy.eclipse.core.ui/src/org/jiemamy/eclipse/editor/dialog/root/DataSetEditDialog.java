@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.CommonMessages;
 import org.jiemamy.eclipse.ui.JiemamyEditDialog;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
@@ -125,8 +126,8 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 		tabFolder.setMenu(menu);
 		menu.addMenuListener(new TabMenuListener(dataSetModel, menu));
 		
-		Set<TableRef> tableRefs = dataSetModel.getRecords().keySet();
-		for (TableRef tableRef : tableRefs) {
+		Set<EntityRef<? extends TableModel>> tableRefs = dataSetModel.getRecords().keySet();
+		for (EntityRef<? extends TableModel> tableRef : tableRefs) {
 			TableModel tableModel = referenceResolver.resolve(tableRef);
 			if (tableModel == null) {
 				logger.warn("");
@@ -190,15 +191,15 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 		
 		if (csv.exists()) {
 			boolean result =
-					MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_export_title, NLS.bind(
-							CommonMessages.Common_fileOverwrite, csv.getPath()));
+					MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_export_title,
+							NLS.bind(CommonMessages.Common_fileOverwrite, csv.getPath()));
 			if (result == false) {
 				return;
 			}
 			
 			if (csv.canWrite() == false) {
-				MessageDialog.openError(getShell(), Messages.DataSetEditDialog_export_title, NLS.bind(
-						CommonMessages.Common_fileWriteFailed, csv.getPath()));
+				MessageDialog.openError(getShell(), Messages.DataSetEditDialog_export_title,
+						NLS.bind(CommonMessages.Common_fileWriteFailed, csv.getPath()));
 				return;
 			}
 		}
@@ -247,14 +248,14 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 		
 		File csv = new File(filename);
 		if (csv.exists() == false) {
-			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title, NLS.bind(
-					CommonMessages.Common_fileNotFound, csv.getPath()));
+			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title,
+					NLS.bind(CommonMessages.Common_fileNotFound, csv.getPath()));
 			return;
 		}
 		
 		if (csv.canRead() == false) {
-			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title, NLS.bind(
-					CommonMessages.Common_fileNotReadable, csv.getPath()));
+			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title,
+					NLS.bind(CommonMessages.Common_fileNotReadable, csv.getPath()));
 			return;
 		}
 		
@@ -272,8 +273,8 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 		try {
 			DataSetUtil.importFromCsv(dataSetModel, tableModel, new FileInputStream(csv));
 		} catch (FileNotFoundException e) {
-			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title, NLS.bind(
-					CommonMessages.Common_fileNotFound, csv.getPath()));
+			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title,
+					NLS.bind(CommonMessages.Common_fileNotFound, csv.getPath()));
 			ExceptionHandler.handleException(e);
 		} catch (IOException e) {
 			ExceptionHandler.handleException(e);
@@ -324,7 +325,7 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 				public void widgetSelected(SelectionEvent evt) {
 					JiemamyFactory factory = dataSetModel.getJiemamy().getFactory();
 					JiemamyContext rootModel = factory.getJiemamyContext();
-					Collection<TableModel> tables = rootModel.findEntities(TableModel.class);
+					Collection<TableModel> tables = rootModel.getTables();
 					List<TableModel> list = IteratorUtils.toList(tables.iterator());
 					TableSelectDialog dialog = new TableSelectDialog(getShell(), list);
 					dialog.open();
@@ -343,8 +344,8 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 					TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex());
 					TableModel tableModel = (TableModel) item.getData();
 					boolean result =
-							MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_title, NLS.bind(
-									Messages.DataSetEditDialog_deleteTable_confirm, tableModel.getName()));
+							MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_title,
+									NLS.bind(Messages.DataSetEditDialog_deleteTable_confirm, tableModel.getName()));
 					if (result == false) {
 						return;
 					}

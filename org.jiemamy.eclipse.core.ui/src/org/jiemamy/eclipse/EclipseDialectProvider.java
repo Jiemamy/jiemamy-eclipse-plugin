@@ -20,6 +20,7 @@ package org.jiemamy.eclipse;
 
 import org.eclipse.core.runtime.CoreException;
 
+import org.jiemamy.ServiceLocator;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
 
@@ -28,11 +29,11 @@ import org.jiemamy.eclipse.utils.ExceptionHandler;
  * 
  * @author daisuke
  */
-public class EclipseDialectProvider implements InstanceProvider<Dialect> {
+public class EclipseDialectProvider implements ServiceLocator {
 	
-	public Dialect getInstance(String fqcn) {
+	public <T>T getService(Class<T> clazz, String fqcn) throws ClassNotFoundException {
 		try {
-			return JiemamyCorePlugin.getDialectResolver().getInstance(fqcn);
+			return clazz.cast(JiemamyCorePlugin.getDialectResolver().getInstance(fqcn));
 		} catch (CoreException e) {
 			ExceptionHandler.handleException(e);
 		}

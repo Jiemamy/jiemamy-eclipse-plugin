@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.sticky.StickyEditDialog;
 import org.jiemamy.eclipse.editor.figure.StickyFigure;
@@ -67,7 +69,12 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		super(stickyModel);
 	}
 	
-	public JiemamyElement getTargetModel() {
+	public void commandExecuted(org.jiemamy.transaction.Command command) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public JiemamyEntity getTargetModel() {
 		StickyModel stickyModel = (StickyModel) getModel();
 		return stickyModel;
 	}
@@ -133,8 +140,8 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		JiemamyContext rootModel = (JiemamyContext) editPart.getModel();
 		StickyModel stickyModel = (StickyModel) getModel();
 		
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		NodeProfile nodeProfile = presentation.getNodeProfiles().get(stickyModel);
 		if (nodeProfile == null) {
 			// 表示しない
@@ -157,8 +164,8 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		StickyModel stickyModel = (StickyModel) getModel();
 		StickyFigure stickyFigure = (StickyFigure) figure;
 		
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		NodeProfile nodeProfile = presentation.getNodeProfiles().get(stickyModel);
 		if (nodeProfile == null) {
 			return;

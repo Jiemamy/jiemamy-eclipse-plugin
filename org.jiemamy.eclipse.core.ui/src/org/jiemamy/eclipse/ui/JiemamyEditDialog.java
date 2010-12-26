@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
@@ -49,7 +50,7 @@ import org.jiemamy.utils.collection.CollectionsUtil;
  * @param <T> 編集対象モデルの型
  * @author daisuke
  */
-public abstract class JiemamyEditDialog<T extends JiemamyElement> extends Dialog {
+public abstract class JiemamyEditDialog<T extends JiemamyEntity> extends Dialog {
 	
 	private static final String X = "x"; //$NON-NLS-1$
 	
@@ -72,7 +73,7 @@ public abstract class JiemamyEditDialog<T extends JiemamyElement> extends Dialog
 	private List<AbstractTab> tabs = CollectionsUtil.newArrayList();
 	
 	/** 編集対象モデルの型 */
-	private final Class<? extends JiemamyElement> type;
+	private final Class<? extends JiemamyEntity> type;
 	
 	/**
 	 * 各コントロールに対する編集リスナ
@@ -90,7 +91,7 @@ public abstract class JiemamyEditDialog<T extends JiemamyElement> extends Dialog
 	 * @param type 編集対象モデルの型
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
-	protected JiemamyEditDialog(Shell parentShell, T targetModel, Class<? extends JiemamyElement> type) {
+	protected JiemamyEditDialog(Shell parentShell, T targetModel, Class<? extends JiemamyEntity> type) {
 		super(parentShell);
 		
 		Validate.notNull(targetModel);

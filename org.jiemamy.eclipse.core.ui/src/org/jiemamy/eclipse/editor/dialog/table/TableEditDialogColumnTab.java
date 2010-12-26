@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
@@ -73,8 +74,10 @@ import org.jiemamy.eclipse.ui.helper.TextSelectionAdapter;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
 import org.jiemamy.eclipse.utils.ExceptionHandler;
 import org.jiemamy.model.attribute.ColumnModel;
+import org.jiemamy.model.attribute.constraint.PrimaryKeyConstraintModel;
 import org.jiemamy.model.dbo.DomainModel;
 import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.utils.LogMarker;
@@ -168,8 +171,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			super.dispose();
 		}
 		
-		public JiemamyElement getTargetModel() {
-			return (JiemamyElement) viewer.getInput();
+		public JiemamyEntity getTargetModel() {
+			return (JiemamyEntity) viewer.getInput();
 		}
 		
 		@Override
@@ -253,7 +256,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
-		private final Jiemamy jiemamy;
+		private final JiemamyContext jiemamy;
 		
 		private Dialect dialect;
 		
@@ -283,7 +286,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Map<ColumnModel, TypeOptionManager> typeOptionManagers = CollectionsUtil.newHashMap();
 		
-		private final List<AttributeModel> attributes;
+		private final List<? extends ColumnModel> columns;
 		
 		private TypeOptionHandler typeOptionHandler;
 		
@@ -298,7 +301,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			super(parent, style, new DefaultTableEditorConfig("カラム情報")); // RESOURCE
 			
 			jiemamy = tableModel.getJiemamy();
-			attributes = tableModel.getAttributes();
+			columns = tableModel.getColumns();
 			
 			try {
 				dialect = rootModel.findDialect();
@@ -309,7 +312,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			
 			assert jiemamy != null;
-			assert attributes != null;
+			assert columns != null;
 			assert dialect != null;
 		}
 		
@@ -408,7 +411,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			tableViewer.setLabelProvider(new ColumnLabelProvider());
 			final ColumnContentProvider contentProvider = new ColumnContentProvider();
 			tableViewer.setContentProvider(contentProvider);
-			tableViewer.setInput(attributes);
+			tableViewer.setInput(columns);
 			tableViewer.addFilter(new ViewerFilter() {
 				
 				@Override
@@ -443,11 +446,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			
 			typeOptionManagers.clear();
-			for (AttributeModel attributeModel : attributes) {
-				if ((attributeModel instanceof ColumnModel) == false) {
-					continue;
-				}
-				ColumnModel columnModel = (ColumnModel) attributeModel;
+			for (ColumnModel columnModel : columns) {
 				TypeOptionManager typeOptionManager =
 						new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
 				typeOptionManagers.put(columnModel, typeOptionManager);
@@ -658,12 +657,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performAddItem() {
+		protected JiemamyEntity performAddItem() {
 			Table table = getTableViewer().getTable();
 			JiemamyFactory factory = jiemamy.getFactory();
 			ColumnModel columnModel = factory.newModel(ColumnModel.class);
 			
-			String newName = "COLUMN_" + (tableModel.findColumns().size() + 1);
+			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			jiemamyFacade.changeModelProperty(columnModel, AttributeProperty.name, newName);
 			
 			DataType builtinDataType = factory.newDataType(allTypes.get(0));
@@ -675,7 +674,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
 			typeOptionManagers.put(columnModel, typeOptionManager);
 			
-			int addedIndex = tableModel.findColumns().indexOf(columnModel);
+			int addedIndex = tableModel.getColumns().indexOf(columnModel);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtColumnName.setFocus();
@@ -684,13 +683,13 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performInsertItem() {
+		protected JiemamyEntity performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
 			JiemamyFactory factory = jiemamy.getFactory();
 			ColumnModel columnModel = factory.newModel(ColumnModel.class);
-			String newName = "COLUMN_" + (tableModel.findColumns().size() + 1);
+			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			jiemamyFacade.changeModelProperty(columnModel, AttributeProperty.name, newName);
 			
 			DataType builtinDataType = factory.newDataType(allTypes.get(0));
@@ -699,8 +698,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			if (index < 0 || index > table.getItemCount()) {
 				jiemamyFacade.addAttribute(tableModel, columnModel);
 			} else {
-				AttributeModel subject = (AttributeModel) getTableViewer().getElementAt(index);
-				int subjectIndex = attributes.indexOf(subject);
+				ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
+				int subjectIndex = columns.indexOf(subject);
 				jiemamyFacade.addAttribute(tableModel, subjectIndex, columnModel);
 			}
 			
@@ -708,7 +707,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
 			typeOptionManagers.put(columnModel, typeOptionManager);
 			
-			int addedIndex = tableModel.findColumns().indexOf(columnModel);
+			int addedIndex = tableModel.getColumns().indexOf(columnModel);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtColumnName.setFocus();
@@ -757,7 +756,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performRemoveItem() {
+		protected JiemamyEntity performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();
@@ -765,7 +764,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return null;
 			}
 			
-			AttributeModel subject = (AttributeModel) getTableViewer().getElementAt(index);
+			ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
 			jiemamyFacade.removeAttribute(tableModel, subject);
 			
 			tableViewer.remove(subject);
@@ -846,7 +845,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			ColumnModel columnModel = tableModel.findColumns().get(columnEditIndex);
+			ColumnModel columnModel = tableModel.getColumns().get(columnEditIndex);
 			
 			JiemamyFactory factory = columnModel.getJiemamy().getFactory();
 			
@@ -872,9 +871,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				jiemamyFacade.changeModelProperty(columnModel, ColumnProperty.notNullConstraint, nnConstraint);
 			}
 			
-			PrimaryKey primaryKey = null;
+			PrimaryKeyConstraintModel primaryKey = null;
 			try {
-				primaryKey = tableModel.findPrimaryKey();
+				primaryKey = tableModel.getPrimaryKey();
 			} catch (ElementNotFoundException e) {
 				// ignore
 			}

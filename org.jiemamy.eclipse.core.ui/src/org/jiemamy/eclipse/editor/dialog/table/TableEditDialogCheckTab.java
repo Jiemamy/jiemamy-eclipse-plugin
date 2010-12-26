@@ -18,7 +18,7 @@
  */
 package org.jiemamy.eclipse.editor.dialog.table;
 
-import java.util.List;
+import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -43,13 +43,19 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.editor.dialog.AbstractEditListener;
 import org.jiemamy.eclipse.editor.dialog.EditListener;
 import org.jiemamy.eclipse.ui.AbstractTableEditor;
 import org.jiemamy.eclipse.ui.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.ui.helper.TextSelectionAdapter;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
+import org.jiemamy.model.attribute.constraint.CheckConstraintModel;
+import org.jiemamy.model.attribute.constraint.ConstraintModel;
+import org.jiemamy.model.attribute.constraint.DefaultCheckConstraintModel;
 import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.utils.LogMarker;
@@ -124,8 +130,8 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			super.dispose();
 		}
 		
-		public JiemamyElement getTargetModel() {
-			return (JiemamyElement) viewer.getInput();
+		public JiemamyEntity getTargetModel() {
+			return (JiemamyEntity) viewer.getInput();
 		}
 		
 		@Override
@@ -153,11 +159,11 @@ public class TableEditDialogCheckTab extends AbstractTab {
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			if ((element instanceof TableCheckConstraint) == false) {
+			if ((element instanceof CheckConstraintModel) == false) {
 				return StringUtils.EMPTY;
 			}
 			
-			TableCheckConstraint check = (TableCheckConstraint) element;
+			CheckConstraintModel check = (CheckConstraintModel) element;
 			switch (columnIndex) {
 				case 0:
 					return check.getName();
@@ -179,13 +185,13 @@ public class TableEditDialogCheckTab extends AbstractTab {
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
-		private final Jiemamy jiemamy;
+		private final JiemamyContext jiemamy;
 		
 		private Text txtCheckName;
 		
 		private Text txtCheckExpression;
 		
-		private final List<AttributeModel> attributes;
+		private final SortedSet<? extends ConstraintModel> attributes;
 		
 
 		/**
@@ -198,7 +204,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			super(parent, style, new DefaultTableEditorConfig("チェック制約情報")); // RESOURCE
 			
 			jiemamy = tableModel.getJiemamy();
-			attributes = tableModel.getAttributes();
+			attributes = tableModel.getConstraints();
 			
 			assert jiemamy != null;
 			assert attributes != null;
@@ -257,7 +263,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 				
 				@Override
 				public boolean select(Viewer viewer, Object parentElement, Object element) {
-					return element instanceof TableCheckConstraint;
+					return element instanceof CheckConstraintModel;
 				}
 				
 			});
@@ -321,7 +327,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			CheckConstraint checkConstraint = (CheckConstraint) getTableViewer().getElementAt(index);
+			CheckConstraintModel checkConstraint = (CheckConstraintModel) getTableViewer().getElementAt(index);
 			
 			txtCheckName.setEnabled(true);
 			txtCheckExpression.setEnabled(true);
@@ -332,10 +338,10 @@ public class TableEditDialogCheckTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performAddItem() {
+		protected JiemamyEntity performAddItem() {
 			Table table = getTableViewer().getTable();
 			JiemamyFactory factory = jiemamy.getFactory();
-			TableCheckConstraint checkConstraint = factory.newModel(TableCheckConstraint.class);
+			CheckConstraintModel checkConstraint = new DefaultCheckConstraintModel(null, null, null, null, null);
 			
 			jiemamyFacade.addAttribute(tableModel, checkConstraint);
 			
@@ -348,7 +354,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performInsertItem() {
+		protected JiemamyEntity performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
@@ -382,8 +388,8 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			Object subject = getTableViewer().getElementAt(index);
 			Object object = getTableViewer().getElementAt(index + 1);
 			
-			int subjectIndex = tableModel.getAttributes().indexOf(subject);
-			int objectIndex = tableModel.getAttributes().indexOf(object);
+			int subjectIndex = tableModel.getConstraints().indexOf(subject);
+			int objectIndex = tableModel.getConstraints().indexOf(object);
 			
 			jiemamyFacade.swapListElement(tableModel, tableModel.getAttributes(), subjectIndex, objectIndex);
 			
@@ -412,7 +418,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyElement performRemoveItem() {
+		protected JiemamyEntity performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();
@@ -433,7 +439,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			}
 			table.setFocus();
 			
-			return (JiemamyElement) subject;
+			return (JiemamyEntity) subject;
 		}
 		
 		private void updateModel() {
@@ -442,7 +448,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			if (editIndex == -1) {
 				return;
 			}
-			CheckConstraint checkConstraint = tableModel.findAttributes(TableCheckConstraint.class).get(editIndex);
+			CheckConstraintModel checkConstraint = tableModel.getConstraints().get(editIndex);
 			
 			String checkName = JiemamyPropertyUtil.careNull(txtCheckName.getText(), true);
 			jiemamyFacade.changeModelProperty(checkConstraint, ConstraintProperty.name, checkName);

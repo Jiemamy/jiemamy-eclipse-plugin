@@ -97,25 +97,22 @@ public abstract class AbstractMovePositionCommand extends Command {
 		JiemamyEditor editor = (JiemamyEditor) EditorUtil.getActiveEditor();
 		JiemamyContext rootModel = editor.getJiemamyContext();
 		
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.get(diagramIndex);
-		for (NodeModel node : presentation.getNodeProfiles().keySet()) {
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
+		for (NodeModel node : presentation.getNodes()) {
 			// エンティティの移動
-			NodeProfile nodeProfile = presentation.getNodeProfiles().get(node);
-			JmRectangle old = nodeProfile.getBoundary();
+			JmRectangle old = node.getBoundary();
 			JmRectangle newBoundary;
 			if (negative) {
 				newBoundary = new JmRectangle(old.x - shift.x, old.y - shift.y, old.width, old.height);
 			} else {
 				newBoundary = new JmRectangle(old.x + shift.x, old.y + shift.y, old.width, old.height);
 			}
-			jiemamyFacade.changeModelProperty(nodeProfile, NodeProfileProperty.boundary, newBoundary);
+			jiemamyFacade.changeModelProperty(node, NodeProfileProperty.boundary, newBoundary);
 			
 			// ベンドポイントの移動
 			for (ConnectionModel connection : node.getSourceConnections()) {
-				ConnectionProfile connectionProfile = presentation.getConnectionProfiles().get(connection);
-				
-				List<JmPoint> bendpoints = connectionProfile.getBendpoints();
+				List<JmPoint> bendpoints = connection.getBendpoints();
 				for (JmPoint bendpoint : bendpoints) {
 					JmPoint newLocation;
 					if (negative) {

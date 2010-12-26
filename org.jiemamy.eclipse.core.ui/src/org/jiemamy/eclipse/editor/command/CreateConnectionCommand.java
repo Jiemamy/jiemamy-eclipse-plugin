@@ -102,7 +102,7 @@ public class CreateConnectionCommand extends Command {
 		}
 		
 		// カラムが1つもないテーブルからは外部キーが貼れない
-		if (((TableModel) source.unwrap()).findColumns().size() < 1) {
+		if (((TableModel) source.unwrap()).getColumns().size() < 1) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_03);
 			return false;
 		}
@@ -194,7 +194,7 @@ public class CreateConnectionCommand extends Command {
 	private LocalKeyConstraint getKey(TableModel tableModel) {
 		LocalKeyConstraint key = null;
 		try {
-			key = tableModel.findPrimaryKey();
+			key = tableModel.getPrimaryKey();
 		} catch (ElementNotFoundException e) {
 			List<LocalKeyConstraint> attributes = tableModel.findAttributes(LocalKeyConstraint.class);
 			if (attributes.size() > 0) {

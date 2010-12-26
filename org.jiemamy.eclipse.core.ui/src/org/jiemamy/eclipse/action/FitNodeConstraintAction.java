@@ -24,6 +24,7 @@ import org.eclipse.gef.commands.CommandStack;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.ChangeNodeConstraintCommand;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
@@ -56,7 +57,7 @@ public class FitNodeConstraintAction extends AbstractJiemamyAction {
 			NodeModel nodeAdapter = (NodeModel) model;
 			CommandStack stack = getViewer().getEditDomain().getCommandStack();
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.get(Migration.DIAGRAM_INDEX);
+			DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 			JmRectangle boundary = presentation.getNodeProfiles().get(nodeAdapter).getBoundary();
 			
 			JmRectangle newBoundary = new JmRectangle(boundary.x, boundary.y, -1, -1);

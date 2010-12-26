@@ -20,7 +20,6 @@ package org.jiemamy.eclipse.editor.editpart.diagram;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.AbsoluteBendpoint;
@@ -33,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.editpolicy.JmBendpointEditPolicy;
 import org.jiemamy.eclipse.editor.editpolicy.JmConnectionEditPolicy;
 import org.jiemamy.model.ConnectionModel;
@@ -113,19 +113,17 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 			return;
 		}
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getAdapter(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.get(Migration.DIAGRAM_INDEX);
-		Map<ConnectionModel, ConnectionProfile> connectionProfiles = diagramPresentationModel.getConnectionProfiles();
+		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		ConnectionModel connection = getModel();
 		
-		ConnectionProfile connectionProfile = diagramPresentationModel.getConnectionProfiles().get(connection);
-		if (connectionProfile == null) {
+		if (connection == null) {
 			return;
 		}
-		List<JmPoint> bendpoints = connectionProfile.getBendpoints();
-		if (connectionProfiles.containsKey(connection) == false) {
-			bendpoints.clear();
-		}
+		List<JmPoint> bendpoints = connection.getBendpoints();
+//		if (connection.containsKey(connection) == false) {
+//			bendpoints.clear();
+//		}
 		List<AbsoluteBendpoint> constraint = new ArrayList<AbsoluteBendpoint>(bendpoints.size());
 		
 		for (JmPoint bendpoint : bendpoints) {

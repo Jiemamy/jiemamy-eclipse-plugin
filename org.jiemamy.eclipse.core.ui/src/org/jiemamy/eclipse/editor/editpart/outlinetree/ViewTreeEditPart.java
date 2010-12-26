@@ -32,6 +32,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
+import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.DisplayPlace;
 import org.jiemamy.eclipse.editor.command.DialogEditCommand;
 import org.jiemamy.eclipse.editor.dialog.view.ViewEditDialog;
@@ -60,6 +61,11 @@ public class ViewTreeEditPart extends AbstractEntityTreeEditPart {
 	public ViewTreeEditPart(ViewModel viewModel) {
 		Validate.notNull(viewModel);
 		setModel(viewModel);
+	}
+	
+	public void commandExecuted(org.jiemamy.transaction.Command arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	@Override
@@ -121,10 +127,5 @@ public class ViewTreeEditPart extends AbstractEntityTreeEditPart {
 		
 		ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 		setWidgetImage(ir.get(Images.ICON_VIEW));
-	}
-	
-	public void commandExecuted(org.jiemamy.transaction.Command arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }

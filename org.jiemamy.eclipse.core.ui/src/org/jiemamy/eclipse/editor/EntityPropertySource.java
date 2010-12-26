@@ -27,6 +27,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 import org.jiemamy.eclipse.utils.ExceptionHandler;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
 import org.jiemamy.utils.reflect.ReflectionUtil;
 
 /**
@@ -34,7 +35,6 @@ import org.jiemamy.utils.reflect.ReflectionUtil;
  * 
  * @author daisuke
  */
-@Adapter(AdapterType.LOGIC)
 public class EntityPropertySource implements IPropertySource {
 	
 	private final JiemamyFacade jiemamyFacade;

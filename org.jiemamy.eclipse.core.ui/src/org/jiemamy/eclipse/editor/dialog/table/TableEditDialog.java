@@ -52,6 +52,7 @@ import org.jiemamy.eclipse.ui.tab.TextEditTab;
 import org.jiemamy.eclipse.utils.ConvertUtil;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.attribute.ColumnModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
 import org.jiemamy.model.dbo.TableModel;
 
 /**
@@ -210,7 +211,7 @@ public class TableEditDialog extends JiemamyEditDialog<TableModel> {
 			}
 		}
 		
-		List<ColumnModel> columns = tableModel.findColumns();
+		List<ColumnModel> columns = tableModel.getColumns();
 		Set<String> columnNames = new HashSet<String>(columns.size());
 		for (ColumnModel columnModel : columns) {
 			columnNames.add(columnModel.getName());

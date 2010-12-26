@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 
+import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
 import org.jiemamy.eclipse.ui.JiemamyEditDialog;
@@ -88,8 +89,9 @@ public class ViewEditDialog extends JiemamyEditDialog<ViewModel> {
 	 * @param jiemamyFacade モデル操作に用いるファサード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditDialog(Shell shell, ViewModel viewModel, int diagramIndex, JiemamyViewFacade jiemamyFacade) {
-		super(shell, viewModel, ViewModel.class);
+	public ViewEditDialog(Shell shell, JiemamyContext context, ViewModel viewModel, int diagramIndex,
+			JiemamyViewFacade jiemamyFacade) {
+		super(shell, context, viewModel, ViewModel.class);
 		
 		Validate.notNull(viewModel);
 		Validate.notNull(jiemamyFacade);

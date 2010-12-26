@@ -44,6 +44,7 @@ import org.jiemamy.eclipse.editor.editpolicy.JmComponentEditPolicy;
 import org.jiemamy.eclipse.editor.editpolicy.JmDirectEditPolicy;
 import org.jiemamy.eclipse.editor.editpolicy.JmGraphicalNodeEditPolicy;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.dbo.DatabaseObjectModel;
@@ -114,8 +115,8 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	}
 	
 	@Override
-	public NodeModel getModel() {
-		return (NodeModel) super.getModel();
+	public DefaultNodeModel getModel() {
+		return (DefaultNodeModel) super.getModel();
 	}
 	
 	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
@@ -150,7 +151,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	
 	@Override
 	public void setModel(Object model) {
-		if (model instanceof NodeModel) {
+		if (model instanceof DefaultNodeModel) {
 			super.setModel(model);
 		} else {
 			throw new IllegalArgumentException();

@@ -34,18 +34,20 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 
+import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.Images;
 import org.jiemamy.eclipse.JiemamyUIPlugin;
 import org.jiemamy.eclipse.ui.JiemamyEditDialog;
 import org.jiemamy.eclipse.ui.tab.TextEditTab;
 import org.jiemamy.eclipse.utils.ConvertUtil;
+import org.jiemamy.model.StickyNodeModel;
 
 /**
  * Sticky設定ダイアログクラス。
  * 
  * @author daisuke
  */
-public class StickyEditDialog extends JiemamyEditDialog<StickyModel> {
+public class StickyEditDialog extends JiemamyEditDialog<StickyNodeModel> {
 	
 	private static final Point DEFAULT_SIZE = new Point((int) (370 * 1.618), 370);
 	
@@ -67,8 +69,9 @@ public class StickyEditDialog extends JiemamyEditDialog<StickyModel> {
 	 * @param jiemamyFacade モデル操作に用いるファサード
 	 * @throws IllegalArgumentException 引数stickyModel, jiemamyFacadeに{@code null}を与えた場合
 	 */
-	public StickyEditDialog(Shell shell, StickyModel stickyModel, int diagramIndex, JiemamyViewFacade jiemamyFacade) {
-		super(shell, stickyModel, StickyModel.class);
+	public StickyEditDialog(Shell shell, JiemamyContext context, StickyNodeModel stickyModel, int diagramIndex,
+			JiemamyViewFacade jiemamyFacade) {
+		super(shell, context, stickyModel, StickyNodeModel.class);
 		
 		Validate.notNull(stickyModel);
 		Validate.notNull(jiemamyFacade);
@@ -80,7 +83,7 @@ public class StickyEditDialog extends JiemamyEditDialog<StickyModel> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final StickyModel stickyModel = getTargetModel();
+		final StickyNodeModel stickyModel = getTargetModel();
 		getShell().setText(Messages.Dialog_Title);
 		
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -137,7 +140,7 @@ public class StickyEditDialog extends JiemamyEditDialog<StickyModel> {
 	
 	@Override
 	protected boolean performOk() {
-		StickyModel stickyModel = getTargetModel();
+		StickyNodeModel stickyModel = getTargetModel();
 		
 		String contents = JiemamyPropertyUtil.careNull(tabContents.getTextWidget().getText(), true);
 		jiemamyFacade.changeModelProperty(stickyModel, StickyProperty.contents, contents);

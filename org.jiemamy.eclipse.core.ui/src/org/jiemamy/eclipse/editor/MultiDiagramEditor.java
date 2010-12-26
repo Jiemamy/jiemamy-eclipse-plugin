@@ -197,11 +197,11 @@ public class MultiDiagramEditor extends MultiPageEditorPart implements IResource
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e);
 		} finally {
-			DiagramFacet presentations = context.getFacet(DiagramFacet.class);
-			if (presentations.getDiagrams().size() == 0) {
+			DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
+			if (diagramFacet.getDiagrams().size() == 0) {
 				DefaultDiagramModel presentationModel = new DefaultDiagramModel(UUID.randomUUID());
 				presentationModel.setName("default");
-				presentations.store(presentationModel);
+				diagramFacet.store(presentationModel);
 			}
 		}
 		setPartName(input.getName());

@@ -125,8 +125,8 @@ public class JmContributor extends ActionBarContributor {
 			return;
 		}
 		
-		DiagramFacet presentations = rootModel.getFacet(DiagramFacet.class);
-		DiagramModel presentation = presentations.get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramFacet = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel presentation = diagramFacet.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		for (DisplayStatus displayStatus : DisplayStatus.values()) {
 			if (presentation.getMode() == displayStatus.getMode()
 					&& presentation.getLevel() == displayStatus.getLevel()) {
@@ -239,10 +239,10 @@ public class JmContributor extends ActionBarContributor {
 				if ((editor instanceof JiemamyEditor) == false) {
 					return;
 				}
-				JiemamyContext rootModel = ((JiemamyEditor) editor).getJiemamyContext();
-				DiagramFacet presentations = rootModel.getFacet(DiagramFacet.class);
+				JiemamyContext context = ((JiemamyEditor) editor).getJiemamyContext();
+				DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
 				DefaultDiagramModel presentation =
-						(DefaultDiagramModel) presentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
+						(DefaultDiagramModel) diagramFacet.getDiagrams().get(Migration.DIAGRAM_INDEX);
 				for (DisplayStatus displayStatus : DisplayStatus.values()) {
 					if (displayStatus.ordinal() == index) {
 						presentation.setMode(displayStatus.getMode());

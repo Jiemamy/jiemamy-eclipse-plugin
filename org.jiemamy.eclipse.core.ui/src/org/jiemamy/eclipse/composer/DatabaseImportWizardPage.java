@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -429,7 +430,7 @@ class DatabaseImportWizardPage extends WizardPage {
 		String oldSelection = cmbDriverClass.getText();
 		cmbDriverClass.removeAll();
 		try {
-			List<Class<? extends Driver>> driverClasses = DriverUtil.getDriverClasses(getDriverJarPaths());
+			Collection<Class<? extends Driver>> driverClasses = DriverUtil.getDriverClasses(getDriverJarPaths());
 			for (Class<? extends Driver> clazz : driverClasses) {
 				String className = clazz.getName();
 				cmbDriverClass.add(className);

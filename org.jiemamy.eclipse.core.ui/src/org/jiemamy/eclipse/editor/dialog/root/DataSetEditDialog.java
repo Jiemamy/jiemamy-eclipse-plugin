@@ -98,8 +98,8 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 	 * @param jiemamyFacade 操作に用いるファサード
 	 * @throws IllegalArgumentException 引数rootModel, jiemamyFacadeに{@code null}を与えた場合
 	 */
-	public DataSetEditDialog(Shell shell, DataSetModel dataSetModel, JiemamyFacade jiemamyFacade) {
-		super(shell, dataSetModel, DataSetModel.class);
+	public DataSetEditDialog(Shell shell, JiemamyContext context, DataSetModel dataSetModel, JiemamyFacade jiemamyFacade) {
+		super(shell, context, dataSetModel, DataSetModel.class);
 		
 		Validate.notNull(dataSetModel);
 		Validate.notNull(jiemamyFacade);
@@ -112,8 +112,6 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 	protected Control createDialogArea(Composite parent) {
 		final DataSetModel dataSetModel = getTargetModel();
 		getShell().setText(Messages.DataSetEditDialog_title);
-		
-		ReferenceResolver referenceResolver = dataSetModel.getJiemamy().getReferenceResolver();
 		
 		Composite composite = (Composite) super.createDialogArea(parent);
 		composite.setLayout(new GridLayout(1, false));
@@ -128,7 +126,7 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 		
 		Set<EntityRef<? extends TableModel>> tableRefs = dataSetModel.getRecords().keySet();
 		for (EntityRef<? extends TableModel> tableRef : tableRefs) {
-			TableModel tableModel = referenceResolver.resolve(tableRef);
+			TableModel tableModel = getContext().resolve(tableRef);
 			if (tableModel == null) {
 				logger.warn("");
 				continue;
@@ -323,9 +321,7 @@ public class DataSetEditDialog extends JiemamyEditDialog<DataSetModel> {
 				
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					JiemamyFactory factory = dataSetModel.getJiemamy().getFactory();
-					JiemamyContext rootModel = factory.getJiemamyContext();
-					Collection<TableModel> tables = rootModel.getTables();
+					Collection<TableModel> tables = getContext().getTables();
 					List<TableModel> list = IteratorUtils.toList(tables.iterator());
 					TableSelectDialog dialog = new TableSelectDialog(getShell(), list);
 					dialog.open();

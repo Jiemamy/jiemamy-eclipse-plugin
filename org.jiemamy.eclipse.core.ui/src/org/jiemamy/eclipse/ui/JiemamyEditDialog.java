@@ -82,6 +82,8 @@ public abstract class JiemamyEditDialog<T extends JiemamyEntity> extends Dialog 
 	 */
 	protected final EditListener editListener = new EditListenerImpl();
 	
+	private final JiemamyContext context;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -91,12 +93,15 @@ public abstract class JiemamyEditDialog<T extends JiemamyEntity> extends Dialog 
 	 * @param type 編集対象モデルの型
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
-	protected JiemamyEditDialog(Shell parentShell, T targetModel, Class<? extends JiemamyEntity> type) {
+	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetModel,
+			Class<? extends JiemamyEntity> type) {
 		super(parentShell);
 		
+		Validate.notNull(context);
 		Validate.notNull(targetModel);
 		Validate.notNull(type);
 		
+		this.context = context;
 		this.targetModel = targetModel;
 		this.type = type;
 		
@@ -195,10 +200,8 @@ public abstract class JiemamyEditDialog<T extends JiemamyEntity> extends Dialog 
 		List<AbstractTab> result = CollectionsUtil.newArrayList();
 		ExtensionResolver<Dialect> dialectResolver = JiemamyCorePlugin.getDialectResolver();
 		
-		JiemamyContext rootModel = targetModel.getJiemamy().getFactory().getJiemamyContext();
-		
 		IConfigurationElement dialectElement =
-				dialectResolver.getExtensionConfigurationElements().get(rootModel.getDialectClassName());
+				dialectResolver.getExtensionConfigurationElements().get(context.getDialectClassName());
 		
 		for (IConfigurationElement additionalTabElement : dialectElement.getChildren("additionalTab")) {
 			if (additionalTabElement.getAttribute("target").equals(this.getClass().getName())) {
@@ -211,6 +214,10 @@ public abstract class JiemamyEditDialog<T extends JiemamyEntity> extends Dialog 
 			}
 		}
 		return result;
+	}
+	
+	protected JiemamyContext getContext() {
+		return context;
 	}
 	
 	/**

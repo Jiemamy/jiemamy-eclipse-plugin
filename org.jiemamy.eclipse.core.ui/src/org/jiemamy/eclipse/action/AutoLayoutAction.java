@@ -43,12 +43,13 @@ import org.eclipse.ui.PlatformUI;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.editpart.diagram.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.editor.editpart.diagram.RootEditPart;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmRectangle;
@@ -62,10 +63,10 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 	private static final int PADDING = 40;
 	
 
-	private static Node getNode(List<Node> list, NodeModel model) {
+	private static Node getNode(List<Node> list, EntityRef<? extends NodeModel> ref) {
 		for (Node obj : list) {
 			EntityNode node = (EntityNode) obj;
-			if (node.model == model) {
+			if (ref.isReferenceOf(node.model)) {
 				return node;
 			}
 		}
@@ -165,7 +166,8 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void execute() {
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
+			DefaultDiagramModel presentation =
+					(DefaultDiagramModel) diagramPresentations.getDiagrams().get(diagramIndex);
 			target.setBoundary(new JmRectangle(x, y, -1, -1));
 			presentation.store(target);
 			oldBendpoints.clear();
@@ -179,7 +181,8 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void undo() {
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
+			DefaultDiagramModel presentation =
+					(DefaultDiagramModel) diagramPresentations.getDiagrams().get(diagramIndex);
 			for (ConnectionModel conn : target.getSourceConnections()) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				bendpoints.clear();
@@ -290,7 +293,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			for (EditPart obj : editParts) {
 				if (obj instanceof AbstractJmNodeEditPart) {
 					AbstractJmNodeEditPart editPart = (AbstractJmNodeEditPart) obj;
-					NodeModel model = editPart.getModel();
+					DefaultNodeModel model = editPart.getModel();
 					EntityNode node = new EntityNode();
 					node.model = model;
 					node.width = editPart.getFigure().getSize().width;

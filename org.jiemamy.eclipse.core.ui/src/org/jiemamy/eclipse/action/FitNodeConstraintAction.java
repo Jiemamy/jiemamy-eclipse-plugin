@@ -54,17 +54,16 @@ public class FitNodeConstraintAction extends AbstractJiemamyAction {
 		Object model = getViewer().getFocusEditPart().getModel();
 		
 		if (model instanceof NodeModel) {
-			NodeModel nodeAdapter = (NodeModel) model;
+			NodeModel node = (NodeModel) model;
 			CommandStack stack = getViewer().getEditDomain().getCommandStack();
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
 			DiagramModel presentation = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
-			JmRectangle boundary = presentation.getNodeProfiles().get(nodeAdapter).getBoundary();
+			JmRectangle boundary = node.getBoundary();
 			
 			JmRectangle newBoundary = new JmRectangle(boundary.x, boundary.y, -1, -1);
 			
 			Command command =
-					new ChangeNodeConstraintCommand(rootModel, Migration.DIAGRAM_INDEX, nodeAdapter, newBoundary,
-							getViewer());
+					new ChangeNodeConstraintCommand(rootModel, Migration.DIAGRAM_INDEX, node, newBoundary, getViewer());
 			
 			stack.execute(command);
 		}

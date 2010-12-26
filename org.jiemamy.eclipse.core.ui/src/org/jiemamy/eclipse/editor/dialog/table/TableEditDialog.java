@@ -90,8 +90,9 @@ public class TableEditDialog extends JiemamyEditDialog<TableModel> {
 	 * @param jiemamyFacade 操作に用いるファサード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TableEditDialog(Shell parentShell, TableModel tableModel, int diagramIndex, JiemamyViewFacade jiemamyFacade) {
-		super(parentShell, tableModel, TableModel.class);
+	public TableEditDialog(Shell parentShell, JiemamyContext context, TableModel tableModel, int diagramIndex,
+			JiemamyViewFacade jiemamyFacade) {
+		super(parentShell, context, tableModel, TableModel.class);
 		
 		Validate.notNull(tableModel);
 		Validate.notNull(jiemamyFacade);
@@ -201,9 +202,7 @@ public class TableEditDialog extends JiemamyEditDialog<TableModel> {
 		}
 		
 		TableModel tableModel = getTargetModel();
-		JiemamyContext rootModel = tableModel.getJiemamy().getFactory().getJiemamyContext();
-		
-		Set<DatabaseObjectModel> entities = rootModel.getEntities();
+		Set<DatabaseObjectModel> entities = getContext().getDatabaseObjects();
 		Set<String> entityNames = new HashSet<String>(entities.size());
 		for (DatabaseObjectModel entityModel : entities) {
 			if (entityModel != tableModel) {

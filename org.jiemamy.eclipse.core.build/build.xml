@@ -12,7 +12,7 @@
 	<property name="dest.dir" value="${basedir}/destination" />
 	<property name="eclipse-headless-builder.dir" value="${ws.dir}/eclipse-headless-builder" />
 	<property name="target.dir.pattern" value="org.jiemamy.eclipse.*" />
-	<property name="target.projects" value="org.jiemamy.eclipse.core,org.jiemamy.eclipse.ui" />
+	<property name="target.projects" value="org.jiemamy.eclipse.core,org.jiemamy.eclipse.core.ui" />
 	<!-- SETTINGS END -->
 	
 	<available 

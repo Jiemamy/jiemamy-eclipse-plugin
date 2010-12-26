@@ -80,14 +80,14 @@ public class RootEditDialog extends JiemamyEditDialog<JiemamyContext> {
 	 * インスタンスを生成する。
 	 * 
 	 * @param shell 親シェルオブジェクト
-	 * @param rootModel 編集対象{@link JiemamyContext}
+	 * @param context 編集対象{@link JiemamyContext}
 	 * @param jiemamyFacade 操作に用いるファサード
 	 * @throws IllegalArgumentException 引数rootModel, jiemamyFacadeに{@code null}を与えた場合
 	 */
-	public RootEditDialog(Shell shell, JiemamyContext rootModel, JiemamyFacade jiemamyFacade) {
-		super(shell, rootModel, JiemamyContext.class);
+	public RootEditDialog(Shell shell, JiemamyContext context, JiemamyFacade jiemamyFacade) {
+		super(shell, context, context, JiemamyContext.class);
 		
-		Validate.notNull(rootModel);
+		Validate.notNull(context);
 		Validate.notNull(jiemamyFacade);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);

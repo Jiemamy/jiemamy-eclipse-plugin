@@ -113,8 +113,8 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 			return;
 		}
 		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(Migration.DIAGRAM_INDEX);
+		DiagramFacet diagramFacet = rootModel.getFacet(DiagramFacet.class);
+		DiagramModel diagramModel = diagramFacet.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		ConnectionModel connection = getModel();
 		
 		if (connection == null) {

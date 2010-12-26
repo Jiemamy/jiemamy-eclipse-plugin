@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.jiemamy.eclipse.core">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.jiemamy.eclipse.core" id="validators" name="%plugin.extension.validators"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to plug in additional model validators.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="validator" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="validator">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.jiemamy.eclipse.extension.validator.ModelValidator"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         0.2.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         The following is an example of the extension point usage:
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension
+         point=&quot;org.jiemamy.eclipse.validators&quot;&gt;
+      &lt;validator
+            class=&quot;org.jiemamy.eclipse.extension.validator.EntityIdentifierValidator&quot; /&gt;
+      &lt;validator
+            class=&quot;org.jiemamy.eclipse.extension.validator.TableValidator&quot; /&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         Plug-ins that want to extend this extension point must implement the &lt;samp&gt;org.jiemamy.eclipse.extension.validator.ModelValidator&lt;/samp&gt;  interface.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2007, Jiemamy Project.  All rights reserved.
+      </documentation>
+   </annotation>
+
+</schema>

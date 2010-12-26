@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension-point id="dialects" name="%plugin.extension.dialects" schema="schema/dialects.exsd"/>
+   <extension-point id="importers" name="%plugin.extension.importers" schema="schema/importers.exsd"/>
+   <extension-point id="exporters" name="%plugin.extension.exporters" schema="schema/exporters.exsd"/>
+   <extension-point id="validators" name="%plugin.extension.validators" schema="schema/validators.exsd"/>
+
+</plugin>

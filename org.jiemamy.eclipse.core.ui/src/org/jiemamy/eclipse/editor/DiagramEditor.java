@@ -1,0 +1,750 @@
+/*
+ * Copyright 2007-2009 Jiemamy Project and the Others.
+ * Created on 2008/07/29
+ *
+ * This file is part of Jiemamy.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+package org.jiemamy.eclipse.editor;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.EventObject;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.UUID;
+
+import com.google.common.collect.Lists;
+
+import org.apache.commons.io.IOUtils;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.PositionConstants;
+import org.eclipse.draw2d.Viewport;
+import org.eclipse.draw2d.parts.ScrollableThumbnail;
+import org.eclipse.gef.DefaultEditDomain;
+import org.eclipse.gef.EditPartViewer;
+import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.KeyStroke;
+import org.eclipse.gef.LayerConstants;
+import org.eclipse.gef.editparts.ScalableRootEditPart;
+import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.palette.PaletteRoot;
+import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.AlignmentAction;
+import org.eclipse.gef.ui.actions.DirectEditAction;
+import org.eclipse.gef.ui.actions.GEFActionConstants;
+import org.eclipse.gef.ui.actions.MatchHeightAction;
+import org.eclipse.gef.ui.actions.MatchWidthAction;
+import org.eclipse.gef.ui.actions.SelectAllAction;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
+import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
+import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
+import org.eclipse.gef.ui.parts.SelectionSynchronizer;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.commands.ActionHandler;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.eclipse.ui.dialogs.SaveAsDialog;
+import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.part.IPageSite;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.jiemamy.DiagramFacet;
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.JiemamyEntity;
+import org.jiemamy.dialect.Dialect;
+import org.jiemamy.eclipse.EclipseDialectProvider;
+import org.jiemamy.eclipse.JiemamyCorePlugin;
+import org.jiemamy.eclipse.editor.editpart.DiagramEditPartFactory;
+import org.jiemamy.eclipse.editor.editpart.OutlineTreeEditPartFactory;
+import org.jiemamy.eclipse.utils.ExceptionHandler;
+import org.jiemamy.eclipse.utils.MarkerUtil;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
+import org.jiemamy.serializer.SerializationException;
+import org.jiemamy.transaction.Command;
+import org.jiemamy.transaction.CommandListener;
+import org.jiemamy.transaction.DispatchStrategy;
+import org.jiemamy.transaction.EventBrokerImpl;
+import org.jiemamy.utils.LogMarker;
+import org.jiemamy.validator.Problem;
+import org.jiemamy.validator.Problem.Severity;
+import org.jiemamy.validator.Validator;
+
+/**
+ * ERダイアグラムエディタ。
+ * 
+ * @author daisuke
+ */
+public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements IResourceChangeListener,
+		CommandListener, JiemamyEditor {
+	
+	/** DELキーのキーコード */
+	private static final int KEYCODE_DEL = 127;
+	
+	private static Logger logger = LoggerFactory.getLogger(DiagramEditor.class);
+	
+	/** Palette component, holding the tools and shapes. */
+	private static PaletteRoot paletteModel;
+	
+	/** zoom level */
+	private static final double[] ZOOM_LEVELS = new double[] {
+		0.1,
+		0.3,
+		0.4,
+		0.5,
+		0.6,
+		0.7,
+		0.8,
+		0.9,
+		1.0,
+		1.2,
+		1.5,
+		2.0,
+		2.5,
+		3.0,
+		5.0,
+		7.0,
+		10.0
+	};
+	
+
+	private static int findSeverity(Severity severity) {
+		if (severity == Severity.ERROR || severity == Severity.FATAL) {
+			return IMarker.SEVERITY_ERROR;
+		} else if (severity == Severity.WARN) {
+			return IMarker.SEVERITY_WARNING;
+		} else if (severity == Severity.INFO || severity == Severity.NOTICE) {
+			return IMarker.SEVERITY_INFO;
+		}
+		return -1;
+	}
+	
+
+	/** ルートEditPart（コントローラ） */
+	private ScalableRootEditPart rootEditPart = new ScalableRootEditPart();
+	
+	/** エディタのルートモデル */
+	private JiemamyContext context;
+	
+	private boolean savePreviouslyNeeded = false;
+	
+	/** このエディタのタブインデックス */
+	private int tabIndex;
+	
+
+	/**
+	 * インスタンスを生成する。
+	 */
+	public DiagramEditor() {
+		setEditDomain(new DefaultEditDomain(this));
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+		logger.debug(LogMarker.LIFECYCLE, "constructed - single");
+	}
+	
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param rootModel ルートモデル
+	 * @param tabIndex マルチタブエディタ上でのタブインデックス
+	 */
+	public DiagramEditor(JiemamyContext rootModel, int tabIndex) {
+		setEditDomain(new DefaultEditDomain(this));
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+		this.tabIndex = tabIndex;
+		logger.debug(LogMarker.LIFECYCLE, "constructed - multi");
+	}
+	
+	public void commandExecuted(Command command) {
+		Dialect dialect;
+		try {
+			dialect = context.findDialect();
+		} catch (ClassNotFoundException e) {
+			dialect = JiemamyCorePlugin.getDialectResolver().getAllInstance().get(0);
+		}
+		Validator validator = dialect.getValidator();
+		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
+		MarkerUtil.deleteAllMarkers();
+		for (Problem problem : validator.validate(context)) {
+			Severity severity = problem.getSeverity();
+			String message = problem.getMessage();
+			MarkerUtil.createMarker(resource, IMarker.PRIORITY_NORMAL, findSeverity(severity), message);
+		}
+	}
+	
+	@Override
+	public void commandStackChanged(EventObject event) {
+		if (isDirty()) {
+			if (savePreviouslyNeeded == false) {
+				savePreviouslyNeeded = true;
+				firePropertyChange(IEditorPart.PROP_DIRTY);
+			}
+		} else {
+			savePreviouslyNeeded = false;
+			firePropertyChange(IEditorPart.PROP_DIRTY);
+		}
+		super.commandStackChanged(event);
+	}
+	
+	@Override
+	public void dispose() {
+		context.getEventBroker().removeListener(this);
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+		super.dispose();
+		logger.debug(LogMarker.LIFECYCLE, "disposed");
+		
+		// FIXME 以下debugコード
+		List<CommandListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
+		for (CommandListener listener : listeners) {
+			logger.warn(listener + " is not removed from EventBroker.");
+		}
+	}
+	
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		ByteArrayOutputStream out = null;
+		ByteArrayInputStream in = null;
+		try {
+			out = new ByteArrayOutputStream();
+			context.getSerializer().serialize(context, out);
+			
+			in = new ByteArrayInputStream(out.toByteArray());
+			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+			file.setContents(in, true, true, monitor);
+			getCommandStack().markSaveLocation();
+		} catch (Exception e) {
+			ExceptionHandler.handleException(e);
+		} finally {
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
+		}
+	}
+	
+	@Override
+	public void doSaveAs() {
+		Shell shell = getSite().getWorkbenchWindow().getShell();
+		SaveAsDialog dialog = new SaveAsDialog(shell);
+		dialog.setOriginalFile(((IFileEditorInput) getEditorInput()).getFile());
+		dialog.open();
+		
+		IPath path = dialog.getResult();
+		if (path == null) {
+			return;
+		}
+		
+		// try to save the editor's contents under a different file name
+		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		try {
+			new ProgressMonitorDialog(shell).run(false, // don't fork
+					false, // not cancelable
+					new WorkspaceModifyOperation() { // run this operation
+					
+						@Override
+						public void execute(IProgressMonitor monitor) {
+							ByteArrayOutputStream out = null;
+							ByteArrayInputStream in = null;
+							try {
+								out = new ByteArrayOutputStream();
+								context.getSerializer().serialize(context, out);
+								
+								in = new ByteArrayInputStream(out.toByteArray());
+								file.create(in, true, monitor);
+							} catch (Exception e) {
+								ExceptionHandler.handleException(e);
+							} finally {
+								IOUtils.closeQuietly(in);
+								IOUtils.closeQuietly(out);
+							}
+						}
+					});
+			setInput(new FileEditorInput(file));
+			getCommandStack().markSaveLocation();
+		} catch (InterruptedException e) {
+			// should not happen, since the monitor dialog is not cancelable
+			ExceptionHandler.handleException(e);
+		} catch (InvocationTargetException e) {
+			ExceptionHandler.handleException(e);
+		}
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	// Java1.4対応APIのため、Classに型パラメータをつけることができない
+	public Object getAdapter(Class adapter) {
+		if (adapter == ZoomManager.class) {
+			return ((ScalableRootEditPart) getGraphicalViewer().getRootEditPart()).getZoomManager();
+		} else if (adapter == IContentOutlinePage.class) {
+			return new DiagramOutlinePage(new org.eclipse.gef.ui.parts.TreeViewer()); // GEFツリービューワを使用
+		}
+		return super.getAdapter(adapter);
+	}
+	
+	/**
+	 * {@link JiemamyContext}を取得する。
+	 * 
+	 * @return エディタのルートモデル
+	 */
+	public JiemamyContext getJiemamyContext() {
+		return context;
+	}
+	
+	/**
+	 * このエディタのタブインデックスを取得する。
+	 * 
+	 * @return タブインデックス
+	 */
+	public int getTabIndex() {
+		return tabIndex;
+	}
+	
+	public JiemamyEntity getTargetModel() {
+		return context;
+	}
+	
+	@Override
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+		super.init(site, input);
+		
+		context = Jiemamy.newInstance(new Artemis(new ArtemisView()), new EclipseDialectProvider());
+		
+		// FIXME 無差別ディスパッチになってる。
+		context.getEventBroker().setStrategy(new DispatchStrategy() {
+			
+			public boolean needToDispatch(CommandListener listener, Command command) {
+				return true;
+			}
+			
+			public boolean needToDispatch(CommandListener arg0, Command arg1) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+		});
+		context.getEventBroker().addListener(this);
+		
+		logger.debug(LogMarker.LIFECYCLE, "initialized");
+	}
+	
+	@Override
+	public boolean isSaveAsAllowed() {
+		return true;
+	}
+	
+	/**
+	 * エディタ外などからの、リソースの変更を検知する。
+	 * {@inheritDoc}
+	 */
+	public void resourceChanged(final IResourceChangeEvent event) {
+		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+			final IEditorInput input = getEditorInput();
+			if (input instanceof IFileEditorInput) {
+				Display.getDefault().asyncExec(new Runnable() {
+					
+					public void run() {
+						IFile file = ((IFileEditorInput) input).getFile();
+						if (file.exists() == false) {
+							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+							page.closeEditor(DiagramEditor.this, true);
+						} else if (getPartName().equals(file.getName()) == false) {
+							setPartName(file.getName());
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	@Override
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+		if (part.getSite().getWorkbenchWindow().getActivePage() == null) {
+			return;
+		}
+		super.selectionChanged(part, selection);
+	}
+	
+	@Override
+	public void setFocus() {
+		super.setFocus();
+		
+		JmContributor contributor = (JmContributor) getEditorSite().getActionBarContributor();
+		if (contributor != null) {
+			contributor.selectCombo(context);
+		}
+		// Thanks to Naokiさん
+		logger.debug(LogMarker.LIFECYCLE, "setFocus");
+	}
+	
+	/**
+	 * このエディタのタブインデックスを設定する。
+	 * 
+	 * @param tabIndex タブインデックス
+	 */
+	public void setTabIndex(int tabIndex) {
+		this.tabIndex = tabIndex;
+	}
+	
+	@Override
+	protected void configureGraphicalViewer() {
+		super.configureGraphicalViewer();
+		
+		// EditPartFactoryの作成と設定
+		GraphicalViewer viewer = getGraphicalViewer();
+		viewer.setEditPartFactory(new DiagramEditPartFactory());
+		viewer.setRootEditPart(rootEditPart);
+		
+		ActionRegistry actionRegistry = getActionRegistry();
+		
+		// to make 'del' and 'f2' key work
+		GraphicalViewerKeyHandler keyHandler = new GraphicalViewerKeyHandler(viewer);
+		keyHandler.put(KeyStroke.getPressed(SWT.DEL, KEYCODE_DEL, 0),
+				actionRegistry.getAction(ActionFactory.DELETE.getId()));
+		keyHandler.put(KeyStroke.getPressed(SWT.F2, 0), actionRegistry.getAction(GEFActionConstants.DIRECT_EDIT));
+		viewer.setKeyHandler(keyHandler);
+		
+		// configure the context menu provider
+		viewer.setContextMenu(new DiagramEditorContextMenuProvider(viewer, this, actionRegistry));
+		getSite().setSelectionProvider(viewer);
+	}
+	
+	@Override
+	protected void createActions() {
+		super.createActions();
+		
+		IAction action;
+		ActionRegistry actionRegistry = getActionRegistry();
+		IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+		
+		// ZoomManager
+		ZoomManager zoomManager = rootEditPart.getZoomManager();
+		
+		// zoom contribution
+		List<String> zoomContributions = Lists.newArrayListWithCapacity(3);
+		zoomContributions.add(ZoomManager.FIT_ALL);
+		zoomContributions.add(ZoomManager.FIT_HEIGHT);
+		zoomContributions.add(ZoomManager.FIT_WIDTH);
+		zoomManager.setZoomLevelContributions(zoomContributions);
+		
+		zoomManager.setZoomLevels(ZOOM_LEVELS);
+		
+		@SuppressWarnings("unchecked")
+		// このメソッドはString型のリストを返すことが保証されている
+		List<String> selectionActions = getSelectionActions();
+		
+		// zoom level contribution
+		action = new ZoomInAction(zoomManager);
+		actionRegistry.registerAction(action);
+		handlerService.activateHandler(action.getActionDefinitionId(), new ActionHandler(action));
+		selectionActions.add(action.getId());
+		
+		action = new ZoomOutAction(zoomManager);
+		actionRegistry.registerAction(action);
+		handlerService.activateHandler(action.getActionDefinitionId(), new ActionHandler(action));
+		selectionActions.add(action.getId());
+		
+		// select action
+		action = new SelectAllAction(this);
+		actionRegistry.registerAction(action);
+		
+		// match size contribution
+		action = new MatchWidthAction(this);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		action = new MatchHeightAction(this);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		// direct edit contribution
+		action = new DirectEditAction((IWorkbenchPart) this);
+		actionRegistry.registerAction(action);
+		// 選択オブジェクトによってアクションを更新する必要がある場合には
+		// 以下のようにして、そのアクションのIDを登録しておく
+		selectionActions.add(action.getId());
+		
+		// alignment contribution
+		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.LEFT);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.RIGHT);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.TOP);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.BOTTOM);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.CENTER);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+		
+		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.MIDDLE);
+		actionRegistry.registerAction(action);
+		selectionActions.add(action.getId());
+	}
+	
+	@Override
+	protected PaletteRoot getPaletteRoot() {
+		if (paletteModel == null) {
+			paletteModel = DiagramEditorPaletteFactory.createPalette();
+		}
+		
+		return paletteModel;
+	}
+	
+	@Override
+	protected void initializeGraphicalViewer() {
+		super.initializeGraphicalViewer();
+		
+		GraphicalViewer viewer = getGraphicalViewer();
+		
+		// 最上位モデルの設定
+		IFile file = ((IFileEditorInput) getEditorInput()).getFile();
+		try {
+			context = context.getSerializer().deserialize(file.getContents());
+			context.normalize();
+		} catch (SerializationException e) {
+			ExceptionHandler.handleException(e, "Data file is broken.");
+		} catch (CoreException e) {
+			ExceptionHandler.handleException(e, ExceptionHandler.DIALOG,
+					"May be, resource is not synchronized.  Try to hit F5 to refresh workspace.");
+		} catch (Exception e) {
+			ExceptionHandler.handleException(e);
+		} finally {
+			JiemamyFactory factory = context.getFactory();
+			if (context == null) {
+				context = factory.getJiemamyContext();
+			}
+			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
+			if (diagramPresentations.size() < 1) {
+				DefaultDiagramModel presentationModel = new DefaultDiagramModel(UUID.randomUUID());
+				presentationModel.setName("default");
+				diagramPresentations.add(presentationModel);
+			}
+		}
+		
+		// 初回のバリデータ起動
+		commandExecuted(null);
+		
+		SortedSet<DatabaseObjectModel> entities = context.getEntities();
+		for (DatabaseObjectModel entityModel : entities) {
+			entityModel.registerAdapter(new EntityPropertySource(entityModel));
+//			if (entityModel instanceof TableModel) {
+//				entityModel.registerAdapter(new RepresentationAdapter());
+//			}
+		}
+		
+		viewer.setContents(context);
+	}
+	
+	@Override
+	protected void setInput(IEditorInput input) {
+		super.setInput(input);
+		
+		// タブにファイル名をセット
+		setPartName(input.getName());
+	}
+	
+
+	/**
+	 * アウトラインビューのページクラス。
+	 * @author daisuke
+	 */
+	private class DiagramOutlinePage extends org.eclipse.gef.ui.parts.ContentOutlinePage {
+		
+		/** ページをアウトラインとサムネイルに分離するコンポーネント */
+		private SashForm sash;
+		
+		/** サムネイル */
+		private Canvas overview;
+		
+		/** サムネイルを表示する為のフィギュア */
+		private ScrollableThumbnail thumbnail;
+		
+		private DisposeListener disposeListener;
+		
+		private final EditPartViewer viewer;
+		
+
+		/**
+		 * インスタンスを生成する。
+		 * 
+		 * @param viewer ビューア
+		 */
+		public DiagramOutlinePage(EditPartViewer viewer) {
+			super(viewer);
+			this.viewer = viewer;
+		}
+		
+		@Override
+		public void createControl(Composite parent) {
+			sash = new SashForm(parent, SWT.VERTICAL);
+			
+			// sash上にコンストラクタで指定したビューワの作成
+			viewer.createControl(sash);
+			
+			configureOutlineViewer();
+			hookOutlineViewer();
+			initializeOutlineViewer();
+			
+			// sash上にサムネイル用のCanvasビューワの作成
+			overview = new Canvas(sash, SWT.BORDER);
+			// サムネイル・フィギュアを配置する為の LightweightSystem
+			LightweightSystem lws = new LightweightSystem(overview);
+			
+			// RootEditPartのビューをソースとしてサムネイルを作成
+			ScalableRootEditPart rep = (ScalableRootEditPart) getGraphicalViewer().getRootEditPart();
+			thumbnail = new ScrollableThumbnail((Viewport) rep.getFigure());
+			thumbnail.setSource(rep.getLayer(LayerConstants.PRINTABLE_LAYERS));
+			
+			lws.setContents(thumbnail);
+			
+			disposeListener = new DisposeListener() {
+				
+				public void widgetDisposed(DisposeEvent e) {
+					// サムネイル・イメージの破棄
+					if (thumbnail != null) {
+						thumbnail.deactivate();
+						thumbnail = null;
+					}
+				}
+			};
+			// グラフィカル・ビューワが破棄されるときにサムネイルも破棄する
+			getGraphicalViewer().getControl().addDisposeListener(disposeListener);
+		}
+		
+		@Override
+		public void dispose() {
+			SelectionSynchronizer selectionSynchronizer = getSelectionSynchronizer();
+			// SelectionSynchronizer からTreeViewerを削除
+			selectionSynchronizer.removeViewer(viewer);
+			
+			Control control = getGraphicalViewer().getControl();
+			if (control != null && control.isDisposed() == false) {
+				control.removeDisposeListener(disposeListener);
+			}
+			
+			super.dispose();
+		}
+		
+		@Override
+		public Control getControl() {
+			return sash;
+		}
+		
+		@Override
+		public void init(IPageSite pageSite) {
+			super.init(pageSite);
+			// グラフィカル・エディタに登録されているアクションを取得
+			ActionRegistry registry = getActionRegistry();
+			// アウトライン・ページで有効にするアクション
+			IActionBars bars = pageSite.getActionBars();
+			
+			// Eclipse 3.0以前では以下のようにしてIDを取得します
+			// String id = IWorkbenchActionConstants.UNDO;
+			String id = ActionFactory.UNDO.getId();
+			bars.setGlobalActionHandler(id, registry.getAction(id));
+			
+			id = ActionFactory.REDO.getId();
+			bars.setGlobalActionHandler(id, registry.getAction(id));
+			
+			id = ActionFactory.DELETE.getId();
+			bars.setGlobalActionHandler(id, registry.getAction(id));
+			bars.updateActionBars();
+		}
+		
+		/**
+		 * ビュアーにコンテンツを設定する。
+		 * @param contents 設定するコンテンツ
+		 */
+		public void setContents(Object contents) {
+			viewer.setContents(contents);
+		}
+		
+		/**
+		 * アウトラインビュアーの設定を行う。
+		 */
+		protected void configureOutlineViewer() {
+			// エディット・ドメインの設定
+			viewer.setEditDomain(getEditDomain());
+			
+			// EditPartFactory の設定
+			viewer.setEditPartFactory(new OutlineTreeEditPartFactory());
+			
+			// THINK アウトラインに対するContextMenuの設定
+			// THINK アウトラインに対するToolBarManagerの設定
+		}
+		
+		/**
+		 * アウトラインビュアー設定用のフックメソッド。
+		 */
+		protected void hookOutlineViewer() {
+			// グラフィカル・エディタとツリー・ビューワとの間で選択を同期させる
+			SelectionSynchronizer selectionSynchronizer = getSelectionSynchronizer();
+			selectionSynchronizer.addViewer(getViewer());
+		}
+		
+		/**
+		 * アウトラインビュアーを初期化する。
+		 */
+		protected void initializeOutlineViewer() {
+			// グラフィカル・エディタのルート・モデルをツリー・ビューワにも設定
+			setContents(context);
+		}
+	}
+	
+
+	public void commandExecuted(Command arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+}

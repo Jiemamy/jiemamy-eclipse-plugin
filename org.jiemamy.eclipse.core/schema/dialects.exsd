@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.jiemamy.eclipse.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.jiemamy.eclipse.core" id="dialects" name="%plugin.extension.dialects"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to plug in additional SQL dialects. An SQL dialect is an object that knows about the restrictions and data types of a Relational Database Management System (RDBMS). Also, a dialect knows how to generate SQL for a given RDBMS.
+&lt;p&gt;
+Each type of RDBMS (PostgreSQL, MySQL, Oracle, and so on) supports a subset of the 
+international SQL standard. In addition, some types support SQL constructs 
+that exceed this standard. The totality of SQL that a type of RDBMS supports is called an SQL dialect.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="dialect" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="dialect">
+      <complexType>
+         <sequence>
+            <element ref="typeOptionManager" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="additionalTab" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.jiemamy.core.extension.dialect.Dialect"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="typeOptionManager">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.jiemamy.eclipse.editor.dialog.TypeOptionHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="additionalTab">
+      <complexType>
+         <attribute name="target" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.jface.dialogs.Dialog"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.jiemamy.eclipse.ui.tab.AbstractTab"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         0.0.1
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         The following is an example of the extension point usage:
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension
+         point=&quot;org.jiemamy.eclipse.dialects&quot;&gt;
+      &lt;dialect
+            class=&quot;org.jiemamy.eclipse.dialect.postgresql.PostgresDialect&quot;
+            name=&quot;PostgreSQL&quot;/&gt;
+      &lt;dialect
+            class=&quot;org.jiemamy.eclipse.dialect.mysql.MysqlDialect&quot;
+            name=&quot;MySQL&quot;/&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         Plug-ins that want to extend this extension point must implement the &lt;samp&gt;org.jiemamy.core.extension.dialect.Dialect&lt;/samp&gt;  interface.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         The Jiemamy Database Modelling Plugin provides several default SQL dialect implementations:
+(In alphabetic order:)
+&lt;ul&gt;
+  &lt;li&gt;MySQL&lt;/li&gt;
+  &lt;li&gt;Postgre SQL&lt;/li&gt;
+&lt;/ul&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2007-2009, Jiemamy Project.  All rights reserved.
+      </documentation>
+   </annotation>
+
+</schema>

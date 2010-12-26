@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.jiemamy.eclipse.core.feature"
+      label="%featureName"
+      version="0.3.0.qualifier"
+      provider-name="%providerName"
+      plugin="org.jiemamy.eclipse.core">
+
+   <description url="http://eclipse.jiemamy.org/description">
+      %description
+   </description>
+
+   <copyright url="http://www.jiemamy.org/copyright">
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://eclipse.jiemamy.org/release/"/>
+   </url>
+
+   <includes
+         id="org.jiemamy.eclipse.core.source"
+         version="0.0.0"/>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.update.core"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+   </requires>
+
+   <plugin
+         id="org.jiemamy.eclipse.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.jiemamy.eclipse.core.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

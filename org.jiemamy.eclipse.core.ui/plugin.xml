@@ -20,7 +20,7 @@
          point="org.jiemamy.eclipse.core.importers">
 	  <importer
 	        name="Database"
-            class="org.jiemamy.composer.importer.DatabaseImporterWithView"
+            class="org.jiemamy.composer.importer.DatabaseImporter"
             wizard="org.jiemamy.eclipse.composer.DatabaseImportWizard"/>
    </extension>
 

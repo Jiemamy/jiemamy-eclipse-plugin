@@ -50,14 +50,14 @@ public class LabelStringUtil {
 	/**
 	 * DataTypeに対する表示用文字列を取得する。
 	 * 
-	 * @param rootModel ルートモデル
+	 * @param context ルートモデル
 	 * @param dataType 表示対象DataType
 	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
 	 */
 	public static String getString(JiemamyContext context, DataType dataType, DisplayPlace place) {
 		try {
-			Dialect dialect = rootModel.findDialect();
+			Dialect dialect = context.findDialect();
 			List<Token> tokens = dialect.getDataTypeResolver().resolveDataType(dataType, resolver);
 			StringBuilder sb = new StringBuilder();
 			Token lastToken = null;

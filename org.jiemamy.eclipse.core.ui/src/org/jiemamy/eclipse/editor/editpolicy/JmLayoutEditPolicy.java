@@ -32,6 +32,7 @@ import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.command.ChangeNodeConstraintCommand;
 import org.jiemamy.eclipse.editor.command.CreateNodeCommand;
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.dbo.DatabaseObjectModel;
 
 /**
@@ -41,7 +42,7 @@ import org.jiemamy.model.dbo.DatabaseObjectModel;
  */
 public class JmLayoutEditPolicy extends XYLayoutEditPolicy {
 	
-	/** {@link StickyModel}が作られた時、はじめに設定されている値 */
+	/** {@link StickyNodeModel}が作られた時、はじめに設定されている値 */
 	private static final String DEFAULT_STICKY_CONTENTS = "memo";
 	
 
@@ -69,8 +70,8 @@ public class JmLayoutEditPolicy extends XYLayoutEditPolicy {
 			DatabaseObjectModel entityModel = (DatabaseObjectModel) model;
 			EntityUtil.autoDenominate(entityModel, rootModel);
 			node = entityModel.getAdapter(NodeModel.class);
-		} else if (model instanceof StickyModel) {
-			StickyModel stickyModel = (StickyModel) model;
+		} else if (model instanceof StickyNodeModel) {
+			StickyNodeModel stickyModel = (StickyNodeModel) model;
 			stickyModel.setContents(DEFAULT_STICKY_CONTENTS);
 			node = stickyModel;
 		}

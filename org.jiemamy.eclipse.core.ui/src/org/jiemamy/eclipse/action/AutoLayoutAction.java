@@ -40,7 +40,6 @@ import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.presentations.PresentationUtil;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
@@ -48,6 +47,7 @@ import org.jiemamy.eclipse.Migration;
 import org.jiemamy.eclipse.editor.editpart.diagram.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.editor.editpart.diagram.RootEditPart;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.geometory.JmPoint;
@@ -115,7 +115,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 	
 	private static class EntityNode extends Node {
 		
-		private NodeModel model;
+		private DefaultNodeModel model;
 		
 	}
 	
@@ -129,7 +129,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		private final int diagramIndex;
 		
-		private NodeModel target;
+		private DefaultNodeModel target;
 		
 		private int x;
 		
@@ -151,16 +151,13 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		 * @param x X座標
 		 * @param y Y座標
 		 */
-		public LayoutCommand(JiemamyContext rootModel, int diagramIndex, NodeModel target, int x, int y) {
+		public LayoutCommand(JiemamyContext rootModel, int diagramIndex, DefaultNodeModel target, int x, int y) {
 			this.rootModel = rootModel;
 			this.diagramIndex = diagramIndex;
 			this.target = target;
 			this.x = x;
 			this.y = y;
-			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
-			NodeModel nodeProfile = presentation.getNodeProfiles().get(target);
-			JmRectangle boundary = nodeProfile.getBoundary();
+			JmRectangle boundary = target.getBoundary();
 			oldX = boundary.x;
 			oldY = boundary.y;
 		}
@@ -169,11 +166,11 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		public void execute() {
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
 			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
-			PresentationUtil.setBoundary(presentation, target, new JmRectangle(x, y, -1, -1));
+			target.setBoundary(new JmRectangle(x, y, -1, -1));
+			presentation.store(target);
 			oldBendpoints.clear();
 			for (ConnectionModel conn : target.getSourceConnections()) {
-				ConnectionModel connectionProfile = presentation.getConnectionProfiles().get(conn);
-				List<JmPoint> bendpoints = connectionProfile.getBendpoints();
+				List<JmPoint> bendpoints = conn.getBendpoints();
 				oldBendpoints.put(conn, new ArrayList<JmPoint>(bendpoints));
 				bendpoints.clear();
 			}
@@ -184,14 +181,14 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
 			DiagramModel presentation = diagramPresentations.getDiagrams().get(diagramIndex);
 			for (ConnectionModel conn : target.getSourceConnections()) {
-				ConnectionModel connectionProfile = presentation.getConnectionProfiles().get(conn);
-				List<JmPoint> bendpoints = connectionProfile.getBendpoints();
+				List<JmPoint> bendpoints = conn.getBendpoints();
 				bendpoints.clear();
 				for (JmPoint bendpoint : oldBendpoints.get(conn)) {
 					bendpoints.add(bendpoint);
 				}
 			}
-			PresentationUtil.setBoundary(presentation, target, new JmRectangle(oldX, oldY, -1, -1));
+			target.setBoundary(new JmRectangle(oldX, oldY, -1, -1));
+			presentation.store(target);
 		}
 	}
 	
@@ -267,7 +264,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		private void assembleEdges(final List<Node> graphNodes, final List<Edge> graphEdges) {
 			for (Object obj : graphNodes) {
 				EntityNode node = (EntityNode) obj;
-				Collection<ConnectionModel> conns = node.model.getSourceConnections();
+				Collection<? extends ConnectionModel> conns = node.model.getSourceConnections();
 				CONN_LOOP: for (ConnectionModel conn : conns) {
 					if (conn.isSelfConnection()) {
 						continue;

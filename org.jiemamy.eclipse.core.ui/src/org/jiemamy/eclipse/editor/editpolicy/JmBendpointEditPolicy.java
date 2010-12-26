@@ -45,8 +45,8 @@ public class JmBendpointEditPolicy extends BendpointEditPolicy {
 		
 		ConnectionModel connection = (ConnectionModel) getHost().getModel();
 		ForeignKeyConstraintModel foreignKey = connection.unwrap();
-		JiemamyContext rootModel = foreignKey.getJiemamy().getFactory().getJiemamyContext();
-		return new CreateBendpointCommand(rootModel, Migration.DIAGRAM_INDEX, connection, point, request.getIndex());
+		JiemamyContext context = foreignKey.getJiemamy().getFactory().getJiemamyContext();
+		return new CreateBendpointCommand(context, Migration.DIAGRAM_INDEX, connection, point, request.getIndex());
 		
 	}
 	

@@ -1,0 +1,18 @@
+#Mon May 17 20:06:15 JST 2010
+block_filters=SourceDirective, privatector
+eclipse.preferences.version=1
+flush_interval=1000
+flush_policy=0
+include_filter=**/*.java
+init_string=target/.clover/coverage.db
+init_string_default=false
+init_string_project_relative=true
+instrument_selected_source_folders=false
+instrumentation_enabled=true
+output_root=target/.clover/bin
+output_root_same_as_project=false
+recreate_output_dirs=true
+regexp_filters[0]=true,0,-1,false,privatector,private \\w+\\(.*
+should_qualify_java_lang=true
+test_include_filter=**/*Test.java,**/Test*.java
+test_source_folders=0

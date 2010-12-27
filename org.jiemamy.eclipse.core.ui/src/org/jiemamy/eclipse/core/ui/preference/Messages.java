@@ -48,7 +48,7 @@ public class Messages extends NLS {
 	
 	// CHECKSTYLE:ON
 	
-	private static final String BUNDLE_NAME = "org.jiemamy.eclipse.preference.messages";
+	private static final String BUNDLE_NAME = "org.jiemamy.eclipse.core.ui.preference.messages";
 	
 	static {
 		reloadMessages();

@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<ivy-module version="2.2">
-    <info organisation="org.jiemamy" module="sampleHello" />
-    <dependencies>
-    </dependencies>
-</ivy-module>

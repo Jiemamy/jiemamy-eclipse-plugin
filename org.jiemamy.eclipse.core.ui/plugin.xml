@@ -55,27 +55,26 @@
       <initializer class="org.jiemamy.eclipse.core.ui.preference.JiemamyPreferenceInitializer"/>
    </extension>
 
-<!--
    <extension
          point="org.eclipse.ui.editors">
-      <editor
+      <!--<editor
             class="org.jiemamy.eclipse.editor.MultiDiagramEditor"
             contributorClass="org.jiemamy.eclipse.editor.JmContributor"
             default="true"
             extensions="jer"
             icon="/icons/database.gif"
             id="org.jiemamy.eclipse.editor.multi.diagram"
-            name="%plugin.erd.editor"/>
+            name="%plugin.erd.editor"/>-->
       <editor
-            class="org.jiemamy.eclipse.editor.DiagramEditor"
-            contributorClass="org.jiemamy.eclipse.editor.JmContributor"
+            class="org.jiemamy.eclipse.core.ui.editor.DiagramEditor"
+            contributorClass="org.jiemamy.eclipse.core.ui.editor.JmContributor"
             default="true"
-            extensions="jer"
+            extensions="jiemamy"
             icon="/icons/database.gif"
-            id="org.jiemamy.eclipse.editor.diagram"
+            id="org.jiemamy.eclipse.core.ui.editor.diagram"
             name="%plugin.erd.editor"/>
    </extension>
--->
+
 
    <extension
          id="problem"

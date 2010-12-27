@@ -1,6 +1,6 @@
 /*
  * Copyright 2007-2009 Jiemamy Project and the Others.
- * Created on 2008/08/03
+ * Created on 2008/07/28
  *
  * This file is part of Jiemamy.
  *
@@ -16,29 +16,44 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.jiemamy.eclipse.core.ui.wizard;
+package org.jiemamy.eclipse.core.ui.editor;
 
 import java.util.Locale;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * {@link org.jiemamy.eclipse.core.ui.wizard}パッケージ用メッセージリソースクラス。
+ * {@link org.jiemamy.eclipse.core.ui.editor}パッケージ用メッセージリソースクラス。
  * 
  * @author daisuke
  */
-public class Messages extends NLS {
+class Messages extends NLS {
 	
 	// CHECKSTYLE:OFF
 	
-	/** データファイル新規作成Wizardのタイトル */
-	public static String Wizard_Title;
+	/** 物理モデル：属性/型レベル */
+	public static String Physical_AttrAndType;
 	
-	/** データファイル新規作成Wizardのメッセージ */
-	public static String Wizard_Message;
+	/** 物理モデル：属性レベル */
+	public static String Physical_Attribute;
 	
-	/** 拡張子にjer以外が指定された場合のエラーメッセージ */
-	public static String File_Extension_Error;
+	/** 物理モデル：識別子レベル */
+	public static String Physical_Key;
+	
+	/** 物理モデル：エンティティレベル */
+	public static String Physical_Entity;
+	
+	/** 論理モデル：属性/型レベル */
+	public static String Logical_AttrAndType;
+	
+	/** 論理モデル：属性レベル */
+	public static String Logical_Attribute;
+	
+	/** 論理モデル：識別子レベル */
+	public static String Logical_Key;
+	
+	/** 論理モデル：エンティティレベル */
+	public static String Logical_Entity;
 	
 	// CHECKSTYLE:ON
 	

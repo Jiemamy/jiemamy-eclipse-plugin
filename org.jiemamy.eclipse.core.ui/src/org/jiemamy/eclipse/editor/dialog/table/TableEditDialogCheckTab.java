@@ -345,7 +345,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			
 			jiemamyFacade.addAttribute(tableModel, checkConstraint);
 			
-			int addedIndex = tableModel.findAttributes(TableCheckConstraint.class).indexOf(checkConstraint);
+			int addedIndex = tableModel.getConstraints().indexOf(checkConstraint);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtCheckName.setFocus();
@@ -358,18 +358,18 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
-			JiemamyFactory factory = jiemamy.getFactory();
-			TableCheckConstraint checkConstraint = factory.newModel(TableCheckConstraint.class);
+			DefaultCheckConstraintModel checkConstraint = new DefaultCheckConstraintModel(null, null, null, null, null);
 			
 			if (index < 0 || index > table.getItemCount()) {
 				jiemamyFacade.addAttribute(tableModel, checkConstraint);
 			} else {
-				AttributeModel attributeModel = (AttributeModel) getTableViewer().getElementAt(index);
+				DefaultCheckConstraintModel attributeModel =
+						(DefaultCheckConstraintModel) getTableViewer().getElementAt(index);
 				int subjectIndex = attributes.indexOf(attributeModel);
 				jiemamyFacade.addAttribute(tableModel, subjectIndex, checkConstraint);
 			}
 			
-			int addedIndex = tableModel.findAttributes(TableCheckConstraint.class).indexOf(checkConstraint);
+			int addedIndex = tableModel.getConstraints().indexOf(checkConstraint);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtCheckName.setFocus();
@@ -408,10 +408,10 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			Object subject = getTableViewer().getElementAt(index);
 			Object object = getTableViewer().getElementAt(index - 1);
 			
-			int subjectIndex = tableModel.getAttributes().indexOf(subject);
-			int objectIndex = tableModel.getAttributes().indexOf(object);
+			int subjectIndex = tableModel.getConstraints().indexOf(subject);
+			int objectIndex = tableModel.getConstraints().indexOf(object);
 			
-			jiemamyFacade.swapListElement(tableModel, tableModel.getAttributes(), subjectIndex, objectIndex);
+			jiemamyFacade.swapListElement(tableModel, tableModel.getConstraints(), subjectIndex, objectIndex);
 			
 			table.setSelection(index - 1);
 			enableEditControls(index - 1);
@@ -427,7 +427,7 @@ public class TableEditDialogCheckTab extends AbstractTab {
 			}
 			
 			Object subject = getTableViewer().getElementAt(index);
-			jiemamyFacade.removeAttribute(tableModel, (AttributeModel) subject);
+			jiemamyFacade.removeAttribute(tableModel, (ConstraintModel) subject);
 			
 			tableViewer.remove(subject);
 			int nextSelection = table.getItemCount() > index ? index : index - 1;

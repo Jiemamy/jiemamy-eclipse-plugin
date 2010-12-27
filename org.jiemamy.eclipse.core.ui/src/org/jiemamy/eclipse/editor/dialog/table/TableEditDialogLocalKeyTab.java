@@ -56,8 +56,12 @@ import org.jiemamy.eclipse.ui.AbstractTableEditor;
 import org.jiemamy.eclipse.ui.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.ui.helper.TextSelectionAdapter;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
+import org.jiemamy.eclipse.utils.JiemamyPropertyUtil;
 import org.jiemamy.model.attribute.ColumnModel;
+import org.jiemamy.model.attribute.constraint.ConstraintModel;
 import org.jiemamy.model.attribute.constraint.DefaultUniqueKeyConstraintModel;
+import org.jiemamy.model.attribute.constraint.LocalKeyConstraintModel;
+import org.jiemamy.model.attribute.constraint.PrimaryKeyConstraintModel;
 import org.jiemamy.model.attribute.constraint.UniqueKeyConstraintModel;
 import org.jiemamy.model.dbo.TableModel;
 import org.jiemamy.transaction.Command;
@@ -82,6 +86,8 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 	/** モデル操作を行うファサード */
 	private final JiemamyFacade jiemamyFacade;
 	
+	private final JiemamyContext context;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -91,9 +97,10 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 	 * @param tableModel 編集対象テーブル
 	 * @param jiemamyFacade モデル操作を行うファサード
 	 */
-	public TableEditDialogLocalKeyTab(TabFolder parentTabFolder, int style, TableModel tableModel,
-			JiemamyFacade jiemamyFacade) {
+	public TableEditDialogLocalKeyTab(TabFolder parentTabFolder, int style, JiemamyContext context,
+			TableModel tableModel, JiemamyFacade jiemamyFacade) {
 		super(parentTabFolder, style, Messages.Tab_Table_Keys);
+		this.context = context;
 		
 		this.tableModel = tableModel;
 		this.jiemamyFacade = jiemamyFacade;
@@ -161,20 +168,16 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 	 */
 	private class LocalKeyConstraintLabelProvider extends BaseLabelProvider implements ITableLabelProvider {
 		
-		private ReferenceResolver resolver;
-		
-
 		private LocalKeyConstraintLabelProvider() {
-			resolver = tableModel.getJiemamy().getReferenceResolver();
 		}
 		
 		public Image getColumnImage(Object element, int columnIndex) {
-			if ((element instanceof LocalKeyConstraint) == false) {
+			if ((element instanceof LocalKeyConstraintModel) == false) {
 				return null;
 			}
 			
-			LocalKeyConstraint localKey = (LocalKeyConstraint) element;
-			if (columnIndex == 0 && localKey instanceof PrimaryKey) {
+			LocalKeyConstraintModel localKey = (LocalKeyConstraintModel) element;
+			if (columnIndex == 0 && localKey instanceof PrimaryKeyConstraintModel) {
 				ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 				return ir.get(Images.ICON_PK);
 			} else {
@@ -183,11 +186,11 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			if ((element instanceof LocalKeyConstraint) == false) {
+			if ((element instanceof LocalKeyConstraintModel) == false) {
 				return StringUtils.EMPTY;
 			}
 			
-			LocalKeyConstraint localKey = (LocalKeyConstraint) element;
+			LocalKeyConstraintModel localKey = (LocalKeyConstraintModel) element;
 			switch (columnIndex) {
 				case 1:
 					return localKey.getName();
@@ -195,7 +198,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 				case 2:
 					List<String> columnNames = CollectionsUtil.newArrayList();
 					for (EntityRef<? extends ColumnModel> columnRef : localKey.getKeyColumns()) {
-						columnNames.add(resolver.resolve(columnRef).getName());
+						columnNames.add(context.resolve(columnRef).getName());
 					}
 					return StringUtils.join(columnNames, ", ");
 					
@@ -213,13 +216,11 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
-		private final JiemamyContext jiemamy;
-		
 		private Text txtKeyConstraintName;
 		
 		private org.eclipse.swt.widgets.List lstKeyColumns;
 		
-		private List<AttributeModel> attributes;
+		private List<LocalKeyConstraintModel> attributes;
 		
 
 		/**
@@ -231,10 +232,8 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		public LocalKeyConstraintTableEditor(Composite parent, int style) {
 			super(parent, style, new DefaultTableEditorConfig("ローカルキー情報")); // RESOURCE
 			
-			jiemamy = tableModel.getJiemamy();
-			attributes = tableModel.getAttributes();
+			attributes = tableModel.getConstraints(LocalKeyConstraintModel.class);
 			
-			assert jiemamy != null;
 			assert attributes != null;
 		}
 		
@@ -290,12 +289,12 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 				
 				@Override
 				public boolean select(Viewer viewer, Object parentElement, Object element) {
-					return element instanceof LocalKeyConstraint;
+					return element instanceof LocalKeyConstraintModel;
 				}
 				
 			});
 			
-			final EventBroker eventBroker = jiemamy.getEventBroker();
+			final EventBroker eventBroker = context.getEventBroker();
 			eventBroker.addListener(contentProvider);
 			
 			// THINK んーーー？？ このタイミングか？
@@ -358,7 +357,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			LocalKeyConstraint localKey = tableModel.findAttributes(LocalKeyConstraint.class).get(index);
+			LocalKeyConstraintModel localKey = tableModel.getConstraints(LocalKeyConstraintModel.class).get(index);
 			
 			txtKeyConstraintName.setEnabled(true);
 			lstKeyColumns.setEnabled(true);
@@ -372,7 +371,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 				lstKeyColumns.add(columnModel.getName());
 				boolean found = false;
 				for (EntityRef<? extends ColumnModel> columnRef : keyColumns) {
-					if (columnRef.getReferenceId().equals(columnModel.getId())) {
+					if (columnRef.getReferentId().equals(columnModel.getId())) {
 						found = true;
 						break;
 					}
@@ -386,13 +385,13 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyEntity performAddItem() {
+		protected UniqueKeyConstraintModel performAddItem() {
 			Table table = getTableViewer().getTable();
 			UniqueKeyConstraintModel uniqueKey = new DefaultUniqueKeyConstraintModel(null, null, null, null, null);
 			
 			jiemamyFacade.addAttribute(tableModel, uniqueKey);
 			
-			int addedIndex = tableModel.findAttributes(LocalKeyConstraint.class).indexOf(uniqueKey);
+			int addedIndex = tableModel.getConstraints(LocalKeyConstraintModel.class).indexOf(uniqueKey);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtKeyConstraintName.setFocus();
@@ -401,7 +400,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 		}
 		
 		@Override
-		protected JiemamyEntity performInsertItem() {
+		protected UniqueKeyConstraintModel performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
@@ -410,12 +409,13 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			if (index < 0 || index > table.getItemCount()) {
 				jiemamyFacade.addAttribute(tableModel, uniqueKey);
 			} else {
-				AttributeModel attributeModel = (AttributeModel) getTableViewer().getElementAt(index);
+				UniqueKeyConstraintModel attributeModel =
+						(UniqueKeyConstraintModel) getTableViewer().getElementAt(index);
 				int subjectIndex = attributes.indexOf(attributeModel);
 				jiemamyFacade.addAttribute(tableModel, subjectIndex, uniqueKey);
 			}
 			
-			int addedIndex = tableModel.findAttributes(LocalKeyConstraint.class).indexOf(uniqueKey);
+			int addedIndex = tableModel.getConstraints(LocalKeyConstraintModel.class).indexOf(uniqueKey);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtKeyConstraintName.setFocus();
@@ -434,10 +434,10 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			Object subject = getTableViewer().getElementAt(index);
 			Object object = getTableViewer().getElementAt(index + 1);
 			
-			int subjectIndex = tableModel.getAttributes().indexOf(subject);
-			int objectIndex = tableModel.getAttributes().indexOf(object);
+			int subjectIndex = tableModel.getConstraints().indexOf(subject);
+			int objectIndex = tableModel.getConstraints().indexOf(object);
 			
-			jiemamyFacade.swapListElement(tableModel, tableModel.getAttributes(), subjectIndex, objectIndex);
+			jiemamyFacade.swapListElement(tableModel, tableModel.getConstraints(), subjectIndex, objectIndex);
 			
 			table.setSelection(index + 1);
 			enableEditControls(index + 1);
@@ -454,10 +454,10 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			Object subject = getTableViewer().getElementAt(index);
 			Object object = getTableViewer().getElementAt(index - 1);
 			
-			int subjectIndex = tableModel.getAttributes().indexOf(subject);
-			int objectIndex = tableModel.getAttributes().indexOf(object);
+			int subjectIndex = tableModel.getConstraints().indexOf(subject);
+			int objectIndex = tableModel.getConstraints().indexOf(object);
 			
-			jiemamyFacade.swapListElement(tableModel, tableModel.getAttributes(), subjectIndex, objectIndex);
+			jiemamyFacade.swapListElement(tableModel, tableModel.getConstraints(), subjectIndex, objectIndex);
 			
 			table.setSelection(index - 1);
 			enableEditControls(index - 1);
@@ -473,7 +473,7 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 			}
 			
 			Object subject = getTableViewer().getElementAt(index);
-			jiemamyFacade.removeAttribute(tableModel, (AttributeModel) subject);
+			jiemamyFacade.removeAttribute(tableModel, (ConstraintModel) subject);
 			
 			tableViewer.remove(subject);
 			int nextSelection = table.getItemCount() > index ? index : index - 1;
@@ -495,14 +495,13 @@ public class TableEditDialogLocalKeyTab extends AbstractTab {
 				return;
 			}
 			
-			JiemamyFactory factory = jiemamy.getFactory();
-			LocalKeyConstraint localKey = tableModel.findAttributes(LocalKeyConstraint.class).get(editIndex);
+			LocalKeyConstraintModel localKey = tableModel.getConstraints(LocalKeyConstraintModel.class).get(editIndex);
 			localKey.setName(JiemamyPropertyUtil.careNull(txtKeyConstraintName.getText(), true));
 			List<EntityRef<? extends ColumnModel>> keyColumns = localKey.getKeyColumns();
 			keyColumns.clear();
 			for (int selectionIndex : lstKeyColumns.getSelectionIndices()) {
 				ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);
-				keyColumns.add(factory.newReference(columnModel));
+				keyColumns.add(columnModel.toReference());
 			}
 		}
 		

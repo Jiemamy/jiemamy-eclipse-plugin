@@ -50,6 +50,7 @@ import org.jiemamy.eclipse.ui.helper.TextSelectionAdapter;
 import org.jiemamy.eclipse.ui.tab.AbstractTab;
 import org.jiemamy.eclipse.ui.tab.TextEditTab;
 import org.jiemamy.eclipse.utils.ConvertUtil;
+import org.jiemamy.eclipse.utils.JiemamyPropertyUtil;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.attribute.ColumnModel;
 import org.jiemamy.model.dbo.DatabaseObjectModel;

@@ -100,9 +100,8 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	// Java1.4対応APIのため、Classに型パラメータをつけることができない
-	public Object getAdapter(Class key) {
+	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
 		logger.debug(key.getName());
 		NodeModel nodeAdapter = getModel();
 		if (nodeAdapter.unwrap() != null) {

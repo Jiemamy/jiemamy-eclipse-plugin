@@ -41,6 +41,7 @@ import org.jiemamy.eclipse.editor.dialog.table.TableEditDialog;
 import org.jiemamy.eclipse.editor.editpolicy.JmTreeComponentEditPolicy;
 import org.jiemamy.eclipse.editor.utils.LabelStringUtil;
 import org.jiemamy.eclipse.ui.JiemamyEditDialog;
+import org.jiemamy.model.attribute.ColumnModel;
 import org.jiemamy.model.dbo.TableModel;
 import org.jiemamy.transaction.SavePoint;
 import org.jiemamy.utils.LogMarker;
@@ -121,10 +122,10 @@ public class TableTreeEditPart extends AbstractEntityTreeEditPart {
 	}
 	
 	@Override
-	protected List<AttributeModel> getModelChildren() {
+	protected List<ColumnModel> getModelChildren() {
 		// ここで返された子モデルがツリーの子アイテムになる
 		TableModel tableModel = getModel();
-		return tableModel.getAttributes();
+		return tableModel.getColumns();
 	}
 	
 	@Override

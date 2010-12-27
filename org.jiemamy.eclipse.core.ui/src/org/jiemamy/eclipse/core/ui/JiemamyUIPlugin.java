@@ -45,7 +45,7 @@ import org.jiemamy.eclipse.core.ui.preference.JiemamyPreferenceImpl;
 public class JiemamyUIPlugin extends AbstractUIPlugin {
 	
 	/** The plug-in ID */
-	public static final String PLUGIN_ID = "org.jiemamy.eclipse.ui";
+	public static final String PLUGIN_ID = "org.jiemamy.eclipse.core.ui";
 	
 	/** アイコンファイルの配置パス */
 	private static final String ICONS_PATH = "icons/";
@@ -153,7 +153,7 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 	/**
 	 * ImageRegistryに指定したファイルの画像を設定する。
 	 * 
-	 * 画像ファイルは icons/ 内に配置する必要がある。
+	 * <p>画像ファイルは icons/ 内に配置する必要がある。</p>
 	 * 
 	 * @param registry 追加対象のImageRegistry
 	 * @param key キー

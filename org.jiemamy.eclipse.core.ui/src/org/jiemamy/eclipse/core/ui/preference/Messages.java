@@ -21,7 +21,8 @@ package org.jiemamy.eclipse.core.ui.preference;
 import org.eclipse.osgi.util.NLS;
 
 /**
- * Preferenceメッセージリソースクラス。
+ * {@link org.jiemamy.eclipse.core.ui.preference}パッケージ用メッセージリソースクラス。
+ * 
  * @author daisuke
  */
 public class Messages extends NLS {

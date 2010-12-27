@@ -1,6 +1,6 @@
 /*
  * Copyright 2007-2009 Jiemamy Project and the Others.
- * Created on 2008/07/28
+ * Created on 2008/08/03
  *
  * This file is part of Jiemamy.
  *
@@ -16,14 +16,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.jiemamy.eclipse.core.ui.preference;
+package org.jiemamy.eclipse.core.ui.wizard;
 
 import java.util.Locale;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
- * {@link org.jiemamy.eclipse.core.ui.preference}パッケージ用メッセージリソースクラス。
+ * Wizardメッセージリソースクラス。
  * 
  * @author daisuke
  */
@@ -31,23 +31,14 @@ public class Messages extends NLS {
 	
 	// CHECKSTYLE:OFF
 	
-	/** グループタイトル：コネクション */
-	public static String Group_Connection;
+	/** データファイル新規作成Wizardのタイトル */
+	public static String Wizard_Title;
 	
-	/** 項目名：外部キー作成時に、参照元テーブルに参照先PKと同名のカラムを作るかどうか */
-	public static String Connection_CreateColumnWithFk;
+	/** データファイル新規作成Wizardのメッセージ */
+	public static String Wizard_Message;
 	
-	/** 項目名：コネクションルータ */
-	public static String Connection_Router;
-	
-	/** Bendpoint Connection Router */
-	public static String Bendpoint_Connection_Router;
-	
-	/** Shortest Path Connection Router */
-	public static String Shortest_Path_Connection_Router;
-	
-	/** Manhattan Connection Router */
-	public static String Manhattan_Connection_Router;
+	/** 拡張子にjer以外が指定された場合のエラーメッセージ */
+	public static String File_Extension_Error;
 	
 	// CHECKSTYLE:ON
 	

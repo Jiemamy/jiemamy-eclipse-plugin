@@ -105,6 +105,7 @@
          ================================= -->
     <target name="clean-all" depends="clean-lib,clean-dest" description="--> clean the project">
     	<clean-ivy/>
+    	<clean-cache/>
     </target>
 
   </project>

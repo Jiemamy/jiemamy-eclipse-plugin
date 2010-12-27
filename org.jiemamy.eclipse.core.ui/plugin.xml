@@ -30,20 +30,18 @@
    </extension>
 -->
 
-<!--
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="org.jiemamy.eclipse.newWizard.category"
+            id="org.jiemamy.eclipse.core.ui.newWizard.category"
             name="Jiemamy"/>
       <wizard
             category="org.jiemamy.eclipse.newWizard.category"
-            class="org.jiemamy.eclipse.wizard.NewDiagramWizard"
+            class="org.jiemamy.eclipse.core.ui.wizard.NewDiagramWizard"
             icon="/icons/database.gif"
             id="org.jiemamy.eclipse.wizard.newDiagram"
             name="Jiemamy ER Diagram"/>
    </extension>
--->
 
    <extension
          point="org.eclipse.ui.preferencePages">

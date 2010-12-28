@@ -19,7 +19,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gef,
  org.eclipse.update.core,
  org.eclipse.debug.core,
- org.eclipse.jdt.ui,
  org.jiemamy.eclipse.core
 Eclipse-BuddyPolicy: registered
 Eclipse-RegisterBuddy: org.jiemamy.eclipse.core

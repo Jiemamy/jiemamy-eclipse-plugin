@@ -40,7 +40,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
-import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmLayoutEditPolicy;
+import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmXYLayoutEditPolicy;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
@@ -155,7 +155,7 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 	
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.LAYOUT_ROLE, new JmLayoutEditPolicy());
+		installEditPolicy(EditPolicy.LAYOUT_ROLE, new JmXYLayoutEditPolicy());
 	}
 	
 	@Override

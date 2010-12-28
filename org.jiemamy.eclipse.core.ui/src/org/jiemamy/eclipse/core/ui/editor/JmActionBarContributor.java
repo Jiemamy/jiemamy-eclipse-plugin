@@ -69,9 +69,9 @@ import org.jiemamy.utils.LogMarker;
  * 
  * @author daisuke
  */
-public class JmContributor extends ActionBarContributor {
+public class JmActionBarContributor extends ActionBarContributor {
 	
-	private static Logger logger = LoggerFactory.getLogger(JmContributor.class);
+	private static Logger logger = LoggerFactory.getLogger(JmActionBarContributor.class);
 	
 	private static final String JIEMAMY_UPDATE_SITE_URL = "http://eclipse.jiemamy.org/release/";
 	

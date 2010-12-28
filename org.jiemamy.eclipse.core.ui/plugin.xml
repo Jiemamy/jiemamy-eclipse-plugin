@@ -67,7 +67,7 @@
             name="%plugin.erd.editor"/>-->
       <editor
             class="org.jiemamy.eclipse.core.ui.editor.DiagramEditor"
-            contributorClass="org.jiemamy.eclipse.core.ui.editor.JmContributor"
+            contributorClass="org.jiemamy.eclipse.core.ui.editor.JmActionBarContributor"
             default="true"
             extensions="jiemamy"
             icon="/icons/database.gif"

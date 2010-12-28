@@ -18,8 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpolicy;
 
-import java.util.UUID;
-
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
@@ -31,30 +29,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.JiemamyEntity;
-import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.command.ChangeNodeConstraintCommand;
+import org.jiemamy.eclipse.core.ui.editor.command.CreateNodeCommand;
+import org.jiemamy.eclipse.core.ui.model.CoreNodePair;
+import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
 
 /**
  * Jiemamy用 {@link XYLayoutEditPolicy}実装クラス。
  * 
  * @author daisuke
  */
-public class JmLayoutEditPolicy extends XYLayoutEditPolicy {
+public class JmXYLayoutEditPolicy extends XYLayoutEditPolicy {
 	
 	/** {@link StickyNodeModel}が作られた時、はじめに設定されている値 */
 	private static final String DEFAULT_STICKY_CONTENTS = "memo";
 	
-	private static Logger logger = LoggerFactory.getLogger(JmLayoutEditPolicy.class);
+	private static Logger logger = LoggerFactory.getLogger(JmXYLayoutEditPolicy.class);
 	
 
 	@Override
 	protected Command createAddCommand(EditPart child, Object constraint) {
+		logger.debug("createAddCommand returns null.");
 		return null;
 	}
 	
@@ -69,22 +67,17 @@ public class JmLayoutEditPolicy extends XYLayoutEditPolicy {
 	
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {
-		JiemamyEntity model = (JiemamyEntity) request.getNewObject();
+		CoreNodePair model = (CoreNodePair) request.getNewObject();
 		JiemamyContext context = (JiemamyContext) getHost().getModel();
 		
-		NodeModel nodeModel = null;
-		if (model instanceof DatabaseObjectModel) {
-			DatabaseObjectModel dboModel = (DatabaseObjectModel) model;
-			nodeModel =
-					new DefaultNodeModel(UUID.randomUUID(),
-							(EntityRef<? extends DatabaseObjectModel>) dboModel.toReference());
-		} else if (model instanceof StickyNodeModel) {
-			StickyNodeModel stickyModel = (StickyNodeModel) model;
-			stickyModel.setContents(DEFAULT_STICKY_CONTENTS);
-			nodeModel = stickyModel;
+		if (model.getDiagramElement() instanceof StickyNodeModel) {
+			((StickyNodeModel) model.getDiagramElement()).setContents(DEFAULT_STICKY_CONTENTS);
 		}
-		return null; // FIXME
-//		return new CreateNodeCommand(context, TODO.DIAGRAM_INDEX, nodeModel, (Rectangle) getConstraintFor(request));
+		
+		Rectangle rect = (Rectangle) getConstraintFor(request);
+		((DefaultNodeModel) model.getDiagramElement()).setBoundary(ConvertUtil.convert(rect));
+		
+		return new CreateNodeCommand(context, TODO.DIAGRAM_INDEX, model);
 	}
 	
 	@Override

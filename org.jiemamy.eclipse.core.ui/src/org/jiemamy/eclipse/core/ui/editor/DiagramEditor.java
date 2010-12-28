@@ -401,7 +401,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 	public void setFocus() {
 		super.setFocus();
 		
-		JmContributor contributor = (JmContributor) getEditorSite().getActionBarContributor();
+		JmActionBarContributor contributor = (JmActionBarContributor) getEditorSite().getActionBarContributor();
 		if (contributor != null) {
 			contributor.selectCombo(context);
 		}

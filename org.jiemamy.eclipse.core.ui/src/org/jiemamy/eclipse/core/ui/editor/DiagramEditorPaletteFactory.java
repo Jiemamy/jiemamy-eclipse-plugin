@@ -35,6 +35,12 @@ import org.eclipse.jface.resource.ImageRegistry;
 
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
+import org.jiemamy.eclipse.core.ui.model.ForeignKeyConnection;
+import org.jiemamy.eclipse.core.ui.model.TableNode;
+import org.jiemamy.eclipse.core.ui.model.ViewNode;
+import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DefaultConnectionModel;
+import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.attribute.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.dbo.DefaultTableModel;
@@ -135,11 +141,13 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						return new DefaultTableModel(UUID.randomUUID());
+						DefaultTableModel table = new DefaultTableModel(UUID.randomUUID());
+						DefaultNodeModel node = new DefaultNodeModel(UUID.randomUUID(), table.toReference());
+						return new TableNode(table, node);
 					}
 					
 					public Object getObjectType() {
-						return DefaultTableModel.class;
+						return TableNode.class;
 					}
 					
 				}, imageRegistry.getDescriptor(Images.BUTTON_TABLE), imageRegistry.getDescriptor(Images.BUTTON_TABLE));
@@ -150,11 +158,13 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						return new DefaultViewModel(UUID.randomUUID());
+						DefaultViewModel view = new DefaultViewModel(UUID.randomUUID());
+						DefaultNodeModel node = new DefaultNodeModel(UUID.randomUUID(), view.toReference());
+						return new ViewNode(view, node);
 					}
 					
 					public Object getObjectType() {
-						return DefaultViewModel.class;
+						return ViewNode.class;
 					}
 					
 				}, imageRegistry.getDescriptor(Images.BUTTON_VIEW), imageRegistry.getDescriptor(Images.BUTTON_VIEW));
@@ -192,13 +202,15 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						// FIXME
-						return new DefaultForeignKeyConstraintModel(UUID.randomUUID(), null, null, null, null, null,
-								null, null, null, null);
+						DefaultForeignKeyConstraintModel fk =
+								new DefaultForeignKeyConstraintModel(UUID.randomUUID(), null, null, null, null, null,
+										null, null, null, null);
+						ConnectionModel conn = new DefaultConnectionModel(UUID.randomUUID(), fk.toReference());
+						return new ForeignKeyConnection(fk, conn);
 					}
 					
 					public Object getObjectType() {
-						return DefaultTableModel.class;
+						return ForeignKeyConnection.class;
 					}
 					
 				}, imageRegistry.getDescriptor(Images.BUTTON_FK), imageRegistry.getDescriptor(Images.BUTTON_FK));

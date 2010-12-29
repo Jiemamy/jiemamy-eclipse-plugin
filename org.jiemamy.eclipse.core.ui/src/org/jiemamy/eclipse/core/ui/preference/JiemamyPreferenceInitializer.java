@@ -18,7 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.preference;
 
-import org.eclipse.core.runtime.Preferences; 
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;

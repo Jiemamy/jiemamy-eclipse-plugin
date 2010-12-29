@@ -75,7 +75,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	@Override
 	public void commandExecuted(org.jiemamy.transaction.Command command) {
 		// TODO Auto-generated method stub
-		
+		refresh();
 	}
 	
 	public void openEditDialog() {

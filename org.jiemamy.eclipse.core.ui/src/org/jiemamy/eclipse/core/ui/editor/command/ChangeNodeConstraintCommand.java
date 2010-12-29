@@ -32,6 +32,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.geometory.JmPoint;
@@ -112,8 +113,14 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		// ベンドポイントの移動
 		shiftBendpoints(false);
 		
+		// FIXME
 		// 負領域に移動した際、全体を移動させ、すべて正領域に
 		shiftPosition(false);
+		
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		diagramModel.store(nodeModel);
+		facet.store(diagramModel);
 	}
 	
 	@Override

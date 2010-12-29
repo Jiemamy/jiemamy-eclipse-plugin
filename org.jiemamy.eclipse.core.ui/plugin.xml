@@ -75,7 +75,6 @@
             name="%plugin.erd.editor"/>
    </extension>
 
-
    <extension
          id="problem"
          point="org.eclipse.core.resources.markers">

@@ -13,14 +13,6 @@
   </root>
 
   <logger name="org.jiemamy">
-    <level value="INFO" />
-  </logger>
-
-  <logger name="org.jiemamy.eclipse.core">
     <level value="DEBUG" />
-  </logger>
-
-  <logger name="org.jiemamy.eclipse.core.ui">
-    <level value="TRACE" />
   </logger>
 </configuration>

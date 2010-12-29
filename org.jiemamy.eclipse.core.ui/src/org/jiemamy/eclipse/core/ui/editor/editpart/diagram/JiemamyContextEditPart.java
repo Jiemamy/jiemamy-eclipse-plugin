@@ -18,7 +18,10 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpart.diagram;
 
+import java.util.Collection;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.ConnectionLayer;
@@ -47,17 +50,16 @@ import org.jiemamy.model.NodeModel;
 import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.utils.LogMarker;
-import org.jiemamy.utils.collection.CollectionsUtil;
 
 /**
  * {@link JiemamyContext}に対するDiagram用EditPart。
  * 
  * @author daisuke
  */
-public class RootEditPart extends AbstractGraphicalEditPart implements EditDialogSupport, IPropertyChangeListener,
-		CommandListener {
+public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements EditDialogSupport,
+		IPropertyChangeListener, CommandListener {
 	
-	private static Logger logger = LoggerFactory.getLogger(RootEditPart.class);
+	private static Logger logger = LoggerFactory.getLogger(JiemamyContextEditPart.class);
 	
 
 	/**
@@ -66,7 +68,7 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 	 * @param context コントロール対象の{@link JiemamyContext}
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public RootEditPart(JiemamyContext context) {
+	public JiemamyContextEditPart(JiemamyContext context) {
 		Validate.notNull(context);
 		setModel(context);
 	}
@@ -85,7 +87,6 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 	
 	public void commandExecuted(Command command) {
 		refresh();
-		refreshChildren();
 //		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}
 	
@@ -110,6 +111,9 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 		return getModel();
 	}
 	
+	/**
+	 * @see EditDialogSupport#openEditDialog()
+	 */
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		JiemamyContext context = getModel();
@@ -140,17 +144,19 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 		super.performRequest(req);
 	}
 	
+	/**
+	 * @see IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
 	public void propertyChange(org.eclipse.jface.util.PropertyChangeEvent event) {
 		setConnectionRouter(getFigure());
 	}
 	
 	@Override
 	public void setModel(Object model) {
-		if (model instanceof JiemamyContext) {
-			super.setModel(model);
-		} else {
+		if (model instanceof JiemamyContext == false) {
 			throw new IllegalArgumentException();
 		}
+		super.setModel(model);
 	}
 	
 	@Override
@@ -158,6 +164,14 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new JmXYLayoutEditPolicy());
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>この実装では、モデル{@link JiemamyContext}に対応するビュー（{@link IFigure}）を
+	 * 新しく生成する。対応するビューは {@link Layer} 型であり、XY座標平面上に子要素を配置（{@link XYLayout}）する。
+	 * また、{@link JiemamyPreference}に応じて、{@link LayerConstants#CONNECTION_LAYER}に
+	 * {@link ConnectionRouter}（コネクションをどのように引き回すか、を表す戦略）を設定する。</p>
+	 */
 	@Override
 	protected IFigure createFigure() {
 		Layer figure = new Layer();
@@ -173,7 +187,8 @@ public class RootEditPart extends AbstractGraphicalEditPart implements EditDialo
 		JiemamyContext context = getModel();
 		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
 		DiagramModel diagramModel = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		return CollectionsUtil.newArrayList(diagramModel.getNodes());
+		Collection<? extends NodeModel> nodes = diagramModel.getNodes();
+		return Lists.newArrayList(nodes);
 	}
 	
 	private void setConnectionRouter(IFigure figure) {

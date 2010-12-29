@@ -86,13 +86,14 @@ import org.jiemamy.eclipse.core.ui.editor.editpart.DiagramEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
 import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.serializer.JiemamySerializer;
 import org.jiemamy.serializer.SerializationException;
 import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.DispatchStrategy;
 import org.jiemamy.transaction.EventBrokerImpl;
 import org.jiemamy.utils.LogMarker;
-import org.jiemamy.validator.CompositeValidator;
+import org.jiemamy.validator.AllValidator;
 import org.jiemamy.validator.Problem;
 import org.jiemamy.validator.Problem.Severity;
 import org.jiemamy.validator.Validator;
@@ -102,16 +103,16 @@ import org.jiemamy.validator.Validator;
  * 
  * @author daisuke
  */
-public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements IResourceChangeListener,
+public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette implements IResourceChangeListener,
 		CommandListener, JiemamyEditor {
 	
-	/** DELキーのキーコード */
-	private static final int KEYCODE_DEL = 127;
-	
-	private static Logger logger = LoggerFactory.getLogger(DiagramEditor.class);
+	private static Logger logger = LoggerFactory.getLogger(JiemamyDiagramEditor.class);
 	
 	/** Palette component, holding the tools and shapes. */
 	private static PaletteRoot paletteModel;
+	
+	/** DELキーのキーコード */
+	private static final int KEYCODE_DEL = 127;
 	
 	/** zoom level */
 	private static final double[] ZOOM_LEVELS = new double[] {
@@ -150,7 +151,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 	/** ルートEditPart（コントローラ） */
 	private ScalableRootEditPart rootEditPart = new ScalableRootEditPart();
 	
-	/** エディタのルートモデル */
+	/** このエディタに対応する{@link JiemamyContext}（モデル） */
 	private JiemamyContext context;
 	
 	private boolean savePreviouslyNeeded = false;
@@ -162,7 +163,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 	/**
 	 * インスタンスを生成する。
 	 */
-	public DiagramEditor() {
+	public JiemamyDiagramEditor() {
 		setEditDomain(new DefaultEditDomain(this));
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		logger.debug(LogMarker.LIFECYCLE, "constructed - single");
@@ -171,39 +172,31 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param rootModel ルートモデル
+	 * @param context {@link JiemamyContext}
 	 * @param tabIndex マルチタブエディタ上でのタブインデックス
 	 */
-	public DiagramEditor(JiemamyContext rootModel, int tabIndex) {
+	public JiemamyDiagramEditor(JiemamyContext context, int tabIndex) {
 		setEditDomain(new DefaultEditDomain(this));
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		this.tabIndex = tabIndex;
 		logger.debug(LogMarker.LIFECYCLE, "constructed - multi");
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>こも実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
+	 */
 	public void commandExecuted(Command command) {
-		Dialect dialect;
+		Validator validator;
 		try {
-			dialect = context.findDialect();
+			Dialect dialect = context.findDialect();
+			validator = dialect.getValidator();
 		} catch (ClassNotFoundException e) {
 //			dialect = JiemamyCorePlugin.getDialectResolver().getAllInstance().get(0);
-			dialect = new Dialect() {
-				
-				public String getConnectionUriTemplate() {
-					return "foobar";
-				}
-				
-				public String getName() {
-					// TODO Auto-generated method stub
-					return "dummy";
-				}
-				
-				public Validator getValidator() {
-					return new CompositeValidator();
-				}
-			};
+//			validator = dialect.getValidator();
+			validator = new AllValidator();
 		}
-		Validator validator = dialect.getValidator();
 		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
 		MarkerUtil.deleteAllMarkers();
 		for (Problem problem : validator.validate(context)) {
@@ -366,8 +359,9 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 	}
 	
 	/**
-	 * エディタ外などからの、リソースの変更を検知する。
 	 * {@inheritDoc}
+	 * 
+	 * エディタ外などからの、リソースの変更を検知する。
 	 */
 	public void resourceChanged(final IResourceChangeEvent event) {
 		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -379,7 +373,7 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 						IFile file = ((IFileEditorInput) input).getFile();
 						if (file.exists() == false) {
 							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-							page.closeEditor(DiagramEditor.this, true);
+							page.closeEditor(JiemamyDiagramEditor.this, true);
 						} else if (getPartName().equals(file.getName()) == false) {
 							setPartName(file.getName());
 						}
@@ -418,13 +412,25 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 		this.tabIndex = tabIndex;
 	}
 	
+	/**
+	 * Describes this EditPart for developmental debugging
+	 * purposes.
+	 * @return a description
+	 */
+	@Override
+	public String toString() {
+		String c = getClass().getName();
+		c = c.substring(c.lastIndexOf('.') + 1);
+		return c + "( " + getEditorInput() + " )"; // $NON-NLS-2$ // $NON-NLS-1$
+	}
+	
 	@Override
 	protected void configureGraphicalViewer() {
 		super.configureGraphicalViewer();
 		
 		// EditPartFactoryの作成と設定
 		GraphicalViewer viewer = getGraphicalViewer();
-		viewer.setEditPartFactory(new DiagramEditPartFactory(context));
+		viewer.setEditPartFactory(new DiagramEditPartFactory(this));
 		viewer.setRootEditPart(rootEditPart);
 		
 		ActionRegistry actionRegistry = getActionRegistry();
@@ -540,9 +546,8 @@ public class DiagramEditor extends GraphicalEditorWithFlyoutPalette implements I
 		// 最上位モデルの設定
 		IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 		try {
-			context =
-					JiemamyContext.findSerializer().deserialize(file.getContents(), DiagramFacet.PROVIDER,
-							SqlFacet.PROVIDER);
+			JiemamySerializer serializer = JiemamyContext.findSerializer();
+			context = serializer.deserialize(file.getContents(), DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 //			context.normalize();
 		} catch (SerializationException e) {
 			ExceptionHandler.handleException(e, "Data file is broken.");

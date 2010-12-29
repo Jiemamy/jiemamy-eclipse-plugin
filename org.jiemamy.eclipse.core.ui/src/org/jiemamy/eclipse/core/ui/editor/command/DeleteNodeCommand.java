@@ -19,69 +19,55 @@
 package org.jiemamy.eclipse.core.ui.editor.command;
 
 import org.eclipse.gef.commands.Command;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.eclipse.core.ui.model.CoreNodePair;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
-import org.jiemamy.transaction.SavePoint;
-import org.jiemamy.utils.LogMarker;
 
 /**
- * ノード作成GEFコマンド。
+ * ノード削除GEFコマンド。
  * 
  * @author daisuke
  */
-public class CreateNodeCommand extends Command {
-	
-	private static Logger logger = LoggerFactory.getLogger(CreateNodeCommand.class);
-	
-	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
-	private final int diagramIndex;
-	
-	private CoreNodePair model;
-	
-	private SavePoint savePoint;
+public class DeleteNodeCommand extends Command {
 	
 	private final JiemamyContext context;
+	
+	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
+	private int diagramIndex;
+	
+	/** 削除されるノード */
+	private NodeModel nodeModel;
 	
 
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param context 作成ノードの親モデル
+	 * @param context ルートモデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param model 作成するノード
+	 * @param nodeModel 削除されるノード
 	 */
-	public CreateNodeCommand(JiemamyContext context, int diagramIndex, CoreNodePair model) {
+	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, NodeModel nodeModel) {
 		this.context = context;
 		this.diagramIndex = diagramIndex;
-		this.model = model;
+		this.nodeModel = nodeModel;
 	}
 	
 	@Override
 	public void execute() {
-		logger.debug(LogMarker.LIFECYCLE, "execute");
-//		savePoint = jiemamyFacade.save();
-		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
-		NodeModel nodeModel = model.getDiagramElement();
-		DatabaseObjectModel coreModel = model.getCoreElement();
-		context.store(coreModel);
-		diagramModel.store(nodeModel);
+		diagramModel.delete(nodeModel.toReference());
 		facet.store(diagramModel);
-		
-//		jiemamyFacade.addNode(diagramIndex, nodeAdapter, ConvertUtil.convert(rectangle));
 	}
 	
 	@Override
 	public void undo() {
-		logger.debug(LogMarker.LIFECYCLE, "undo");
-//		jiemamyFacade.rollback(savePoint);
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		diagramModel.store(nodeModel);
+		facet.store(diagramModel);
 	}
+	
 }

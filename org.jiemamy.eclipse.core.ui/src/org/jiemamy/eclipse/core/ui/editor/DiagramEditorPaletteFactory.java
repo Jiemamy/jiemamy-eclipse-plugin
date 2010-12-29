@@ -47,7 +47,7 @@ import org.jiemamy.model.dbo.DefaultTableModel;
 import org.jiemamy.model.dbo.DefaultViewModel;
 
 /**
- * {@link DiagramEditor}用のパレット（デフォルトで右側にある奴）を生成するファクトリ。
+ * {@link JiemamyDiagramEditor}用のパレット（デフォルトで右側にある奴）を生成するファクトリ。
  * 
  * @author daisuke
  */

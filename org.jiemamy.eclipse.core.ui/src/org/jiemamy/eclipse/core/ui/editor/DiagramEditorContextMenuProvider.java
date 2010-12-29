@@ -42,13 +42,13 @@ import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
 
 /**
- * {@link DiagramEditor}用のコンテキストメニュー（右クリックメニュー）を提供するプロバイダ実装クラス。
+ * {@link JiemamyDiagramEditor}用のコンテキストメニュー（右クリックメニュー）を提供するプロバイダ実装クラス。
  * 
  * @author daisuke
  */
 public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 	
-	private final DiagramEditor editorPart;
+	private final JiemamyDiagramEditor editorPart;
 	
 	/** The editor's action registry. */
 	private final ActionRegistry actionRegistry;
@@ -62,7 +62,7 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 	 * @param editor the editor
 	 * @param registry the editor's action registry
 	 */
-	public DiagramEditorContextMenuProvider(EditPartViewer viewer, DiagramEditor editor, ActionRegistry registry) {
+	public DiagramEditorContextMenuProvider(EditPartViewer viewer, JiemamyDiagramEditor editor, ActionRegistry registry) {
 		super(viewer);
 		if (registry == null) {
 			throw new IllegalArgumentException();

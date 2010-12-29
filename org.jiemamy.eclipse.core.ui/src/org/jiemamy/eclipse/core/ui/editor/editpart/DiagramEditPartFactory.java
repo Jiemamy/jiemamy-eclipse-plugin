@@ -24,9 +24,18 @@ import org.eclipse.gef.EditPartFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.RootEditPart;
+import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
+import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.JiemamyContextEditPart;
+import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.TableEditPart;
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.dbo.DatabaseObjectModel;
+import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.model.dbo.ViewModel;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -38,49 +47,61 @@ public class DiagramEditPartFactory implements EditPartFactory {
 	
 	private static Logger logger = LoggerFactory.getLogger(DiagramEditPartFactory.class);
 	
-	private final JiemamyContext context;
+	private final JiemamyEditor editor;
 	
 
-	public DiagramEditPartFactory(JiemamyContext context) {
-		this.context = context;
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param editor
+	 */
+	public DiagramEditPartFactory(JiemamyEditor editor) {
+		this.editor = editor;
 	}
 	
-	public EditPart createEditPart(EditPart context, Object model) {
-		logger.debug(LogMarker.LIFECYCLE, "createEditPart for " + model);
+	/**
+	 * @param parent {@link EditPart}
+	 * @param model model object
+	 * @return new {@link EditPart} instance
+	 */
+	public EditPart createEditPart(EditPart parent, Object model) {
+		logger.debug(LogMarker.LIFECYCLE, "createEditPart for {}", model);
 		EditPart part = null;
+		JiemamyContext context = editor.getJiemamyContext();
 		
 		if (model instanceof JiemamyContext) {
-			part = new RootEditPart((JiemamyContext) model);
-//		} else if (model instanceof NodeModel) {
-//			NodeModel nodeAdapter = (NodeModel) model;
-//			DatabaseObjectModel entityModel = nodeAdapter.unwrap();
-//			if (entityModel instanceof TableModel) {
-//				part = new TableEditPart((NodeModel) model);
-//			} else if (entityModel instanceof ViewModel) {
-//				part = new ViewEditPart((NodeModel) model);
-//			} else if (entityModel == null) {
-//				if (nodeAdapter instanceof StickyModel) {
-//					part = new StickyEditPart((StickyModel) nodeAdapter);
-//				} else {
-//					JiemamyUIPlugin.log("unknown node: " + model.getClass().getName(), Status.ERROR);
-//				}
-//			} else {
-//				JiemamyUIPlugin.log("unknown entity: " + model.getClass().getName(), Status.ERROR);
-//			}
+			part = new JiemamyContextEditPart((JiemamyContext) model);
+		} else if (model instanceof DefaultNodeModel) {
+			DefaultNodeModel node = (DefaultNodeModel) model;
+			
+			try {
+				context.getFacet(DiagramFacet.class).resolve(node.toReference());
+				if (node.getCoreModelRef() == null) {
+					if (node instanceof StickyNodeModel) {
+//						part = new StickyEditPart((StickyNodeModel) node);
+					}
+				} else {
+					DatabaseObjectModel core = context.resolve(node.getCoreModelRef());
+					if (core instanceof TableModel) {
+						part = new TableEditPart(node);
+					} else if (core instanceof ViewModel) {
+//						part = new ViewEditPart(node);
+					}
+				}
+			} catch (EntityNotFoundException e) {
+				// ignore
+			}
 //		} else if (model instanceof ConnectionModel) {
 //			ConnectionModel connectionAdapter = (ConnectionModel) model;
 //			ForeignKeyConstraintModel foreignKey = connectionAdapter.unwrap();
 //			if (foreignKey != null) {
 //				part = new ForeignKeyEditPart(connectionAdapter);
-//			} else {
-//				JiemamyUIPlugin.log("unknown connection: " + model.getClass().getName(), Status.ERROR);
 //			}
-		} else {
-			JiemamyUIPlugin.log("unknown model: " + model.getClass().getName(), Status.ERROR);
 		}
 		
 		if (part == null) {
-			JiemamyUIPlugin.log("Cannot create EditPart for unknown model.", Status.ERROR);
+			String message = "Cannot create EditPart for unknown model: " + model.getClass().getName();
+			JiemamyUIPlugin.log(message, Status.ERROR);
 		}
 		
 		return part;

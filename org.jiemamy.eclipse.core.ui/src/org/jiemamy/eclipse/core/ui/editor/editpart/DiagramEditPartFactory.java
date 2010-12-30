@@ -31,6 +31,7 @@ import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.JiemamyContextEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.TableEditPart;
+import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.ViewEditPart;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.dbo.DatabaseObjectModel;
@@ -85,7 +86,7 @@ public class DiagramEditPartFactory implements EditPartFactory {
 					if (core instanceof TableModel) {
 						part = new TableEditPart(node);
 					} else if (core instanceof ViewModel) {
-//						part = new ViewEditPart(node);
+						part = new ViewEditPart(node);
 					}
 				}
 			} catch (EntityNotFoundException e) {

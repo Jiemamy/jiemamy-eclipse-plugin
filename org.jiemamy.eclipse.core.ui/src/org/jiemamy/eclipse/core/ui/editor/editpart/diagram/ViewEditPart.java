@@ -30,45 +30,33 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
-import org.jiemamy.eclipse.core.ui.editor.figure.ColumnFigure;
-import org.jiemamy.eclipse.core.ui.editor.figure.TableFigure;
+import org.jiemamy.eclipse.core.ui.editor.figure.ViewFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.DiagramModel;
-import org.jiemamy.model.Level;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.attribute.ColumnModel;
-import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.model.dbo.ViewModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.utils.LogMarker;
 
 /**
- * {@link TableModel}に対するDiagram用{@link EditPart}（コントローラ）。
+ * {@link ViewModel}に対するDiagram用{@link EditPart}（コントローラ）。
  * 
  * @author daisuke
  */
-public class TableEditPart extends AbstractJmNodeEditPart {
+public class ViewEditPart extends AbstractJmNodeEditPart {
 	
-	private static Logger logger = LoggerFactory.getLogger(TableEditPart.class);
+	private static Logger logger = LoggerFactory.getLogger(ViewEditPart.class);
 	
 
-//	@Override
-//	protected DirectEditManager createDirectEditManager() {
-//		EntityFigure figure = (EntityFigure) getFigure();
-//		CellEditorLocator locator = new NodeCellEditorLocator(figure.getEntityNameLabel());
-//		return new EntityDirectEditManager(this, TextCellEditor.class, locator);
-//	}
-	
 	/**
 	 * インスタンスを生成する。
 	 * 
 	 * @param nodeModel コントロール対象のノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TableEditPart(DefaultNodeModel nodeModel) {
+	public ViewEditPart(DefaultNodeModel nodeModel) {
 		super(nodeModel);
 	}
 	
@@ -82,14 +70,14 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		NodeModel node = getModel();
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
+		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
 		
 //		// 編集前のスナップショットを保存
 //		JiemamyViewFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
 //		SavePoint beforeEditSavePoint = facade.save();
 //		
 //		Shell shell = getViewer().getControl().getShell();
-//		JiemamyEditDialog<TableModel> dialog = new TableEditDialog(shell, tableModel, Migration.DIAGRAM_INDEX, facade);
+//		ViewEditDialog dialog = new ViewEditDialog(shell, viewModel, Migration.DIAGRAM_INDEX, facade);
 //		
 //		if (dialog.open() == Dialog.OK) {
 //			// 編集後のスナップショットを保存
@@ -114,11 +102,11 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	protected IFigure createFigure() {
 		logger.debug(LogMarker.LIFECYCLE, "createFigure");
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		TableFigure figure = new TableFigure();
+		ViewFigure figure = new ViewFigure();
 		NodeModel node = getModel();
 		
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
-		String description = tableModel.getDescription();
+		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
+		String description = viewModel.getDescription();
 		
 		if (StringUtils.isEmpty(description) == false) {
 			Panel tooltip = new Panel();
@@ -138,52 +126,19 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		logger.debug(LogMarker.LIFECYCLE, "updateFigure");
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		NodeModel node = getModel();
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
-		TableFigure tableFigure = (TableFigure) figure;
+		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
+		ViewFigure viewFigure = (ViewFigure) figure;
 		
-		String labelString = LabelStringUtil.getString(context, tableModel, DisplayPlace.FIGURE);
+		String labelString = LabelStringUtil.getString(context, viewModel, DisplayPlace.FIGURE);
 		DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
 		
-		tableFigure.setDatabaseObjectName(labelString);
+		viewFigure.setDatabaseObjectName(labelString);
 		
 		JmColor color = node.getColor();
-		tableFigure.setBgColor(ConvertUtil.convert(color));
+		viewFigure.setBgColor(ConvertUtil.convert(color));
 		
-		tableFigure.removeAllColumns();
+		viewFigure.removeAllColumns();
 		
-		for (ColumnModel columnModel : tableModel.getColumns()) {
-			ColumnFigure[] columnFigure = createColumnFigure(columnModel);
-			tableFigure.add(columnFigure[0], columnFigure[1]);
-		}
-	}
-	
-	private ColumnFigure[] createColumnFigure(ColumnModel columnModel) {
-		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		
-		DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		
-		if (presentation.getLevel() == Level.ENTITY) {
-			return new ColumnFigure[0];
-		}
-		
-		ColumnFigure nameLabel = new ColumnFigure();
-		ColumnFigure typeLabel = new ColumnFigure();
-		
-		nameLabel.setText(LabelStringUtil.getString(context, columnModel, DisplayPlace.FIGURE));
-		typeLabel.setText(LabelStringUtil.getString(context, columnModel.getDataType(), DisplayPlace.FIGURE));
-		
-		NodeModel node = getModel();
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
-		
-		if (tableModel.getPrimaryKey().getKeyColumns().contains(columnModel.toReference())) {
-			nameLabel.setUnderline(true);
-			typeLabel.setUnderline(true);
-		}
-		
-		return new ColumnFigure[] {
-			nameLabel,
-			typeLabel
-		};
+		// TODO カラム部の表示
 	}
 }

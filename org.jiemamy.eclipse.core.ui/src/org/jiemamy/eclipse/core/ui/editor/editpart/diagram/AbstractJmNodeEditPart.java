@@ -28,6 +28,7 @@ import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
@@ -42,10 +43,12 @@ import org.jiemamy.JiemamyEntity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmComponentEditPolicy;
+import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.geometory.JmRectangle;
 import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.utils.LogMarker;
@@ -96,15 +99,6 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		logger.debug("deactivate");
 	}
 	
-	@Override
-	public NodeModel getModel() {
-		return (NodeModel) super.getModel();
-	}
-	
-	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
-		return new ChopboxAnchor(getFigure());
-	}
-	
 //	@Override
 //	// Java1.4対応APIのため、Classに型パラメータをつけることができない
 //	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
@@ -121,6 +115,15 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 //		}
 //		return super.getAdapter(key);
 //	}
+	
+	@Override
+	public NodeModel getModel() {
+		return (NodeModel) super.getModel();
+	}
+	
+	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
+		return new ChopboxAnchor(getFigure());
+	}
 	
 	public ConnectionAnchor getSourceConnectionAnchor(Request connection) {
 		return new ChopboxAnchor(getFigure());
@@ -222,6 +225,22 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		}
 		logger.debug(getModel() + " targetConnections = " + result);
 		return result;
+	}
+	
+	@Override
+	protected void refreshVisuals() {
+		logger.debug(LogMarker.LIFECYCLE, "refreshVisuals");
+		super.refreshVisuals();
+		GraphicalEditPart editPart = (GraphicalEditPart) getParent();
+		if (editPart == null) {
+			// モデルが削除された場合にeditPart==nullとなる。その時は描画処理は行わない。
+			return;
+		}
+		
+		NodeModel node = getModel();
+		JmRectangle boundary = node.getBoundary();
+		editPart.setLayoutConstraint(this, getFigure(), ConvertUtil.convert(boundary));
+		updateFigure(getFigure());
 	}
 	
 	/**

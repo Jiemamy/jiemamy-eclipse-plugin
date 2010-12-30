@@ -103,12 +103,12 @@ public class DatabaseObjectFigure extends Figure {
 	}
 	
 	/**
-	 * エンティティ名を設定する。
+	 * DatabaseObject名を設定する。
 	 * 
-	 * @param entityName エンティティ名
+	 * @param databaseObjectName DatabaseObject名
 	 */
-	public void setEntityName(String entityName) {
-		entityNameLabel.setText(entityName);
+	public void setDatabaseObjectName(String databaseObjectName) {
+		entityNameLabel.setText(databaseObjectName);
 	}
 	
 }

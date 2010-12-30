@@ -19,7 +19,6 @@
 package org.jiemamy.eclipse.core.ui.editor.figure;
 
 import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LineBorder;
@@ -30,31 +29,27 @@ import org.eclipse.swt.graphics.Color;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.model.dbo.ViewModel;
 
 /**
- * {@link TableModel}の{@link IFigure}（ビュー）。
+ * {@link ViewModel}の{@link IFigure}（ビュー）。
  * 
  * @author daisuke
  */
-public class TableFigure extends DatabaseObjectFigure {
+public class ViewFigure extends DatabaseObjectFigure {
 	
-	private ColumnLayoutFigure columnFigure = new ColumnLayoutFigure();
-	
-	private CompartmentFigure columnNameFigure = new CompartmentFigure();
-	
-	private CompartmentFigure columnTypeFigure = new CompartmentFigure();
+	private static final Color DEFAULT = new Color(null, 240, 250, 255);
 	
 
 	/**
 	 * インスタンスを生成する。
 	 */
-	public TableFigure() {
-		super(ColorConstants.tooltipBackground);
+	public ViewFigure() {
+		super(DEFAULT);
 		
 		Label entityNameLabel = getEntityNameLabel();
 		ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
-		entityNameLabel.setIcon(ir.get(Images.LABEL_TABLE));
+		entityNameLabel.setIcon(ir.get(Images.LABEL_VIEW));
 		
 		setLayoutManager(new ToolbarLayout());
 		setBorder(new LineBorder(ColorConstants.black, 1));
@@ -62,39 +57,32 @@ public class TableFigure extends DatabaseObjectFigure {
 		setOpaque(true);
 		
 		add(entityNameLabel);
-		add(columnFigure);
-		
-		columnFigure.add(columnNameFigure);
-		columnFigure.add(columnTypeFigure);
+		add(getColumnFigure());
 	}
 	
-	/**
-	 * フィギュアを追加する。
-	 * 
-	 * @param nameFigure カラム名
-	 * @param typeFigure 型
-	 */
-	public void add(ColumnFigure nameFigure, ColumnFigure typeFigure) {
-		columnNameFigure.add(nameFigure);
-		columnTypeFigure.add(typeFigure);
+	@Override
+	public void add(IFigure figure, Object constraint, int index) {
+		if (figure instanceof ColumnFigure) {
+			getColumnFigure().add(figure);
+		} else {
+			super.add(figure, constraint, index);
+		}
 	}
 	
 	@Override
 	public void remove(IFigure figure) {
 		if (figure instanceof ColumnFigure) {
-			columnNameFigure.remove(figure);
-			columnTypeFigure.remove(figure);
+			getColumnFigure().remove(figure);
 		} else {
 			super.remove(figure);
 		}
 	}
 	
 	/**
-	 * カラムをクリアする。
+	 * 全てのFigureをクリアする。
 	 */
 	public void removeAllColumns() {
-		columnNameFigure.removeAll();
-		columnTypeFigure.removeAll();
+		getColumnFigure().removeAll();
 	}
 	
 	/**
@@ -102,34 +90,16 @@ public class TableFigure extends DatabaseObjectFigure {
 	 * 
 	 * <p>背景色に合わせて、文字色も調整する。</p>
 	 * 
-	 * @param bgColor 背景色
+	 * @param bgColor 背景色. {@code null}の場合、デフォルトの色を設定する
 	 */
 	@Override
 	public void setBgColor(Color bgColor) {
 		super.setBgColor(bgColor);
 		
 		if (SwtColorUtil.isDarkColor(getBackgroundColor())) {
-			columnNameFigure.setForegroundColor(ColorConstants.white);
-			columnTypeFigure.setForegroundColor(ColorConstants.white);
+			setForegroundColor(ColorConstants.white);
 		} else {
-			columnNameFigure.setForegroundColor(ColorConstants.black);
-			columnTypeFigure.setForegroundColor(ColorConstants.black);
-		}
-	}
-	
-
-	private static class ColumnLayoutFigure extends Figure {
-		
-		/**
-		 * インスタンスを生成する。
-		 */
-		public ColumnLayoutFigure() {
-			ToolbarLayout layout = new ToolbarLayout(true);
-			layout.setMinorAlignment(ToolbarLayout.ALIGN_TOPLEFT);
-			layout.setStretchMinorAxis(false);
-			layout.setSpacing(2);
-			setLayoutManager(layout);
-			setBorder(new CompartmentFigureBorder());
+			setForegroundColor(ColorConstants.black);
 		}
 	}
 }

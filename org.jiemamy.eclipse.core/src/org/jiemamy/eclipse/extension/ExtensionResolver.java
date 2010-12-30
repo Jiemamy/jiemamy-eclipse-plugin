@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections15.list.UnmodifiableList;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ILog;
@@ -32,8 +34,6 @@ import org.eclipse.core.runtime.Status;
 import org.seasar.eclipse.common.util.ExtensionAcceptor;
 
 import org.jiemamy.eclipse.JiemamyCorePlugin;
-
-import com.google.common.collect.Maps;
 
 /**
  * 拡張ポイントに設定された項目の読み出しを行うクラス。
@@ -113,7 +113,8 @@ public class ExtensionResolver<T> {
 					log.log(status);
 				}
 			}
-			allInstance = UnmodifiableList.decorate(result);
+			
+			allInstance = ImmutableList.copyOf(result);
 		}
 		return allInstance;
 	}

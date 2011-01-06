@@ -20,8 +20,8 @@ package org.jiemamy.eclipse.core.ui.model;
 
 import org.apache.commons.lang.Validate;
 
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.ViewModel;
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.dbo.DefaultViewModel;
 
 /**
  * TODO for daisuke
@@ -31,9 +31,9 @@ import org.jiemamy.model.dbo.ViewModel;
  */
 public class ViewNode implements CoreNodePair {
 	
-	private final ViewModel view;
+	private final DefaultViewModel view;
 	
-	private final NodeModel node;
+	private final DefaultNodeModel node;
 	
 
 	/**
@@ -42,18 +42,18 @@ public class ViewNode implements CoreNodePair {
 	 * @param node
 	 * @param view 
 	 */
-	public ViewNode(ViewModel view, NodeModel node) {
+	public ViewNode(DefaultViewModel view, DefaultNodeModel node) {
 		Validate.notNull(view);
 		Validate.notNull(node);
 		this.view = view;
 		this.node = node;
 	}
 	
-	public ViewModel getCoreElement() {
+	public DefaultViewModel getCoreElement() {
 		return view;
 	}
 	
-	public NodeModel getDiagramElement() {
+	public DefaultNodeModel getDiagramElement() {
 		return node;
 	}
 }

@@ -20,8 +20,8 @@ package org.jiemamy.eclipse.core.ui.model;
 
 import org.apache.commons.lang.Validate;
 
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.dbo.DefaultTableModel;
 
 /**
  * TODO for daisuke
@@ -31,23 +31,23 @@ import org.jiemamy.model.dbo.TableModel;
  */
 public class TableNode implements CoreNodePair {
 	
-	private final TableModel table;
+	private final DefaultTableModel table;
 	
-	private final NodeModel node;
+	private final DefaultNodeModel node;
 	
 
-	public TableNode(TableModel table, NodeModel node) {
+	public TableNode(DefaultTableModel table, DefaultNodeModel node) {
 		Validate.notNull(table);
 		Validate.notNull(node);
 		this.table = table;
 		this.node = node;
 	}
 	
-	public TableModel getCoreElement() {
+	public DefaultTableModel getCoreElement() {
 		return table;
 	}
 	
-	public NodeModel getDiagramElement() {
+	public DefaultNodeModel getDiagramElement() {
 		return node;
 	}
 }

@@ -18,11 +18,8 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.jiemamy.JiemamyEntity;
 import org.jiemamy.model.CoreElement;
 import org.jiemamy.model.DiagramElement;
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
 
 /**
  * TODO for daisuke

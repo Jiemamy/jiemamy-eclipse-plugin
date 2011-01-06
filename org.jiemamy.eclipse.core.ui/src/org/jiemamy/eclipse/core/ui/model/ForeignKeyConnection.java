@@ -21,7 +21,7 @@ package org.jiemamy.eclipse.core.ui.model;
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.attribute.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 
 /**
  * TODO for daisuke

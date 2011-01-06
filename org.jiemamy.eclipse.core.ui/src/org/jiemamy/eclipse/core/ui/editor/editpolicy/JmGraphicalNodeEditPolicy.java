@@ -29,7 +29,7 @@ package org.jiemamy.eclipse.core.ui.editor.editpolicy;
 //import org.jiemamy.eclipse.core.ui.TODO;
 //import org.jiemamy.model.DefaultConnectionModel;
 //import org.jiemamy.model.NodeModel;
-//import org.jiemamy.model.attribute.constraint.DefaultForeignKeyConstraintModel;
+//import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 //
 ///**
 // * GraphicalNodeののEditPolicy。

@@ -27,9 +27,10 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.model.CoreNodePair;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
+import org.jiemamy.model.dbo.DefaultDatabaseObjectModel;
 import org.jiemamy.transaction.SavePoint;
 import org.jiemamy.utils.LogMarker;
+import org.jiemamy.utils.NamingUtil;
 
 /**
  * ノード作成GEFコマンド。
@@ -71,7 +72,8 @@ public class CreateNodeCommand extends Command {
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		NodeModel nodeModel = model.getDiagramElement();
-		DatabaseObjectModel coreModel = model.getCoreElement();
+		DefaultDatabaseObjectModel coreModel = model.getCoreElement();
+		NamingUtil.autoName(coreModel, context);
 		context.store(coreModel);
 		diagramModel.store(nodeModel);
 		facet.store(diagramModel);

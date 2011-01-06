@@ -23,7 +23,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import org.jiemamy.model.attribute.ColumnModel;
+import org.jiemamy.model.column.ColumnModel;
 
 /**
  * {@link ColumnModel}用Figure（ビュー）。

@@ -15,9 +15,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/jar/logback-core-0.9.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/opencsv-1.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/slf4j-api-1.6.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jar/stax-1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/stax-api-1.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jar/stax-utils-20040917.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bundle/staxmate-2.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jar/stax-api-1.0-2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jar/woodstox-core-asl-4.1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>

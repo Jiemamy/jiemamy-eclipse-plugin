@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.JiemamyEntity;
+import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmComponentEditPolicy;
@@ -137,7 +137,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		return new ChopboxAnchor(getFigure());
 	}
 	
-	public JiemamyEntity getTargetModel() {
+	public Entity getTargetModel() {
 		return getJiemamyContext().resolve(getModel().getCoreModelRef());
 	}
 	

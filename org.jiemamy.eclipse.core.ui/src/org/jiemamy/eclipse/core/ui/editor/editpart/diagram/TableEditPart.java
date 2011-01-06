@@ -40,7 +40,7 @@ import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.Level;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.attribute.ColumnModel;
+import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.dbo.TableModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.utils.LogMarker;

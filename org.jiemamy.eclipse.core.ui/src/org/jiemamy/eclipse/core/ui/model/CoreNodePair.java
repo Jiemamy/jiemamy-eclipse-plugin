@@ -18,8 +18,8 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.dbo.DefaultDatabaseObjectModel;
 
 /**
  * TODO for daisuke
@@ -29,7 +29,7 @@ import org.jiemamy.model.dbo.DatabaseObjectModel;
  */
 public interface CoreNodePair extends CoreDiagramPair {
 	
-	DatabaseObjectModel getCoreElement();
+	DefaultDatabaseObjectModel getCoreElement();
 	
-	NodeModel getDiagramElement();
+	DefaultNodeModel getDiagramElement();
 }

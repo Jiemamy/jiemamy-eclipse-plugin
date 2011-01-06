@@ -22,12 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.JiemamyEntity;
+import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
-import org.jiemamy.model.attribute.ColumnModel;
-import org.jiemamy.model.attribute.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.attribute.constraint.PrimaryKeyConstraintModel;
+import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.constraint.PrimaryKeyConstraintModel;
 import org.jiemamy.model.datatype.TypeVariant;
 import org.jiemamy.model.dbo.DatabaseObjectModel;
 import org.jiemamy.model.dbo.DomainModel;
@@ -50,13 +50,13 @@ public class LabelStringUtil {
 	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
 	 */
-	public static String getString(JiemamyContext context, JiemamyEntity targetElement, DisplayPlace place) {
+	public static String getString(JiemamyContext context, Entity targetElement, DisplayPlace place) {
 		if (targetElement instanceof DomainModel) {
 			DomainModel domainModel = (DomainModel) targetElement;
 			return domainModel.getName();
 		} else if (targetElement instanceof DatabaseObjectModel) {
-			DatabaseObjectModel entityModel = (DatabaseObjectModel) targetElement;
-			return entityModel.getName();
+			DatabaseObjectModel doModel = (DatabaseObjectModel) targetElement;
+			return doModel.getName();
 		} else if (targetElement instanceof ColumnModel) {
 			ColumnModel columnModel = (ColumnModel) targetElement;
 			return columnModel.getName();
@@ -133,7 +133,7 @@ public class LabelStringUtil {
 //			logger.warn("Dialectのロスト", e);
 //			return dataType.toBuiltinDataType(context).getTypeName();
 //		}
-		return "FOOBAR";
+		return "FOOBAR"; // FIXME
 	}
 	
 	private LabelStringUtil() {

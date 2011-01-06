@@ -27,7 +27,7 @@ import org.jiemamy.model.Mode;
  * 
  * @author daisuke
  */
-public enum DisplayStatus {
+enum DisplayStatus {
 	
 	/** 物理モデル：属性/型レベル */
 	PHYSICAL_ATTRTYPE(Mode.PHYSICAL, Level.ATTRTYPE, Messages.Physical_AttrAndType),

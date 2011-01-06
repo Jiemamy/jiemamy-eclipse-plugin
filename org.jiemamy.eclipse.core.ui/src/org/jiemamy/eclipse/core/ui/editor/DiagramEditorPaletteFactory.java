@@ -42,7 +42,7 @@ import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.model.attribute.constraint.DefaultForeignKeyConstraintModel;
+import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.dbo.DefaultTableModel;
 import org.jiemamy.model.dbo.DefaultViewModel;
 

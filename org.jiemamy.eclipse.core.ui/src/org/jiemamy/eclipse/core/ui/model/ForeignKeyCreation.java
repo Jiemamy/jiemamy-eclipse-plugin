@@ -20,8 +20,10 @@ package org.jiemamy.eclipse.core.ui.model;
 
 import org.apache.commons.lang.Validate;
 
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.dbo.DefaultTableModel;
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 
 /**
  * TODO for daisuke
@@ -29,25 +31,31 @@ import org.jiemamy.model.dbo.DefaultTableModel;
  * @version $Id$
  * @author daisuke
  */
-public class TableNode implements CoreNodePair {
+public class ForeignKeyCreation implements Creation {
 	
-	private final DefaultTableModel table;
+	private final ForeignKeyConstraintModel fk;
 	
-	private final DefaultNodeModel node;
+	private final ConnectionModel connection;
 	
 
-	public TableNode(DefaultTableModel table, DefaultNodeModel node) {
-		Validate.notNull(table);
-		Validate.notNull(node);
-		this.table = table;
-		this.node = node;
+	public ForeignKeyCreation(ForeignKeyConstraintModel fk, ConnectionModel connection) {
+		Validate.notNull(fk);
+		Validate.notNull(connection);
+		this.fk = fk;
+		this.connection = connection;
 	}
 	
-	public DefaultTableModel getCoreElement() {
-		return table;
+	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	public DefaultNodeModel getDiagramElement() {
-		return node;
+	public ForeignKeyConstraintModel getCoreElement() {
+		return fk;
 	}
+	
+	public ConnectionModel getDiagramElement() {
+		return connection;
+	}
+	
 }

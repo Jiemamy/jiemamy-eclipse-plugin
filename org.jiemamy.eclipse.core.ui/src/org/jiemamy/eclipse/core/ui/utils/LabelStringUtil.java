@@ -25,12 +25,12 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.PrimaryKeyConstraintModel;
 import org.jiemamy.model.datatype.TypeVariant;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
-import org.jiemamy.model.dbo.DomainModel;
+import org.jiemamy.model.domain.DomainModel;
 
 /**
  * UI表示用文字列を生成するユーティリティクラス。

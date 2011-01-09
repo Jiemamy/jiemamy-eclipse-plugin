@@ -35,16 +35,17 @@ import org.eclipse.jface.resource.ImageRegistry;
 
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.model.ForeignKeyConnection;
-import org.jiemamy.eclipse.core.ui.model.TableNode;
-import org.jiemamy.eclipse.core.ui.model.ViewNode;
+import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
+import org.jiemamy.eclipse.core.ui.model.StickyCreation;
+import org.jiemamy.eclipse.core.ui.model.TableCreation;
+import org.jiemamy.eclipse.core.ui.model.ViewCreation;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
-import org.jiemamy.model.dbo.DefaultTableModel;
-import org.jiemamy.model.dbo.DefaultViewModel;
+import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.view.DefaultViewModel;
 
 /**
  * {@link JiemamyDiagramEditor}用のパレット（デフォルトで右側にある奴）を生成するファクトリ。
@@ -143,11 +144,11 @@ public final class DiagramEditorPaletteFactory {
 					public Object getNewObject() {
 						DefaultTableModel table = new DefaultTableModel(UUID.randomUUID());
 						DefaultNodeModel node = new DefaultNodeModel(UUID.randomUUID(), table.toReference());
-						return new TableNode(table, node);
+						return new TableCreation(table, node);
 					}
 					
 					public Object getObjectType() {
-						return TableNode.class;
+						return TableCreation.class;
 					}
 					
 				}, imageRegistry.getDescriptor(Images.BUTTON_TABLE), imageRegistry.getDescriptor(Images.BUTTON_TABLE));
@@ -160,11 +161,11 @@ public final class DiagramEditorPaletteFactory {
 					public Object getNewObject() {
 						DefaultViewModel view = new DefaultViewModel(UUID.randomUUID());
 						DefaultNodeModel node = new DefaultNodeModel(UUID.randomUUID(), view.toReference());
-						return new ViewNode(view, node);
+						return new ViewCreation(view, node);
 					}
 					
 					public Object getObjectType() {
-						return ViewNode.class;
+						return ViewCreation.class;
 					}
 					
 				}, imageRegistry.getDescriptor(Images.BUTTON_VIEW), imageRegistry.getDescriptor(Images.BUTTON_VIEW));
@@ -181,7 +182,8 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						return new StickyNodeModel(UUID.randomUUID());
+						StickyNodeModel stickyNodeModel = new StickyNodeModel(UUID.randomUUID());
+						return new StickyCreation(stickyNodeModel);
 					}
 					
 					public Object getObjectType() {
@@ -202,15 +204,16 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
+						// FIXME
 						DefaultForeignKeyConstraintModel fk =
 								new DefaultForeignKeyConstraintModel(UUID.randomUUID(), null, null, null, null, null,
 										null, null, null, null);
 						ConnectionModel conn = new DefaultConnectionModel(UUID.randomUUID(), fk.toReference());
-						return new ForeignKeyConnection(fk, conn);
+						return new ForeignKeyCreation(fk, conn);
 					}
 					
 					public Object getObjectType() {
-						return ForeignKeyConnection.class;
+						return ForeignKeyCreation.class;
 					}
 					
 				}, imageRegistry.getDescriptor(Images.BUTTON_FK), imageRegistry.getDescriptor(Images.BUTTON_FK));

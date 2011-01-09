@@ -18,8 +18,10 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.dbo.DefaultDatabaseObjectModel;
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.model.CoreElement;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.DiagramElement;
 
 /**
  * TODO for daisuke
@@ -27,9 +29,11 @@ import org.jiemamy.model.dbo.DefaultDatabaseObjectModel;
  * @version $Id$
  * @author daisuke
  */
-public interface CoreNodePair extends CoreDiagramPair {
+public interface Creation {
 	
-	DefaultDatabaseObjectModel getCoreElement();
+	void execute(JiemamyContext context, DefaultDiagramModel diagramModel);
 	
-	DefaultNodeModel getDiagramElement();
+	CoreElement getCoreElement();
+	
+	DiagramElement getDiagramElement();
 }

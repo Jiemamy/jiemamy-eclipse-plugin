@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.Color;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.dbo.ViewModel;
+import org.jiemamy.model.view.ViewModel;
 
 /**
  * {@link ViewModel}の{@link IFigure}（ビュー）。

@@ -25,7 +25,7 @@ import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.swt.graphics.Color;
 
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
+import org.jiemamy.model.DatabaseObjectModel;
 
 /**
  * {@link DatabaseObjectModel}のFigure（ビュー）。

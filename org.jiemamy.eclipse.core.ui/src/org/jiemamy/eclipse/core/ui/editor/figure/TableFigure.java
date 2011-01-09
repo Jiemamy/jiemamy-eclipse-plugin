@@ -30,7 +30,7 @@ import org.eclipse.swt.graphics.Color;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.dbo.TableModel;
+import org.jiemamy.model.table.TableModel;
 
 /**
  * {@link TableModel}の{@link IFigure}（ビュー）。

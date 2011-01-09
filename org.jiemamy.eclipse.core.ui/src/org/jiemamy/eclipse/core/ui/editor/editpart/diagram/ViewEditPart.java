@@ -25,19 +25,24 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.gef.EditPart;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
+import org.jiemamy.eclipse.core.ui.editor.dialog.view.ViewEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.ViewFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.ViewModel;
 import org.jiemamy.model.geometory.JmColor;
+import org.jiemamy.model.view.DefaultViewModel;
+import org.jiemamy.model.view.ViewModel;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -70,26 +75,24 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		NodeModel node = getModel();
-		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
+		DefaultViewModel viewModel = (DefaultViewModel) context.resolve(node.getCoreModelRef());
 		
 //		// 編集前のスナップショットを保存
 //		JiemamyViewFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
 //		SavePoint beforeEditSavePoint = facade.save();
 //		
-//		Shell shell = getViewer().getControl().getShell();
-//		ViewEditDialog dialog = new ViewEditDialog(shell, viewModel, Migration.DIAGRAM_INDEX, facade);
-//		
-//		if (dialog.open() == Dialog.OK) {
-//			// 編集後のスナップショットを保存
+		Shell shell = getViewer().getControl().getShell();
+		ViewEditDialog dialog = new ViewEditDialog(shell, context, viewModel, TODO.DIAGRAM_INDEX);
+		
+		if (dialog.open() == Dialog.OK) {
+			// 編集後のスナップショットを保存
 //			SavePoint afterEditSavePoint = facade.save();
-//			
+			
 //			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
 //			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 //			viewer.getEditDomain().getCommandStack().execute(command);
-//		} else {
-//			// 編集前にロールバック
-//			facade.rollback(beforeEditSavePoint);
-//		}
+			context.store(viewModel);
+		}
 	}
 	
 	@Override

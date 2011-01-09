@@ -5,7 +5,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jar/commons-lang-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/dddbase-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/eclipse-common-0.0.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jar/google-collections-1.0.jar" sourcepath="/Users/daisuke/.m2/repository/com/google/collections/google-collections/1.0/google-collections-1.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jar/google-collections-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/jcl-over-slf4j-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/jiemamy-commons-0.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/jiemamy-core-0.3.0-SNAPSHOT.jar" sourcepath="lib/source/jiemamy-core-0.3.0-SNAPSHOT.jar"/>

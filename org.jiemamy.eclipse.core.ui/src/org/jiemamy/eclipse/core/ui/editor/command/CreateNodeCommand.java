@@ -24,13 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.eclipse.core.ui.model.CoreNodePair;
+import org.jiemamy.eclipse.core.ui.model.NodeCreation;
 import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.dbo.DefaultDatabaseObjectModel;
 import org.jiemamy.transaction.SavePoint;
 import org.jiemamy.utils.LogMarker;
-import org.jiemamy.utils.NamingUtil;
 
 /**
  * ノード作成GEFコマンド。
@@ -44,7 +41,7 @@ public class CreateNodeCommand extends Command {
 	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
 	private final int diagramIndex;
 	
-	private CoreNodePair model;
+	private NodeCreation creation;
 	
 	private SavePoint savePoint;
 	
@@ -56,12 +53,12 @@ public class CreateNodeCommand extends Command {
 	 * 
 	 * @param context 作成ノードの親モデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param model 作成するノード
+	 * @param creation 作成するノード
 	 */
-	public CreateNodeCommand(JiemamyContext context, int diagramIndex, CoreNodePair model) {
+	public CreateNodeCommand(JiemamyContext context, int diagramIndex, NodeCreation creation) {
 		this.context = context;
 		this.diagramIndex = diagramIndex;
-		this.model = model;
+		this.creation = creation;
 	}
 	
 	@Override
@@ -71,11 +68,8 @@ public class CreateNodeCommand extends Command {
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
-		NodeModel nodeModel = model.getDiagramElement();
-		DefaultDatabaseObjectModel coreModel = model.getCoreElement();
-		NamingUtil.autoName(coreModel, context);
-		context.store(coreModel);
-		diagramModel.store(nodeModel);
+		
+		creation.execute(context, diagramModel);
 		facet.store(diagramModel);
 		
 //		jiemamyFacade.addNode(diagramIndex, nodeAdapter, ConvertUtil.convert(rectangle));

@@ -41,8 +41,8 @@ import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.Level;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.dbo.TableModel;
 import org.jiemamy.model.geometory.JmColor;
+import org.jiemamy.model.table.TableModel;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -136,13 +136,14 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	@Override
 	protected void updateFigure(IFigure figure) {
 		logger.debug(LogMarker.LIFECYCLE, "updateFigure");
+		
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
+		
 		NodeModel node = getModel();
 		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
 		TableFigure tableFigure = (TableFigure) figure;
 		
 		String labelString = LabelStringUtil.getString(context, tableModel, DisplayPlace.FIGURE);
-		DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
 		
 		tableFigure.setDatabaseObjectName(labelString);
 		

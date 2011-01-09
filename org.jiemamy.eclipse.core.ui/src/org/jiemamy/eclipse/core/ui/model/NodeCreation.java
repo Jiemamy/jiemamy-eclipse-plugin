@@ -18,10 +18,12 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.apache.commons.lang.Validate;
-
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.model.DefaultDatabaseObjectModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.dbo.DefaultViewModel;
+import org.jiemamy.model.NodeModel;
+import org.jiemamy.utils.NamingUtil;
 
 /**
  * TODO for daisuke
@@ -29,31 +31,18 @@ import org.jiemamy.model.dbo.DefaultViewModel;
  * @version $Id$
  * @author daisuke
  */
-public class ViewNode implements CoreNodePair {
+public abstract class NodeCreation implements Creation {
 	
-	private final DefaultViewModel view;
-	
-	private final DefaultNodeModel node;
-	
-
-	/**
-	 * インスタンスを生成する。
-	 * 
-	 * @param node
-	 * @param view 
-	 */
-	public ViewNode(DefaultViewModel view, DefaultNodeModel node) {
-		Validate.notNull(view);
-		Validate.notNull(node);
-		this.view = view;
-		this.node = node;
+	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		NodeModel nodeModel = getDiagramElement();
+		DefaultDatabaseObjectModel coreModel = getCoreElement();
+		NamingUtil.autoName(coreModel, context);
+		context.store(coreModel);
+		diagramModel.store(nodeModel);
 	}
 	
-	public DefaultViewModel getCoreElement() {
-		return view;
-	}
+	public abstract DefaultDatabaseObjectModel getCoreElement();
 	
-	public DefaultNodeModel getDiagramElement() {
-		return node;
-	}
+	public abstract DefaultNodeModel getDiagramElement();
+	
 }

@@ -20,8 +20,8 @@ package org.jiemamy.eclipse.core.ui.model;
 
 import org.apache.commons.lang.Validate;
 
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.view.DefaultViewModel;
 
 /**
  * TODO for daisuke
@@ -29,26 +29,33 @@ import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
  * @version $Id$
  * @author daisuke
  */
-public class ForeignKeyConnection implements CoreDiagramPair {
+public class ViewCreation extends NodeCreation {
 	
-	private final ForeignKeyConstraintModel fk;
+	private final DefaultViewModel view;
 	
-	private final ConnectionModel connection;
+	private final DefaultNodeModel node;
 	
 
-	public ForeignKeyConnection(ForeignKeyConstraintModel fk, ConnectionModel connection) {
-		Validate.notNull(fk);
-		Validate.notNull(connection);
-		this.fk = fk;
-		this.connection = connection;
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param node
+	 * @param view 
+	 */
+	public ViewCreation(DefaultViewModel view, DefaultNodeModel node) {
+		Validate.notNull(view);
+		Validate.notNull(node);
+		this.view = view;
+		this.node = node;
 	}
 	
-	public ForeignKeyConstraintModel getCoreElement() {
-		return fk;
+	@Override
+	public DefaultViewModel getCoreElement() {
+		return view;
 	}
 	
-	public ConnectionModel getDiagramElement() {
-		return connection;
+	@Override
+	public DefaultNodeModel getDiagramElement() {
+		return node;
 	}
-	
 }

@@ -18,6 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpart;
 
+import org.apache.commons.lang.Validate;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
@@ -30,13 +31,14 @@ import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.JiemamyContextEditPart;
+import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.StickyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.TableEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.ViewEditPart;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.model.dbo.DatabaseObjectModel;
-import org.jiemamy.model.dbo.TableModel;
-import org.jiemamy.model.dbo.ViewModel;
+import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.view.ViewModel;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -55,8 +57,10 @@ public class DiagramEditPartFactory implements EditPartFactory {
 	 * インスタンスを生成する。
 	 * 
 	 * @param editor
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public DiagramEditPartFactory(JiemamyEditor editor) {
+		Validate.notNull(editor);
 		this.editor = editor;
 	}
 	
@@ -79,7 +83,7 @@ public class DiagramEditPartFactory implements EditPartFactory {
 				context.getFacet(DiagramFacet.class).resolve(node.toReference());
 				if (node.getCoreModelRef() == null) {
 					if (node instanceof StickyNodeModel) {
-//						part = new StickyEditPart((StickyNodeModel) node);
+						part = new StickyEditPart((StickyNodeModel) node);
 					}
 				} else {
 					DatabaseObjectModel core = context.resolve(node.getCoreModelRef());

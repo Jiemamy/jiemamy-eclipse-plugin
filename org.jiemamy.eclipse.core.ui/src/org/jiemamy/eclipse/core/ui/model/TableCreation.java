@@ -18,8 +18,10 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.jiemamy.model.CoreElement;
-import org.jiemamy.model.DiagramElement;
+import org.apache.commons.lang.Validate;
+
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.table.DefaultTableModel;
 
 /**
  * TODO for daisuke
@@ -27,10 +29,27 @@ import org.jiemamy.model.DiagramElement;
  * @version $Id$
  * @author daisuke
  */
-public interface CoreDiagramPair {
+public class TableCreation extends NodeCreation {
 	
-	CoreElement getCoreElement();
+	private final DefaultTableModel table;
 	
-	DiagramElement getDiagramElement();
+	private final DefaultNodeModel node;
 	
+
+	public TableCreation(DefaultTableModel table, DefaultNodeModel node) {
+		Validate.notNull(table);
+		Validate.notNull(node);
+		this.table = table;
+		this.node = node;
+	}
+	
+	@Override
+	public DefaultTableModel getCoreElement() {
+		return table;
+	}
+	
+	@Override
+	public DefaultNodeModel getDiagramElement() {
+		return node;
+	}
 }

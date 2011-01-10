@@ -548,7 +548,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		try {
 			JiemamySerializer serializer = JiemamyContext.findSerializer();
 			context = serializer.deserialize(file.getContents(), DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
-//			context.normalize();
+			context.getEventBroker().addListener(this); // THINK require?
 		} catch (SerializationException e) {
 			ExceptionHandler.handleException(e, "Data file is broken.");
 		} catch (CoreException e) {

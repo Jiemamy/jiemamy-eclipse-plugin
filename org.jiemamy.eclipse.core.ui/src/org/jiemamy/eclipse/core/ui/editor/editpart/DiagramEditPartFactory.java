@@ -25,7 +25,6 @@ import org.eclipse.gef.EditPartFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -56,7 +55,7 @@ public class DiagramEditPartFactory implements EditPartFactory {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param editor
+	 * @param editor {@link EditPart}を司るエディタインスタンス
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public DiagramEditPartFactory(JiemamyEditor editor) {
@@ -65,6 +64,8 @@ public class DiagramEditPartFactory implements EditPartFactory {
 	}
 	
 	/**
+	 * {@inheritDoc}
+	 * 
 	 * @param parent {@link EditPart}
 	 * @param model model object
 	 * @return new {@link EditPart} instance
@@ -80,7 +81,6 @@ public class DiagramEditPartFactory implements EditPartFactory {
 			DefaultNodeModel node = (DefaultNodeModel) model;
 			
 			try {
-				context.getFacet(DiagramFacet.class).resolve(node.toReference());
 				if (node.getCoreModelRef() == null) {
 					if (node instanceof StickyNodeModel) {
 						part = new StickyEditPart((StickyNodeModel) node);
@@ -94,7 +94,8 @@ public class DiagramEditPartFactory implements EditPartFactory {
 					}
 				}
 			} catch (EntityNotFoundException e) {
-				// ignore
+				String message = "Cannot resolve core model: " + node.getCoreModelRef();
+				JiemamyUIPlugin.log(message, Status.ERROR);
 			}
 //		} else if (model instanceof ConnectionModel) {
 //			ConnectionModel connectionAdapter = (ConnectionModel) model;

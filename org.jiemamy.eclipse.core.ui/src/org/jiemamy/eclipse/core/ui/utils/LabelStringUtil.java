@@ -18,9 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
@@ -39,9 +36,6 @@ import org.jiemamy.model.domain.DomainModel;
  */
 public class LabelStringUtil {
 	
-	private static Logger logger = LoggerFactory.getLogger(LabelStringUtil.class);
-	
-
 	/**
 	 * JiemamyEntityに対する表示用文字列を取得する。
 	 * 

@@ -38,6 +38,12 @@ public class ForeignKeyCreation implements Creation {
 	private final ConnectionModel connection;
 	
 
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param fk 作成する外部キー
+	 * @param connection 作成するコネクション
+	 */
 	public ForeignKeyCreation(ForeignKeyConstraintModel fk, ConnectionModel connection) {
 		Validate.notNull(fk);
 		Validate.notNull(connection);

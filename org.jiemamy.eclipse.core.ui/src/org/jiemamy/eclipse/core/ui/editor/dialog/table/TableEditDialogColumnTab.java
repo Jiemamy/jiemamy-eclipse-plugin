@@ -115,6 +115,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * 
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
+	 * @param context コンテキスト
 	 * @param tableModel 編集対象{@link TableModel}
 	 */
 	public TableEditDialogColumnTab(TabFolder parentTabFolder, int style, JiemamyContext context,

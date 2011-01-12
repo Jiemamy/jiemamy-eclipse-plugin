@@ -226,6 +226,11 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends D
 		return result;
 	}
 	
+	/**
+	 * コンテキストを取得する。
+	 * 
+	 * @return {@link JiemamyContext}
+	 */
 	protected JiemamyContext getContext() {
 		return context;
 	}

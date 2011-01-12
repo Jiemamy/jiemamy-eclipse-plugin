@@ -38,7 +38,6 @@ import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmPointUtil;
 import org.jiemamy.model.geometory.JmRectangle;
-import org.jiemamy.transaction.SavePoint;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -62,8 +61,6 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	private final JmRectangle oldBoundary;
 	
 	private final EditPartViewer viewer;
-	
-	private SavePoint save;
 	
 
 	/**

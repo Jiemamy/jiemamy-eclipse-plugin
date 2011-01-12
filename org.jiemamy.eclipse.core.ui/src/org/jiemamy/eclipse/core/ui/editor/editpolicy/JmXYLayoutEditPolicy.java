@@ -25,8 +25,6 @@ import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.XYLayoutEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
@@ -43,12 +41,10 @@ import org.jiemamy.model.DefaultNodeModel;
  */
 public class JmXYLayoutEditPolicy extends XYLayoutEditPolicy {
 	
-	private static Logger logger = LoggerFactory.getLogger(JmXYLayoutEditPolicy.class);
-	
-
 	/**
 	 * {@inheritDoc}
-	 * 既存のノードの位置サイズが変更された時に呼ばれ、編集コマンドを返す。
+	 * 
+	 * <p>既存のノードの位置サイズが変更された時に呼ばれ、編集コマンドを返す。</p>
 	 */
 	@Override
 	protected Command createChangeConstraintCommand(EditPart child, Object constraint) {
@@ -61,7 +57,8 @@ public class JmXYLayoutEditPolicy extends XYLayoutEditPolicy {
 	
 	/**
 	 * {@inheritDoc}
-	 * ノードが新規に作成された時に呼ばれ、編集コマンドを返す。
+	 * 
+	 * <p>ノードが新規に作成された時に呼ばれ、編集コマンドを返す。</p>
 	 */
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {

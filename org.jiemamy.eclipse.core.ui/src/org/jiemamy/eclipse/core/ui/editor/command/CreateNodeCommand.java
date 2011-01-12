@@ -26,7 +26,6 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.model.NodeCreation;
 import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.transaction.SavePoint;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -42,8 +41,6 @@ public class CreateNodeCommand extends Command {
 	private final int diagramIndex;
 	
 	private NodeCreation creation;
-	
-	private SavePoint savePoint;
 	
 	private final JiemamyContext context;
 	

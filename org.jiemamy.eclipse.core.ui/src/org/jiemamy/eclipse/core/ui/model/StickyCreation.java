@@ -18,6 +18,8 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
+import org.apache.commons.lang.Validate;
+
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DefaultDatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
@@ -41,9 +43,11 @@ public class StickyCreation extends NodeCreation {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param stickyNodeModel
+	 * @param stickyNodeModel 作成する付箋モデル
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public StickyCreation(StickyNodeModel stickyNodeModel) {
+		Validate.notNull(stickyNodeModel);
 		this.stickyNodeModel = stickyNodeModel;
 	}
 	

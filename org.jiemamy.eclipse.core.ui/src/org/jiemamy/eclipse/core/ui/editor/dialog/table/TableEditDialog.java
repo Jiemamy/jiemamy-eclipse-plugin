@@ -83,9 +83,9 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	 * コンストラクタ。
 	 * 
 	 * @param parentShell 親シェルオブジェクト
+	 * @param context コンテキスト
 	 * @param tableModel 編集対象モデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param jiemamyFacade 操作に用いるファサード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public TableEditDialog(Shell parentShell, JiemamyContext context, DefaultTableModel tableModel, int diagramIndex) {

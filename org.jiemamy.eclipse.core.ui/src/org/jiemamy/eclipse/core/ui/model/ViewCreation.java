@@ -39,8 +39,8 @@ public class ViewCreation extends NodeCreation {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param node
-	 * @param view 
+	 * @param node 作成するノード
+	 * @param view 作成するビュー
 	 */
 	public ViewCreation(DefaultViewModel view, DefaultNodeModel node) {
 		Validate.notNull(view);

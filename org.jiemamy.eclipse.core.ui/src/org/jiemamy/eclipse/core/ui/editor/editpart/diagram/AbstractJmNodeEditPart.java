@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.ChopboxAnchor;
 import org.eclipse.draw2d.ConnectionAnchor;
@@ -52,7 +54,6 @@ import org.jiemamy.model.geometory.JmRectangle;
 import org.jiemamy.transaction.Command;
 import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.utils.LogMarker;
-import org.jiemamy.utils.collection.CollectionsUtil;
 
 /**
  * {@link NodeModel}に対するDiagram用EditPart（コントローラ）の抽象クラス。
@@ -179,6 +180,11 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 //		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new JmDirectEditPolicy());
 	}
 	
+	/**
+	 * コンテキストを取得する。
+	 * 
+	 * @return {@link JiemamyContext}
+	 */
 	protected JiemamyContext getJiemamyContext() {
 		return (JiemamyContext) getRoot().getContents().getModel();
 	}
@@ -192,7 +198,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
 		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		List<ConnectionModel> result = CollectionsUtil.newArrayList();
+		List<ConnectionModel> result = Lists.newArrayList();
 		Collection<? extends ConnectionModel> connections = getModel().getSourceConnections();
 		for (ConnectionModel connectionAdapter : connections) {
 			// FIXME
@@ -213,7 +219,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
 		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		List<ConnectionModel> result = CollectionsUtil.newArrayList();
+		List<ConnectionModel> result = Lists.newArrayList();
 		Collection<? extends ConnectionModel> connections = getModel().getTargetConnections();
 		for (ConnectionModel connectionAdapter : connections) {
 			// FIXME

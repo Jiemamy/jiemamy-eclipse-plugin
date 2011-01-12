@@ -36,6 +36,12 @@ public class TableCreation extends NodeCreation {
 	private final DefaultNodeModel node;
 	
 
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param table 作成するテーブル
+	 * @param node 作成するノード
+	 */
 	public TableCreation(DefaultTableModel table, DefaultNodeModel node) {
 		Validate.notNull(table);
 		Validate.notNull(node);

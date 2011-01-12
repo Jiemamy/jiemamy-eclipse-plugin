@@ -34,7 +34,7 @@ import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.StickyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.TableEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.ViewEditPart;
 import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.table.TableModel;
 import org.jiemamy.model.view.ViewModel;
@@ -77,26 +77,21 @@ public class DiagramEditPartFactory implements EditPartFactory {
 		
 		if (model instanceof JiemamyContext) {
 			part = new JiemamyContextEditPart((JiemamyContext) model);
-		} else if (model instanceof DefaultNodeModel) {
-			DefaultNodeModel node = (DefaultNodeModel) model;
-			
+		} else if (model instanceof DefaultDatabaseObjectNodeModel) {
+			DefaultDatabaseObjectNodeModel node = (DefaultDatabaseObjectNodeModel) model;
 			try {
-				if (node.getCoreModelRef() == null) {
-					if (node instanceof StickyNodeModel) {
-						part = new StickyEditPart((StickyNodeModel) node);
-					}
-				} else {
-					DatabaseObjectModel core = context.resolve(node.getCoreModelRef());
-					if (core instanceof TableModel) {
-						part = new TableEditPart(node);
-					} else if (core instanceof ViewModel) {
-						part = new ViewEditPart(node);
-					}
+				DatabaseObjectModel core = context.resolve(node.getCoreModelRef());
+				if (core instanceof TableModel) {
+					part = new TableEditPart(node);
+				} else if (core instanceof ViewModel) {
+					part = new ViewEditPart(node);
 				}
 			} catch (EntityNotFoundException e) {
 				String message = "Cannot resolve core model: " + node.getCoreModelRef();
 				JiemamyUIPlugin.log(message, Status.ERROR);
 			}
+		} else if (model instanceof StickyNodeModel) {
+			part = new StickyEditPart((StickyNodeModel) model);
 //		} else if (model instanceof ConnectionModel) {
 //			ConnectionModel connectionAdapter = (ConnectionModel) model;
 //			ForeignKeyConstraintModel foreignKey = connectionAdapter.unwrap();

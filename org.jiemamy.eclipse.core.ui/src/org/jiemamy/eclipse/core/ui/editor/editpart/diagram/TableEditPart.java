@@ -25,23 +25,28 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.gef.EditPart;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
+import org.jiemamy.eclipse.core.ui.editor.dialog.table.TableEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.ColumnFigure;
 import org.jiemamy.eclipse.core.ui.editor.figure.TableFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.DatabaseObjectNodeModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.Level;
-import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.geometory.JmColor;
+import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
 import org.jiemamy.utils.LogMarker;
 
@@ -55,6 +60,16 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	private static Logger logger = LoggerFactory.getLogger(TableEditPart.class);
 	
 
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param nodeModel コントロール対象のノード
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
+	 */
+	public TableEditPart(DefaultDatabaseObjectNodeModel nodeModel) {
+		super(nodeModel);
+	}
+	
 //	@Override
 //	protected DirectEditManager createDirectEditManager() {
 //		EntityFigure figure = (EntityFigure) getFigure();
@@ -62,46 +77,44 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 //		return new EntityDirectEditManager(this, TextCellEditor.class, locator);
 //	}
 	
-	/**
-	 * インスタンスを生成する。
-	 * 
-	 * @param nodeModel コントロール対象のノード
-	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
-	 */
-	public TableEditPart(DefaultNodeModel nodeModel) {
-		super(nodeModel);
-	}
-	
 	@Override
 	public void commandExecuted(org.jiemamy.transaction.Command command) {
 		refresh();
+	}
+	
+	@Override
+	public DatabaseObjectNodeModel getModel() {
+		return (DatabaseObjectNodeModel) super.getModel();
+	}
+	
+	@Override
+	public Entity getTargetModel() {
+		return getJiemamyContext().resolve(getModel().getCoreModelRef());
 	}
 	
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		NodeModel node = getModel();
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
+		DatabaseObjectNodeModel node = getModel();
+		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(node.getCoreModelRef());
 		
 //		// 編集前のスナップショットを保存
 //		JiemamyViewFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
 //		SavePoint beforeEditSavePoint = facade.save();
-//		
-//		Shell shell = getViewer().getControl().getShell();
-//		JiemamyEditDialog<TableModel> dialog = new TableEditDialog(shell, tableModel, Migration.DIAGRAM_INDEX, facade);
-//		
-//		if (dialog.open() == Dialog.OK) {
+		
+		Shell shell = getViewer().getControl().getShell();
+		TableEditDialog dialog = new TableEditDialog(shell, context, tableModel, TODO.DIAGRAM_INDEX);
+		
+		if (dialog.open() == Dialog.OK) {
 //			// 編集後のスナップショットを保存
 //			SavePoint afterEditSavePoint = facade.save();
 //			
 //			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
 //			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 //			viewer.getEditDomain().getCommandStack().execute(command);
-//		} else {
-//			// 編集前にロールバック
-//			facade.rollback(beforeEditSavePoint);
-//		}
+			context.store(tableModel);
+		}
 	}
 	
 	@Override
@@ -115,7 +128,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		logger.debug(LogMarker.LIFECYCLE, "createFigure");
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		TableFigure figure = new TableFigure();
-		NodeModel node = getModel();
+		DatabaseObjectNodeModel node = getModel();
 		
 		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
 		String description = tableModel.getDescription();
@@ -139,7 +152,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		
-		NodeModel node = getModel();
+		DatabaseObjectNodeModel node = getModel();
 		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
 		TableFigure tableFigure = (TableFigure) figure;
 		
@@ -174,10 +187,10 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		nameLabel.setText(LabelStringUtil.getString(context, columnModel, DisplayPlace.FIGURE));
 		typeLabel.setText(LabelStringUtil.getString(context, columnModel.getDataType(), DisplayPlace.FIGURE));
 		
-		NodeModel node = getModel();
+		DatabaseObjectNodeModel node = getModel();
 		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
 		
-		if (tableModel.getPrimaryKey().getKeyColumns().contains(columnModel.toReference())) {
+		if (tableModel.isPrimaryKeyColumn(columnModel.toReference())) {
 			nameLabel.setUnderline(true);
 			typeLabel.setUnderline(true);
 		}

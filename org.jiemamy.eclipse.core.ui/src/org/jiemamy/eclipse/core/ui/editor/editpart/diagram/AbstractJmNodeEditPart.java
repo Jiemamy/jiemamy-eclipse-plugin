@@ -137,9 +137,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		return new ChopboxAnchor(getFigure());
 	}
 	
-	public Entity getTargetModel() {
-		return getJiemamyContext().resolve(getModel().getCoreModelRef());
-	}
+	public abstract Entity getTargetModel();
 	
 	@Override
 	public void performRequest(Request req) {

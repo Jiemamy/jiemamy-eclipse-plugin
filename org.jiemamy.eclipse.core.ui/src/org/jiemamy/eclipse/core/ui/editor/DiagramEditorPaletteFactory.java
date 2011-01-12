@@ -41,6 +41,7 @@ import org.jiemamy.eclipse.core.ui.model.TableCreation;
 import org.jiemamy.eclipse.core.ui.model.ViewCreation;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
@@ -143,7 +144,8 @@ public final class DiagramEditorPaletteFactory {
 					
 					public Object getNewObject() {
 						DefaultTableModel table = new DefaultTableModel(UUID.randomUUID());
-						DefaultNodeModel node = new DefaultNodeModel(UUID.randomUUID(), table.toReference());
+						DefaultNodeModel node =
+								new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), table.toReference());
 						return new TableCreation(table, node);
 					}
 					
@@ -160,7 +162,8 @@ public final class DiagramEditorPaletteFactory {
 					
 					public Object getNewObject() {
 						DefaultViewModel view = new DefaultViewModel(UUID.randomUUID());
-						DefaultNodeModel node = new DefaultNodeModel(UUID.randomUUID(), view.toReference());
+						DefaultNodeModel node =
+								new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), view.toReference());
 						return new ViewCreation(view, node);
 					}
 					

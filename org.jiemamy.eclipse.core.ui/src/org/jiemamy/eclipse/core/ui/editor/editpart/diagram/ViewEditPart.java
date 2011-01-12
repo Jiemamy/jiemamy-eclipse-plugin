@@ -32,14 +32,15 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.eclipse.core.ui.editor.dialog.view.ViewEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.ViewFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.DatabaseObjectNodeModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.model.view.DefaultViewModel;
 import org.jiemamy.model.view.ViewModel;
@@ -61,7 +62,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	 * @param nodeModel コントロール対象のノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditPart(DefaultNodeModel nodeModel) {
+	public ViewEditPart(DefaultDatabaseObjectNodeModel nodeModel) {
 		super(nodeModel);
 	}
 	
@@ -70,17 +71,27 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		refresh();
 	}
 	
+	@Override
+	public DatabaseObjectNodeModel getModel() {
+		return (DatabaseObjectNodeModel) super.getModel();
+	}
+	
+	@Override
+	public Entity getTargetModel() {
+		return getJiemamyContext().resolve(getModel().getCoreModelRef());
+	}
+	
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		NodeModel node = getModel();
+		DatabaseObjectNodeModel node = getModel();
 		DefaultViewModel viewModel = (DefaultViewModel) context.resolve(node.getCoreModelRef());
 		
 //		// 編集前のスナップショットを保存
 //		JiemamyViewFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
 //		SavePoint beforeEditSavePoint = facade.save();
-//		
+		
 		Shell shell = getViewer().getControl().getShell();
 		ViewEditDialog dialog = new ViewEditDialog(shell, context, viewModel, TODO.DIAGRAM_INDEX);
 		
@@ -106,7 +117,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		logger.debug(LogMarker.LIFECYCLE, "createFigure");
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		ViewFigure figure = new ViewFigure();
-		NodeModel node = getModel();
+		DatabaseObjectNodeModel node = getModel();
 		
 		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
 		String description = viewModel.getDescription();
@@ -128,7 +139,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	protected void updateFigure(IFigure figure) {
 		logger.debug(LogMarker.LIFECYCLE, "updateFigure");
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		NodeModel node = getModel();
+		DatabaseObjectNodeModel node = getModel();
 		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
 		ViewFigure viewFigure = (ViewFigure) figure;
 		

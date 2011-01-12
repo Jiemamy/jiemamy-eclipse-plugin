@@ -98,8 +98,9 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	
 	@Override
 	protected boolean canExecuteOk() {
-		return StringUtils.isEmpty(tabDefinition.getTextWidget().getText()) == false
-				&& StringUtils.isEmpty(txtName.getText()) == false && super.canExecuteOk();
+		boolean definitionOk = StringUtils.isEmpty(tabDefinition.getTextWidget().getText()) == false;
+		boolean nameOk = StringUtils.isEmpty(txtName.getText()) == false;
+		return definitionOk && nameOk && super.canExecuteOk();
 	}
 	
 	@Override

@@ -38,6 +38,11 @@ import org.jiemamy.composer.Exporter;
 import org.jiemamy.composer.ImportConfig;
 import org.jiemamy.composer.Importer;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
+import org.jiemamy.eclipse.core.ui.editor.action.AutoLayoutAction;
+import org.jiemamy.eclipse.core.ui.editor.action.ChangeNodeBackgroundColorAction;
+import org.jiemamy.eclipse.core.ui.editor.action.FitNodeConstraintAction;
+import org.jiemamy.eclipse.core.ui.editor.action.PropertyAction;
+import org.jiemamy.eclipse.core.ui.editor.action.SaveDiagramImageAction;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
 
@@ -101,15 +106,15 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 			menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 		}
 		
-//		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new ChangeNodeBackgroundColorAction(viewer));
-//		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new SaveDiagramImageAction(viewer));
-//		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new AutoLayoutAction(viewer));
+		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new ChangeNodeBackgroundColorAction(viewer));
+		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new SaveDiagramImageAction(viewer));
+		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, new AutoLayoutAction(viewer));
 		
 		buildImporterMenu(menu, viewer);
 		buildExporterMenu(menu, viewer);
 		
-//		menu.add(new Separator());
-//		menu.add(new PropertyAction(viewer));
+		menu.add(new Separator());
+		menu.add(new PropertyAction(viewer));
 		
 		// Alignment Actions
 		MenuManager alignMenu = new MenuManager("位置調整(&O)"); // RESOURCE
@@ -150,22 +155,22 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 		
 		// Match width Actions
 		// TODO エンティティでないときはdisableにする。 hint: getViewer().getSelectedEditParts()を使う？
-//		MenuManager matchSizeMenu = new MenuManager("サイズ調整(&Z)"); // RESOURCE
-//		matchSizeMenu.add(new FitNodeConstraintAction(viewer));
-//		
-//		action = getAction(GEFActionConstants.MATCH_HEIGHT);
-//		action.setEnabled(true);
-//		if (action.isEnabled()) {
-//			matchSizeMenu.add(action);
-//		}
-//		action = getAction(GEFActionConstants.MATCH_WIDTH);
-//		action.setEnabled(true);
-//		if (action.isEnabled()) {
-//			matchSizeMenu.add(action);
-//		}
-//		if (matchSizeMenu.isEmpty() == false) {
-//			menu.appendToGroup(GEFActionConstants.GROUP_REST, matchSizeMenu);
-//		}
+		MenuManager matchSizeMenu = new MenuManager("サイズ調整(&Z)"); // RESOURCE
+		matchSizeMenu.add(new FitNodeConstraintAction(viewer));
+		
+		action = getAction(GEFActionConstants.MATCH_HEIGHT);
+		action.setEnabled(true);
+		if (action.isEnabled()) {
+			matchSizeMenu.add(action);
+		}
+		action = getAction(GEFActionConstants.MATCH_WIDTH);
+		action.setEnabled(true);
+		if (action.isEnabled()) {
+			matchSizeMenu.add(action);
+		}
+		if (matchSizeMenu.isEmpty() == false) {
+			menu.appendToGroup(GEFActionConstants.GROUP_REST, matchSizeMenu);
+		}
 	}
 	
 	private void buildExporterMenu(IMenuManager menu, GraphicalViewer viewer) {

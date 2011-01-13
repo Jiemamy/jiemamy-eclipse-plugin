@@ -33,8 +33,10 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.TODO;
+import org.jiemamy.eclipse.core.ui.editor.dialog.context.JiemamyContextEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmXYLayoutEditPolicy;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
@@ -122,9 +125,10 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 //		JiemamyFacade facade = context.newFacade(JiemamyViewFacade.class);
 //		SavePoint beforeEditSavePoint = facade.save();
 //		
-//		RootEditDialog dialog = new RootEditDialog(getViewer().getControl().getShell(), context, facade);
+		Shell shell = getViewer().getControl().getShell();
+		JiemamyContextEditDialog dialog = new JiemamyContextEditDialog(shell, context);
 //		
-//		if (dialog.open() == Dialog.OK) {
+		if (dialog.open() == Dialog.OK) {
 //			// 編集後のスナップショットを保存
 //			SavePoint afterEditSavePoint = facade.save();
 //			
@@ -132,10 +136,10 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 //					new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
 //			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 //			viewer.getEditDomain().getCommandStack().execute(command);
-//		} else {
+		} else {
 //			// 編集前にロールバック
 //			facade.rollback(beforeEditSavePoint);
-//		}
+		}
 	}
 	
 	@Override

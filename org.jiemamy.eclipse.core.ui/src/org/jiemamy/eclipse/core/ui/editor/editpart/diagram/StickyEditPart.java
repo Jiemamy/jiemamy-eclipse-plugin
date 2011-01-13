@@ -31,6 +31,7 @@ import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.editor.figure.StickyFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -54,7 +55,7 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	}
 	
 	@Override
-	public void commandExecuted(org.jiemamy.transaction.Command command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		// TODO Auto-generated method stub
 		
 	}

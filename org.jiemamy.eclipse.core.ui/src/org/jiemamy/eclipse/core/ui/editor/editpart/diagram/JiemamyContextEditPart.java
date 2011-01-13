@@ -50,8 +50,8 @@ import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmXYLayoutEditPolicy;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.transaction.Command;
-import org.jiemamy.transaction.CommandListener;
+import org.jiemamy.transaction.StoredEvent;
+import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -60,7 +60,7 @@ import org.jiemamy.utils.LogMarker;
  * @author daisuke
  */
 public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements EditDialogSupport,
-		IPropertyChangeListener, CommandListener {
+		IPropertyChangeListener, StoredEventListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyContextEditPart.class);
 	
@@ -88,7 +88,7 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		context.getEventBroker().addListener(this);
 	}
 	
-	public void commandExecuted(Command command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		refresh();
 //		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}

@@ -88,10 +88,10 @@ import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.serializer.JiemamySerializer;
 import org.jiemamy.serializer.SerializationException;
-import org.jiemamy.transaction.Command;
-import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.DispatchStrategy;
 import org.jiemamy.transaction.EventBrokerImpl;
+import org.jiemamy.transaction.StoredEvent;
+import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 import org.jiemamy.validator.AllValidator;
 import org.jiemamy.validator.Problem;
@@ -104,7 +104,7 @@ import org.jiemamy.validator.Validator;
  * @author daisuke
  */
 public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette implements IResourceChangeListener,
-		CommandListener, JiemamyEditor {
+		StoredEventListener, JiemamyEditor {
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyDiagramEditor.class);
 	
@@ -187,7 +187,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	 * 
 	 * <p>こも実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
 	 */
-	public void commandExecuted(Command command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		Validator validator;
 		try {
 			Dialect dialect = context.findDialect();
@@ -228,8 +228,8 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		logger.debug(LogMarker.LIFECYCLE, "disposed");
 		
 		// FIXME 以下debugコード
-		List<CommandListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
-		for (CommandListener listener : listeners) {
+		List<StoredEventListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
+		for (StoredEventListener listener : listeners) {
 			logger.warn(listener + " is not removed from EventBroker.");
 		}
 	}
@@ -343,7 +343,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// FIXME 無差別ディスパッチになってる。
 		context.getEventBroker().setStrategy(new DispatchStrategy() {
 			
-			public boolean needToDispatch(CommandListener listener, Command command) {
+			public boolean needToDispatch(StoredEventListener listener, StoredEvent command) {
 				return true;
 			}
 			

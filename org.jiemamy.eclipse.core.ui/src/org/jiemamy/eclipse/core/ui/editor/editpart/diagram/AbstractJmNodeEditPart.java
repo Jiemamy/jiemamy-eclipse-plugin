@@ -51,8 +51,8 @@ import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.geometory.JmRectangle;
-import org.jiemamy.transaction.Command;
-import org.jiemamy.transaction.CommandListener;
+import org.jiemamy.transaction.StoredEvent;
+import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -61,7 +61,7 @@ import org.jiemamy.utils.LogMarker;
  * @author daisuke
  */
 public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart implements EditDialogSupport,
-		NodeEditPart, CommandListener {
+		NodeEditPart, StoredEventListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractJmNodeEditPart.class);
 	
@@ -87,7 +87,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		logger.debug("activate");
 	}
 	
-	public void commandExecuted(Command command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		// THINK どのメソッドを呼ばなければならないのか精査
 		refresh();
 	}

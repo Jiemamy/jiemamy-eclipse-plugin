@@ -44,6 +44,7 @@ import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.model.view.DefaultViewModel;
 import org.jiemamy.model.view.ViewModel;
+import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -67,7 +68,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	}
 	
 	@Override
-	public void commandExecuted(org.jiemamy.transaction.Command command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		refresh();
 	}
 	

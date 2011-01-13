@@ -48,6 +48,7 @@ import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
+import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -78,7 +79,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 //	}
 	
 	@Override
-	public void commandExecuted(org.jiemamy.transaction.Command command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		refresh();
 	}
 	

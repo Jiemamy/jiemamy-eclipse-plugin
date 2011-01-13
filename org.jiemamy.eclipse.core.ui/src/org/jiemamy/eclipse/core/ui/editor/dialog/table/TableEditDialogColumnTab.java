@@ -87,9 +87,9 @@ import org.jiemamy.model.domain.DomainModel;
 import org.jiemamy.model.parameter.ParameterMap;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
-import org.jiemamy.transaction.Command;
-import org.jiemamy.transaction.CommandListener;
 import org.jiemamy.transaction.EventBroker;
+import org.jiemamy.transaction.StoredEvent;
+import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -163,12 +163,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ColumnContentProvider extends ArrayContentProvider implements CommandListener {
+	private class ColumnContentProvider extends ArrayContentProvider implements StoredEventListener {
 		
 		private Viewer viewer;
 		
 
-		public void commandExecuted(Command command) {
+		public void commandExecuted(StoredEvent<?> command) {
 			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: commandExecuted");
 			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}

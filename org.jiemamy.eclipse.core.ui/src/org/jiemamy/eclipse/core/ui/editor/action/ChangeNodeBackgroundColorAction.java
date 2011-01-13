@@ -35,6 +35,7 @@ import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.command.ChangeNodeColorCommand;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.geometory.JmColor;
 
@@ -70,12 +71,14 @@ public class ChangeNodeBackgroundColorAction extends AbstractJiemamyAction {
 			if (rgb != null) {
 				DiagramFacet facet = context.getFacet(DiagramFacet.class);
 				JmColor newColor = ConvertUtil.convert(rgb);
+				CommandStack stack = getViewer().getEditDomain().getCommandStack();
 				
 				for (AbstractJmNodeEditPart editPart : editParts) {
 					DefaultNodeModel nodeModel = (DefaultNodeModel) editPart.getModel();
 					EntityRef<? extends DefaultNodeModel> ref = nodeModel.toReference();
-					CommandStack stack = getViewer().getEditDomain().getCommandStack();
-					Command command = new ChangeNodeColorCommand(facet, TODO.DIAGRAM_INDEX, ref, newColor);
+					DefaultDiagramModel diagramModel =
+							(DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+					Command command = new ChangeNodeColorCommand(facet, diagramModel, ref, newColor);
 					
 					stack.execute(command);
 				}

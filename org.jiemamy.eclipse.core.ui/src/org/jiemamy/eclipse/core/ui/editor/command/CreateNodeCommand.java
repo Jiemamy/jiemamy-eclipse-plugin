@@ -37,12 +37,12 @@ public class CreateNodeCommand extends Command {
 	
 	private static Logger logger = LoggerFactory.getLogger(CreateNodeCommand.class);
 	
+	private final JiemamyContext context;
+	
 	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
 	private final int diagramIndex;
 	
 	private NodeCreation creation;
-	
-	private final JiemamyContext context;
 	
 
 	/**
@@ -61,20 +61,16 @@ public class CreateNodeCommand extends Command {
 	@Override
 	public void execute() {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
-//		savePoint = jiemamyFacade.save();
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		
 		creation.execute(context, diagramModel);
 		facet.store(diagramModel);
-		
-//		jiemamyFacade.addNode(diagramIndex, nodeAdapter, ConvertUtil.convert(rectangle));
 	}
 	
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
-//		jiemamyFacade.rollback(savePoint);
 	}
 }

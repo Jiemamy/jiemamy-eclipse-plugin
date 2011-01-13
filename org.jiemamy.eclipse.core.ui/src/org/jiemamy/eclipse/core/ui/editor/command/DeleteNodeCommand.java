@@ -21,7 +21,6 @@ package org.jiemamy.eclipse.core.ui.editor.command;
 import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.DiagramFacet;
-import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
 
@@ -32,42 +31,36 @@ import org.jiemamy.model.NodeModel;
  */
 public class DeleteNodeCommand extends Command {
 	
-	private final JiemamyContext context;
+	private final DiagramFacet diagramFacet;
 	
-	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
-	private int diagramIndex;
+	private final DefaultDiagramModel diagramModel;
 	
 	/** 削除されるノード */
-	private NodeModel nodeModel;
+	private final NodeModel nodeModel;
 	
 
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param context ルートモデル
-	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
+	 * @param diagramFacet facet
+	 * @param diagramModel ダイアグラム
 	 * @param nodeModel 削除されるノード
 	 */
-	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, NodeModel nodeModel) {
-		this.context = context;
-		this.diagramIndex = diagramIndex;
+	public DeleteNodeCommand(DiagramFacet diagramFacet, DefaultDiagramModel diagramModel, NodeModel nodeModel) {
+		this.diagramFacet = diagramFacet;
+		this.diagramModel = diagramModel;
 		this.nodeModel = nodeModel;
 	}
 	
 	@Override
 	public void execute() {
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		diagramModel.delete(nodeModel.toReference());
-		facet.store(diagramModel);
+		diagramFacet.store(diagramModel);
 	}
 	
 	@Override
 	public void undo() {
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(nodeModel);
-		facet.store(diagramModel);
+		diagramFacet.store(diagramModel);
 	}
-	
 }

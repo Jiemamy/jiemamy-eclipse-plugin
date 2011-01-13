@@ -21,6 +21,7 @@ package org.jiemamy.eclipse.core.ui.editor.dialog.table;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -43,6 +44,8 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SqlFacet;
+import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTab;
@@ -52,6 +55,8 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.script.DefaultAroundScriptModel;
+import org.jiemamy.model.script.Position;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
 
@@ -238,11 +243,29 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		String logicalName = txtLogicalName.getText();
 		tableModel.setLogicalName(logicalName);
 		
-//		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
-//		jiemamyFacade.changeModelProperty(tableModel, EntityProperty.beginScript, beginScript);
-//		
-//		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
-//		jiemamyFacade.changeModelProperty(tableModel, EntityProperty.endScript, endScript);
+		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		DefaultAroundScriptModel aroundScript;
+		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
+		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
+		
+		try {
+			aroundScript = (DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+		} catch (EntityNotFoundException e) {
+			aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+			aroundScript.setCoreModelRef(tableModel.toReference());
+		}
+		
+		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
+			aroundScript.setScript(Position.BEGIN, beginScript);
+			aroundScript.setScript(Position.END, endScript);
+			facet.store(aroundScript);
+		} else {
+			try {
+				facet.delete(aroundScript.toReference());
+			} catch (EntityNotFoundException e) {
+				// ignore
+			}
+		}
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
 		tableModel.setDescription(description);
@@ -270,16 +293,26 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 //		AbstractTab tabIndex = new TableEditDialogIndexTab(tabFolder, SWT.NULL, tableModel, jiemamyFacade);
 //		tabIndex.addKeyListener(editListener);
 //		addTab(tabIndex);
-//		
-//		// ---- B-6. BeginScript
-//		String beginScript = StringUtils.defaultString(tableModel.getBeginScript());
-//		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_Table_BeginScript, beginScript);
-//		addTab(tabBeginScript);
-//		
-//		// ---- B-7. EndScript
-//		String endScript = StringUtils.defaultString(tableModel.getEndScript());
-//		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_Table_EndScript, endScript);
-//		addTab(tabEndScript);
+		
+		String beginScript = "";
+		String endScript = "";
+		try {
+			SqlFacet facet = getContext().getFacet(SqlFacet.class);
+			DefaultAroundScriptModel aroundScript =
+					(DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
+			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
+		} catch (EntityNotFoundException e) {
+			// ignore
+		}
+		
+		// ---- B-6. BeginScript
+		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_Table_BeginScript, beginScript);
+		addTab(tabBeginScript);
+		
+		// ---- B-7. EndScript
+		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_Table_EndScript, endScript);
+		addTab(tabEndScript);
 		
 		// ---- B-8. Description
 		String description = StringUtils.defaultString(tableModel.getDescription());

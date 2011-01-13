@@ -22,10 +22,12 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.ComponentEditPolicy;
 import org.eclipse.gef.requests.GroupRequest;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyDiagramEditor;
 import org.jiemamy.eclipse.core.ui.editor.command.DeleteNodeCommand;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
 
 /**
@@ -39,7 +41,9 @@ public class JmComponentEditPolicy extends ComponentEditPolicy {
 	protected Command createDeleteCommand(GroupRequest deleteRequest) {
 		JiemamyContext context = (JiemamyContext) getHost().getParent().getModel();
 		NodeModel nodeModel = (NodeModel) getHost().getModel();
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		return new DeleteNodeCommand(context, TODO.DIAGRAM_INDEX, nodeModel);
+		return new DeleteNodeCommand(facet, diagramModel, nodeModel);
 	}
 }

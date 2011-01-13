@@ -34,7 +34,6 @@ import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmPointUtil;
 import org.jiemamy.model.geometory.JmRectangle;
@@ -139,11 +138,10 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		for (ConnectionModel connection : nodeModel.getSourceConnections()) {
 			if (selectedModels.contains(connection.getSource()) && selectedModels.contains(connection.getTarget())) {
 				DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-				DiagramModel diagramModel = diagramFacet.getDiagrams().get(diagramIndex);
+				DefaultDiagramModel diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
 				List<JmPoint> bendpoints = connection.getBendpoints();
 				for (int i = 0; i < bendpoints.size(); i++) {
 					JmPoint bendpoint = bendpoints.get(i);
-					int bendpointIndex = bendpoints.indexOf(bendpoint);
 					JmPoint newLocation;
 					if (positive) {
 						newLocation = JmPointUtil.shiftPositive(bendpoint, delta);
@@ -151,7 +149,9 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 						newLocation = JmPointUtil.shiftNegative(bendpoint, delta);
 					}
 					((DefaultConnectionModel) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
-//					jiemamyFacade.moveBendpoint(diagramIndex, connection, bendpointIndex, newLocation);
+					nodeModel.store(connection);
+					diagramModel.store(nodeModel);
+					diagramFacet.store(diagramModel);
 				}
 			}
 		}

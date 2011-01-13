@@ -35,10 +35,9 @@ public class ChangeNodeColorCommand extends Command {
 	
 	private final DiagramFacet diagramFacet;
 	
-	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
-	private final int diagramIndex;
+	private final DefaultDiagramModel diagramModel;
 	
-	private final EntityRef<? extends DefaultNodeModel> nodeModel;
+	private final EntityRef<? extends DefaultNodeModel> nodeRef;
 	
 	private final JmColor newColor;
 	
@@ -49,25 +48,23 @@ public class ChangeNodeColorCommand extends Command {
 	 * インスタンスを生成する。
 	 * 
 	 * @param diagramFacet ファセット
-	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
+	 * @param diagramModel ダイアグラム
 	 * @param nodeRef 変更対象のエンティティ
 	 * @param newColor newColor
 	 */
-	public ChangeNodeColorCommand(DiagramFacet diagramFacet, int diagramIndex,
+	public ChangeNodeColorCommand(DiagramFacet diagramFacet, DefaultDiagramModel diagramModel,
 			EntityRef<? extends DefaultNodeModel> nodeRef, JmColor newColor) {
 		this.diagramFacet = diagramFacet;
-		this.diagramIndex = diagramIndex;
-		this.nodeModel = nodeRef;
+		this.diagramModel = diagramModel;
+		this.nodeRef = nodeRef;
 		this.newColor = newColor;
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
 		DefaultNodeModel node = diagramModel.resolve(nodeRef);
 		oldColor = node.getColor();
 	}
 	
 	@Override
 	public void execute() {
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
-		DefaultNodeModel node = diagramModel.resolve(nodeModel);
+		DefaultNodeModel node = diagramModel.resolve(nodeRef);
 		
 		node.setColor(newColor);
 		diagramModel.store(node);
@@ -76,8 +73,7 @@ public class ChangeNodeColorCommand extends Command {
 	
 	@Override
 	public void undo() {
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
-		DefaultNodeModel node = diagramModel.resolve(nodeModel);
+		DefaultNodeModel node = diagramModel.resolve(nodeRef);
 		
 		node.setColor(oldColor);
 		diagramModel.store(node);

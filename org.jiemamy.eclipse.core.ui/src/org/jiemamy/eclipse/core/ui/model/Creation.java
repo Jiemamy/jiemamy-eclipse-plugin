@@ -19,9 +19,7 @@
 package org.jiemamy.eclipse.core.ui.model;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.CoreElement;
 import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DiagramElement;
 
 /**
  * TODO for daisuke
@@ -33,7 +31,4 @@ public interface Creation {
 	
 	void execute(JiemamyContext context, DefaultDiagramModel diagramModel);
 	
-	CoreElement getCoreElement();
-	
-	DiagramElement getDiagramElement();
 }

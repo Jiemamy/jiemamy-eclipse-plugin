@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
-import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.Images;
@@ -76,7 +75,6 @@ import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.column.DefaultColumnModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
-import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModelBuilder;
 import org.jiemamy.model.constraint.NotNullConstraintModel;
 import org.jiemamy.model.datatype.DefaultTypeVariant;
 import org.jiemamy.model.datatype.TypeReference;
@@ -762,38 +760,29 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			if (chkIsNotNull.getSelection() == false) {
 				NotNullConstraintModel nn = tableModel.getNotNullConstraintFor(columnModel.toReference());
 				if (nn != null) {
-					tableModel.removeConstraint(nn);
+					tableModel.deleteConstraint(nn.toReference());
 				}
 			} else if (tableModel.getNotNullConstraintFor(columnModel.toReference()) == null) {
-				DefaultNotNullConstraintModel nn =
-						new DefaultNotNullConstraintModel(null, null, null, null, columnModel.toReference());
-				tableModel.addConstraint(nn);
+				tableModel.store(DefaultNotNullConstraintModel.of(columnModel));
 			}
 			
 			DefaultPrimaryKeyConstraintModel primaryKey = (DefaultPrimaryKeyConstraintModel) tableModel.getPrimaryKey();
 			if (chkIsPK.getSelection() == false) {
 				if (primaryKey != null) {
 					if (primaryKey.getKeyColumns().size() <= 1) {
-						tableModel.removeConstraint(primaryKey);
+						tableModel.deleteConstraint(primaryKey.toReference());
 					} else {
-						List<EntityRef<? extends ColumnModel>> keyColumns = primaryKey.getKeyColumns();
-						keyColumns.remove(columnModel.toReference());
-						DefaultPrimaryKeyConstraintModel newPrimaryKey =
-								new DefaultPrimaryKeyConstraintModel(primaryKey.getName(), primaryKey.getLogicalName(),
-										primaryKey.getDescription(), keyColumns, primaryKey.getDeferrability());
-						tableModel.addConstraint(newPrimaryKey);
+						primaryKey.removeKeyColumn(columnModel.toReference());
+						tableModel.store(primaryKey);
 					}
 				}
 			} else {
 				if (primaryKey == null) {
-					List<EntityRef<? extends ColumnModel>> columnRefs = Lists.newArrayList();
-					columnRefs.add(columnModel.toReference());
-					primaryKey = new DefaultPrimaryKeyConstraintModel(null, null, null, columnRefs, null);
+					primaryKey = DefaultPrimaryKeyConstraintModel.of(columnModel);
 				} else {
-					DefaultPrimaryKeyConstraintModelBuilder builder = new DefaultPrimaryKeyConstraintModelBuilder();
-					primaryKey = builder.addKeyColumn(columnModel).apply(primaryKey);
+					primaryKey.addKeyColumn(columnModel.toReference());
 				}
-				tableModel.addConstraint(primaryKey);
+				tableModel.store(primaryKey);
 			}
 			
 //			if (chkIsDisabled.getSelection() == false) {

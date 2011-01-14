@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -153,7 +152,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	
 	@Override
 	public boolean isTabComplete() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	
@@ -276,8 +274,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Button chkIsDisabled;
 		
-//		private Button chkIsRepresentation;
-		
 		private Text txtDescription;
 		
 		private Composite cmpTypeOption;
@@ -359,63 +355,20 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			txtDescription.addKeyListener(editListener);
 		}
 		
-		// THINK ↓要る？
-//		@Override
-//		protected void configureTable(final Table table) {
-//			super.configureTable(table);
-//			
-//			final Menu menu = new Menu(table);
-//			table.setMenu(menu);
-//			menu.addMenuListener(new MenuAdapter() {
-//				
-//				@Override
-//				public void menuShown(MenuEvent evt) {
-//					for (MenuItem item : menu.getItems()) {
-//						item.dispose();
-//					}
-//					int index = table.getSelectionIndex();
-//					if (index == -1) {
-//						return;
-//					}
-//					
-//					MenuItem removeItem = new MenuItem(menu, SWT.PUSH);
-//					removeItem.setText("&Remove"); // RESOURCE
-//					removeItem.addSelectionListener(new SelectionAdapter() {
-//						
-//						@Override
-//						public void widgetSelected(SelectionEvent evt) {
-//							removeTableSelectionItem();
-//						}
-//					});
-//				}
-//			});
-//		}
-		
 		@Override
 		protected void configureTableViewer(TableViewer tableViewer) {
 			tableViewer.setLabelProvider(new ColumnLabelProvider());
 			final ColumnContentProvider contentProvider = new ColumnContentProvider();
 			tableViewer.setContentProvider(contentProvider);
 			tableViewer.setInput(tableModel);
-			tableViewer.addFilter(new ViewerFilter() {
-				
-				@Override
-				public boolean select(Viewer viewer, Object parentElement, Object element) {
-					return element instanceof ColumnModel;
-				}
-				
-			});
 			
-			final EventBroker eventBroker = context.getEventBroker();
-			eventBroker.addListener(contentProvider);
-			final EventBroker eventBroker2 = tableModel.getEventBroker();
+			final EventBroker eventBroker = tableModel.getEventBroker();
 			eventBroker.addListener(contentProvider);
 			
-			// THINK んーーー？？ このタイミングか？
+			// THINK んーーー？？ このタイミングか？ AbstractTableEditor#dispose かな？
 			tableViewer.getTable().addDisposeListener(new DisposeListener() {
 				
 				public void widgetDisposed(DisposeEvent e) {
-					eventBroker2.removeListener(contentProvider);
 					eventBroker.removeListener(contentProvider);
 				}
 				
@@ -540,7 +493,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setSelection(false);
 			chkIsNotNull.setSelection(false);
 			chkIsDisabled.setSelection(false);
-//			chkIsRepresentation.setSelection(false);
 			txtDefaultValue.setText(StringUtils.EMPTY);
 			txtDescription.setText(StringUtils.EMPTY);
 			
@@ -550,7 +502,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setEnabled(false);
 			chkIsNotNull.setEnabled(false);
 			chkIsDisabled.setEnabled(false);
-//			chkIsRepresentation.setEnabled(false);
 			txtDefaultValue.setEnabled(false);
 			txtDescription.setEnabled(false);
 			
@@ -571,7 +522,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setEnabled(true);
 			chkIsNotNull.setEnabled(true);
 			chkIsDisabled.setEnabled(true);
-//			chkIsRepresentation.setEnabled(true);
 			
 			TypeVariant dataType = columnModel.getDataType();
 //			if (dataType instanceof BuiltinDataType) {
@@ -663,16 +613,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0), new ParameterMap());
 			columnModel.setDataType(type);
+			columnModel.setIndex(index);
 			tableModel.store(columnModel);
-			
-			if (index < 0 || index > table.getItemCount()) {
-				tableModel.store(columnModel);
-			} else {
-				ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
-//				int subjectIndex = columns.indexOf(subject);
-//				tableModel.store(subjectIndex, columnModel);
-				tableModel.store(columnModel); // FIXME ↑
-			}
 			
 //			TypeOptionManager typeOptionManager =
 //					new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
@@ -790,9 +732,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private void updateModel() {
 			int columnEditIndex = getTableViewer().getTable().getSelectionIndex();
-			int selectionInedx = cmbDataType.getSelectionIndex();
 			
-			if (columnEditIndex == -1 || selectionInedx == -1) {
+			if (columnEditIndex == -1) {
 				return;
 			}
 			
@@ -804,9 +745,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			String logicalName = StringUtils.defaultString(txtColumnLogicalName.getText());
 			columnModel.setLogicalName(logicalName);
 			
-			TypeVariant dataType =
-					new DefaultTypeVariant(allTypes.get(cmbDataType.getSelectionIndex()), new ParameterMap());
-			columnModel.setDataType(dataType);
+			int selectionInedx = cmbDataType.getSelectionIndex();
+			if (selectionInedx != -1) {
+				TypeVariant dataType = new DefaultTypeVariant(allTypes.get(selectionInedx), new ParameterMap());
+				columnModel.setDataType(dataType);
+			}
 			
 			String defaultValue = StringUtils.defaultString(txtDefaultValue.getText());
 			columnModel.setDefaultValue(defaultValue);
@@ -830,7 +773,16 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			DefaultPrimaryKeyConstraintModel primaryKey = (DefaultPrimaryKeyConstraintModel) tableModel.getPrimaryKey();
 			if (chkIsPK.getSelection() == false) {
 				if (primaryKey != null) {
-					tableModel.removeConstraint(primaryKey);
+					if (primaryKey.getKeyColumns().size() <= 1) {
+						tableModel.removeConstraint(primaryKey);
+					} else {
+						List<EntityRef<? extends ColumnModel>> keyColumns = primaryKey.getKeyColumns();
+						keyColumns.remove(columnModel.toReference());
+						DefaultPrimaryKeyConstraintModel newPrimaryKey =
+								new DefaultPrimaryKeyConstraintModel(primaryKey.getName(), primaryKey.getLogicalName(),
+										primaryKey.getDescription(), keyColumns, primaryKey.getDeferrability());
+						tableModel.addConstraint(newPrimaryKey);
+					}
 				}
 			} else {
 				if (primaryKey == null) {
@@ -855,13 +807,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 //				columnModel.getAdapter(Disablable.class).setDisabled(true);
 //			}
 			
-//			RepresentationAdapter representationAdapter = tableModel.getAdapter(RepresentationAdapter.class);
-//			if (chkIsRepresentation.getSelection()) {
-//				representationAdapter.setRepresentation(true);
-//			} else {
-//				representationAdapter.setRepresentation(null);
-			//			}
-			
 //			typeOptionManagers.get(columnModel).writeBackToAdapter();
 		}
 		
@@ -871,7 +816,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			@Override
 			protected void process(TypedEvent e) {
 				updateModel();
-				columnTableEditor.refreshTable();
 			}
 		}
 	}

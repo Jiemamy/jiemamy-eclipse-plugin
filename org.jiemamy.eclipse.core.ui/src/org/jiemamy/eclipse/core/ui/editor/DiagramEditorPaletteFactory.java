@@ -207,10 +207,7 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						// FIXME
-						DefaultForeignKeyConstraintModel fk =
-								new DefaultForeignKeyConstraintModel(UUID.randomUUID(), null, null, null, null, null,
-										null, null, null, null);
+						DefaultForeignKeyConstraintModel fk = new DefaultForeignKeyConstraintModel(UUID.randomUUID());
 						ConnectionModel conn = new DefaultConnectionModel(UUID.randomUUID(), fk.toReference());
 						return new ForeignKeyCreation(fk, conn);
 					}

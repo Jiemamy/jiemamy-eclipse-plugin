@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ivy-module version="2.2">
-    <info organisation="org.jiemamy" module="sampleHello" />
+    <info organisation="org.jiemamy" module="eclipse-core" />
     <dependencies>
         <dependency org="org.seasar.eclipsecommon" name="eclipse-common" rev="0.0.4" transitive="false" />
         <dependency org="org.jiemamy" name="jiemamy-core" rev="0.3.0-SNAPSHOT" />

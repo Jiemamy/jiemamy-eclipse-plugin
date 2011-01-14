@@ -54,14 +54,15 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.TextEditTab;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.model.script.Position;
 import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
 
 /**
- * テーブルの詳細編集ダイアログクラス。
+ * {@link DefaultTableModel}の詳細編集ダイアログクラス。
  * 
  * @author daisuke
  */
@@ -70,18 +71,20 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	private static final Point DEFAULT_SIZE = new Point(700, 500);
 	
 	// 共通
+	/** テーブル名コンポーネント */
 	private Text txtName;
 	
+	/** テーブル論理名コンポーネント */
 	private Text txtLogicalName;
 	
+	/** 開始スクリプトタブ */
 	private TextEditTab tabBeginScript;
 	
+	/** 終了スクリプトタブ */
 	private TextEditTab tabEndScript;
 	
+	/** 説明タブ */
 	private TextEditTab tabDescription;
-	
-	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
-	private final int diagramIndex;
 	
 
 	/**
@@ -94,12 +97,11 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public TableEditDialog(Shell parentShell, JiemamyContext context, DefaultTableModel tableModel, int diagramIndex) {
-		super(parentShell, context, tableModel, TableModel.class);
+		super(parentShell, context, tableModel, DefaultTableModel.class, diagramIndex);
 		
 		Validate.notNull(tableModel);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		this.diagramIndex = diagramIndex;
 	}
 	
 	@Override
@@ -123,7 +125,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		
 		txtName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		txtName.setText(tableModel.getName());
+		txtName.setText(StringUtils.defaultString(tableModel.getName()));
 		txtName.addFocusListener(new TextSelectionAdapter(txtName));
 		txtName.addKeyListener(editListener);
 		
@@ -149,7 +151,10 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					getNodeModel().setColor(ConvertUtil.convert(rgb));
+					DefaultNodeModel nodeModel = getNodeModel();
+					DefaultDiagramModel diagramModel = getDiagramModel();
+					nodeModel.setColor(ConvertUtil.convert(rgb));
+					diagramModel.store(nodeModel);
 				}
 			}
 		});
@@ -160,7 +165,10 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				getNodeModel().setColor(null);
+				DefaultNodeModel nodeModel = getNodeModel();
+				DefaultDiagramModel diagramModel = getDiagramModel();
+				nodeModel.setColor(null);
+				diagramModel.store(nodeModel);
 			}
 		});
 		
@@ -185,7 +193,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 //		}
 		
 		// ---- B. タブ
-		TabFolder tabFolder = new TabFolder(composite, SWT.NULL);
+		TabFolder tabFolder = new TabFolder(composite, SWT.NONE);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 7;
 		tabFolder.setLayoutData(gd);

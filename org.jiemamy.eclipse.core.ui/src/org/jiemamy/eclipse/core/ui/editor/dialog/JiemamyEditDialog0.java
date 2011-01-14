@@ -31,6 +31,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 
@@ -318,11 +319,12 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	 * 
 	 * @author daisuke
 	 */
-	public class EditListenerImpl extends AbstractEditListener {
+	private class EditListenerImpl extends AbstractEditListener {
 		
 		@Override
 		protected void process(TypedEvent e) {
-			getButton(IDialogConstants.OK_ID).setEnabled(canExecuteOk());
+			Button button = getButton(IDialogConstants.OK_ID);
+			button.setEnabled(canExecuteOk());
 		}
 	}
 	

@@ -18,6 +18,8 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.dialog.view;
 
+import java.util.UUID;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -37,18 +39,24 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SqlFacet;
+import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextEditTab;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.script.DefaultAroundScriptModel;
+import org.jiemamy.model.script.Position;
 import org.jiemamy.model.view.DefaultViewModel;
-import org.jiemamy.model.view.ViewModel;
 
 /**
- * View設定ダイアログクラス。
+ * {@link DefaultViewModel}の詳細編集ダイアログクラス。
  * 
  * @author daisuke
  */
@@ -74,26 +82,22 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	/** 説明タブ */
 	private TextEditTab tabDescription;
 	
-	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
-	private final int diagramIndex;
-	
 
 	/**
 	 * コンストラクタ。
 	 * 
-	 * @param shell 親シェルオブジェクト
+	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
-	 * @param viewModel 編集対象ビュー
+	 * @param viewModel 編集対象モデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditDialog(Shell shell, JiemamyContext context, DefaultViewModel viewModel, int diagramIndex) {
-		super(shell, context, viewModel, ViewModel.class);
+	public ViewEditDialog(Shell parentShell, JiemamyContext context, DefaultViewModel viewModel, int diagramIndex) {
+		super(parentShell, context, viewModel, DefaultViewModel.class, diagramIndex);
 		
 		Validate.notNull(viewModel);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		this.diagramIndex = diagramIndex;
 	}
 	
 	@Override
@@ -105,27 +109,28 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final ViewModel viewModel = getTargetCoreModel();
+		final DefaultViewModel viewModel = getTargetCoreModel();
 		getShell().setText(Messages.Dialog_Title);
 		
+		// ---- A. 最上段名称欄
 		Composite composite = (Composite) super.createDialogArea(parent);
 		composite.setLayout(new GridLayout(7, false));
 		
 		// ---- A-1. ビュー名
-		Label label = new Label(composite, SWT.NULL);
+		Label label = new Label(composite, SWT.NONE);
 		label.setText(Messages.Label_View_Name);
 		
-		txtName = new Text(composite, SWT.BORDER);
+		txtName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		txtName.setText(StringUtils.defaultString(viewModel.getName()));
 		txtName.addFocusListener(new TextSelectionAdapter(txtName));
 		txtName.addKeyListener(editListener);
 		
 		// ---- A-2. 論理名
-		label = new Label(composite, SWT.NULL);
+		label = new Label(composite, SWT.NONE);
 		label.setText(Messages.Label_View_LogicalName);
 		
-		txtLogicalName = new Text(composite, SWT.BORDER);
+		txtLogicalName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtLogicalName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		txtLogicalName.setText(StringUtils.defaultString(viewModel.getLogicalName()));
 		txtLogicalName.addFocusListener(new TextSelectionAdapter(txtLogicalName));
@@ -143,7 +148,11 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					getNodeModel().setColor(ConvertUtil.convert(rgb));
+					DefaultNodeModel nodeModel = getNodeModel();
+					DefaultDiagramModel diagramModel = getDiagramModel();
+					nodeModel.setColor(ConvertUtil.convert(rgb));
+					diagramModel.store(nodeModel);
+					getContext().getFacet(DiagramFacet.class).store(diagramModel);
 				}
 			}
 		});
@@ -154,7 +163,11 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				getNodeModel().setColor(null);
+				DefaultNodeModel nodeModel = getNodeModel();
+				DefaultDiagramModel diagramModel = getDiagramModel();
+				nodeModel.setColor(null);
+				diagramModel.store(nodeModel);
+				getContext().getFacet(DiagramFacet.class).store(diagramModel);
 			}
 		});
 		
@@ -203,6 +216,10 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	
 	@Override
 	protected boolean performOk() {
+		if (StringUtils.isEmpty(txtName.getText())) {
+			return false;
+		}
+		
 		DefaultViewModel viewModel = getTargetCoreModel();
 		
 		String name = txtName.getText();
@@ -214,36 +231,62 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 		String definition = tabDefinition.getTextWidget().getText();
 		viewModel.setDefinition(definition);
 		
-//		String beginScript = tabBeginScript.getTextWidget().getText();
-//		jiemamyFacade.changeModelProperty(viewModel, EntityProperty.beginScript, beginScript);
-//		
-//		String endScript = tabEndScript.getTextWidget().getText();
-//		jiemamyFacade.changeModelProperty(viewModel, EntityProperty.endScript, endScript);
+		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		DefaultAroundScriptModel aroundScript;
+		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
+		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		String description = tabDescription.getTextWidget().getText();
+		try {
+			aroundScript = (DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+		} catch (EntityNotFoundException e) {
+			aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+			aroundScript.setCoreModelRef(viewModel.toReference());
+		}
+		
+		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
+			aroundScript.setScript(Position.BEGIN, beginScript);
+			aroundScript.setScript(Position.END, endScript);
+			facet.store(aroundScript);
+		} else {
+			try {
+				facet.delete(aroundScript.toReference());
+			} catch (EntityNotFoundException e) {
+				// ignore
+			}
+		}
+		
+		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
 		viewModel.setDescription(description);
 		
 		return true;
 	}
 	
-	private void createTabs(final ViewModel viewModel, TabFolder tabFolder) {
+	private void createTabs(final DefaultViewModel viewModel, TabFolder tabFolder) {
 		// ---- B-1. Definition
 		String definition = StringUtils.defaultString(viewModel.getDefinition());
 		tabDefinition = new TextEditTab(tabFolder, Messages.Tab_View_Definition, definition);
 		tabDefinition.addKeyListener(editListener);
 		addTab(tabDefinition);
 		
-//		// ---- B-2. BeginScript
-//		String beginScript = StringUtils.defaultString(viewModel.getBeginScript());
-//		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_View_BeginScript, beginScript);
-//		tabBeginScript.addKeyListener(editListener);
-//		addTab(tabBeginScript);
-//		
-//		// ---- B-3. EndScript
-//		String endScript = StringUtils.defaultString(viewModel.getEndScript());
-//		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_View_EndScript, endScript);
-//		tabEndScript.addKeyListener(editListener);
-//		addTab(tabEndScript);
+		String beginScript = "";
+		String endScript = "";
+		try {
+			SqlFacet facet = getContext().getFacet(SqlFacet.class);
+			DefaultAroundScriptModel aroundScript =
+					(DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
+			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
+		} catch (EntityNotFoundException e) {
+			// ignore
+		}
+		
+		// ---- B-2. BeginScript
+		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_View_BeginScript, beginScript);
+		addTab(tabBeginScript);
+		
+		// ---- B-3. EndScript
+		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_View_EndScript, endScript);
+		addTab(tabEndScript);
 		
 		// ---- B-4. Description
 		String description = StringUtils.defaultString(viewModel.getDescription());

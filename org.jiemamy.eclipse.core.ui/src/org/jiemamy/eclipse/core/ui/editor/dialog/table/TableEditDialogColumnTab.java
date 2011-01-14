@@ -26,9 +26,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -163,7 +163,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ColumnContentProvider extends ArrayContentProvider implements StoredEventListener {
+	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
 		private Viewer viewer;
 		
@@ -173,27 +173,29 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
-		@Override
 		public void dispose() {
 			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: disposed");
-			super.dispose();
+		}
+		
+		public Object[] getElements(Object inputElement) {
+			if (inputElement instanceof TableModel) {
+				return ((TableModel) inputElement).getColumns().toArray();
+			}
+			logger.error("unknown input: " + inputElement.getClass().getName());
+			return new Object[0];
 		}
 		
 		public Entity getTargetModel() {
 			return (Entity) viewer.getInput();
 		}
 		
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: input changed");
 			logger.trace(LogMarker.LIFECYCLE, "oldInput: " + oldInput);
 			logger.trace(LogMarker.LIFECYCLE, "newInput: " + newInput);
 			
 			this.viewer = viewer;
-			
-			super.inputChanged(viewer, oldInput, newInput);
 		}
-		
 	}
 	
 	/**
@@ -280,11 +282,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Composite cmpTypeOption;
 		
+
 //		private Map<ColumnModel, TypeOptionManager> typeOptionManagers = CollectionsUtil.newHashMap();
 		
-		private final List<? extends ColumnModel> columns;
-		
-
 //		private TypeOptionHandler typeOptionHandler;
 		
 		/**
@@ -296,8 +296,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		public ColumnTableEditor(Composite parent, int style) {
 			super(parent, style, new DefaultTableEditorConfig("カラム情報")); // RESOURCE
 			
-			columns = tableModel.getColumns();
-			
 			try {
 				dialect = context.findDialect();
 			} catch (ClassNotFoundException e) {
@@ -306,7 +304,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				logger.warn("Dialectのロスト", e);
 			}
 			
-			assert columns != null;
 			assert dialect != null;
 		}
 		
@@ -399,7 +396,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			tableViewer.setLabelProvider(new ColumnLabelProvider());
 			final ColumnContentProvider contentProvider = new ColumnContentProvider();
 			tableViewer.setContentProvider(contentProvider);
-			tableViewer.setInput(columns);
+			tableViewer.setInput(tableModel);
 			tableViewer.addFilter(new ViewerFilter() {
 				
 				@Override
@@ -411,11 +408,14 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			final EventBroker eventBroker = context.getEventBroker();
 			eventBroker.addListener(contentProvider);
+			final EventBroker eventBroker2 = tableModel.getEventBroker();
+			eventBroker.addListener(contentProvider);
 			
 			// THINK んーーー？？ このタイミングか？
 			tableViewer.getTable().addDisposeListener(new DisposeListener() {
 				
 				public void widgetDisposed(DisposeEvent e) {
+					eventBroker2.removeListener(contentProvider);
 					eventBroker.removeListener(contentProvider);
 				}
 				
@@ -669,7 +669,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				tableModel.store(columnModel);
 			} else {
 				ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
-				int subjectIndex = columns.indexOf(subject);
+//				int subjectIndex = columns.indexOf(subject);
 //				tableModel.store(subjectIndex, columnModel);
 				tableModel.store(columnModel); // FIXME ↑
 			}
@@ -694,13 +694,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			Object subject = getTableViewer().getElementAt(index);
-			Object object = getTableViewer().getElementAt(index + 1);
-			
-			int subjectIndex = tableModel.getColumns().indexOf(subject);
-			int objectIndex = tableModel.getColumns().indexOf(object);
-			
-//			tableModel.swapColumn(subjectIndex, objectIndex); // FIXME
+			ColumnModel object = (ColumnModel) getTableViewer().getElementAt(index + 1);
+			object.setIndex(index);
+			tableModel.store(object);
 			
 			table.setSelection(index + 1);
 			enableEditControls(index + 1);
@@ -714,13 +710,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			Object subject = getTableViewer().getElementAt(index);
-			Object object = getTableViewer().getElementAt(index - 1);
-			
-			int subjectIndex = tableModel.getColumns().indexOf(subject);
-			int objectIndex = tableModel.getColumns().indexOf(object);
-			
-//			tableModel.swapColumn(subjectIndex, objectIndex); // FIXME
+			ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
+			subject.setIndex(index - 1);
+			tableModel.store(subject);
 			
 			table.setSelection(index - 1);
 			enableEditControls(index - 1);
@@ -821,6 +813,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			String description = StringUtils.defaultString(txtDescription.getText());
 			columnModel.setDescription(description);
+			
+			tableModel.store(columnModel);
 			
 			if (chkIsNotNull.getSelection() == false) {
 				NotNullConstraintModel nn = tableModel.getNotNullConstraintFor(columnModel.toReference());

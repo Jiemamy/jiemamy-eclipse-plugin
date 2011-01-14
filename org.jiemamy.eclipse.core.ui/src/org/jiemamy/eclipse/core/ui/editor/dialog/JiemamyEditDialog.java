@@ -22,10 +22,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.DiagramModel;
 
 /**
  * Jiemamyのモデル編集ダイアログ抽象クラス。
@@ -37,6 +36,8 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	
 	private DefaultNodeModel nodeModel;
 	
+	private DefaultDiagramModel diagramModel;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -47,12 +48,17 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	 * @param type 編集対象モデルの型
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
-	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetCoreModel, Class<?> type) {
+	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetCoreModel, Class<?> type,
+			int diagramIndex) {
 		super(parentShell, context, targetCoreModel, type);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DiagramModel diagramModel = facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		nodeModel = (DefaultNodeModel) diagramModel.getNodeFor(targetCoreModel.toReference());
+	}
+	
+	protected DefaultDiagramModel getDiagramModel() {
+		return diagramModel;
 	}
 	
 	protected DefaultNodeModel getNodeModel() {

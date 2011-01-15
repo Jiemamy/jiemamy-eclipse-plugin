@@ -50,7 +50,7 @@ public class MockDialect implements Dialect {
 		allDataTypes.add(new DefaultTypeReference(DataTypeCategory.VARCHAR));
 	}
 	
-	public List<TypeReference> getAllDataTypes() {
+	public List<TypeReference> getAllTypeReferences() {
 		return allDataTypes;
 	}
 	
@@ -65,4 +65,5 @@ public class MockDialect implements Dialect {
 	public Validator getValidator() {
 		return validator;
 	}
+	
 }

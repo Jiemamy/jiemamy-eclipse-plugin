@@ -47,6 +47,7 @@ import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmComponentEditPolicy;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
@@ -61,7 +62,7 @@ import org.jiemamy.utils.LogMarker;
  * @author daisuke
  */
 public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart implements EditDialogSupport,
-		NodeEditPart, StoredEventListener {
+		NodeEditPart, StoredEventListener<DatabaseObjectModel> {
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractJmNodeEditPart.class);
 	
@@ -87,7 +88,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		logger.debug("activate");
 	}
 	
-	public void commandExecuted(StoredEvent<?> command) {
+	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
 		// THINK どのメソッドを呼ばなければならないのか精査
 		refresh();
 	}

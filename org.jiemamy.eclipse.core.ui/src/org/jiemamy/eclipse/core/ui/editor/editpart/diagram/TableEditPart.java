@@ -40,6 +40,7 @@ import org.jiemamy.eclipse.core.ui.editor.figure.ColumnFigure;
 import org.jiemamy.eclipse.core.ui.editor.figure.TableFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DiagramModel;
@@ -79,7 +80,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 //	}
 	
 	@Override
-	public void commandExecuted(StoredEvent<?> command) {
+	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
 		refresh();
 	}
 	
@@ -90,7 +91,8 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	
 	@Override
 	public Entity getTargetModel() {
-		return getJiemamyContext().resolve(getModel().getCoreModelRef());
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	public void openEditDialog() {

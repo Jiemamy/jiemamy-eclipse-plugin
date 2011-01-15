@@ -85,6 +85,7 @@ import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.core.ui.editor.editpart.DiagramEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.serializer.JiemamySerializer;
 import org.jiemamy.serializer.SerializationException;
@@ -104,7 +105,7 @@ import org.jiemamy.validator.Validator;
  * @author daisuke
  */
 public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette implements IResourceChangeListener,
-		StoredEventListener, JiemamyEditor {
+		StoredEventListener<DatabaseObjectModel>, JiemamyEditor {
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyDiagramEditor.class);
 	
@@ -187,7 +188,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	 * 
 	 * <p>こも実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
 	 */
-	public void commandExecuted(StoredEvent<?> command) {
+	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
 		Validator validator;
 		try {
 			Dialect dialect = context.findDialect();
@@ -341,7 +342,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 		
 		// FIXME 無差別ディスパッチになってる。
-		context.getEventBroker().setStrategy(new DispatchStrategy() {
+		context.getEventBroker().setDefaultStrategy(new DispatchStrategy() {
 			
 			public boolean needToDispatch(StoredEventListener listener, StoredEvent command) {
 				return true;

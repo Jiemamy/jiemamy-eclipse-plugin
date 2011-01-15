@@ -30,6 +30,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.editor.figure.StickyFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
@@ -55,9 +56,8 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	}
 	
 	@Override
-	public void commandExecuted(StoredEvent<?> command) {
-		// TODO Auto-generated method stub
-		
+	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
+		refresh();
 	}
 	
 	@Override
@@ -67,35 +67,32 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	
 	@Override
 	public Entity getTargetModel() {
-		StickyNodeModel stickyModel = getModel();
-		return stickyModel;
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
-		JiemamyContext rootModel = (JiemamyContext) getParent().getModel();
+		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		StickyNodeModel stickyModel = getModel();
 		
-//		// 編集前のスナップショットを保存
-//		JiemamyViewFacade facade = rootModel.newFacade(JiemamyViewFacade.class);
-//		SavePoint beforeEditSavePoint = facade.save();
-//		
 //		Shell shell = getViewer().getControl().getShell();
 //		StickyEditDialog dialog = new StickyEditDialog(shell, stickyModel, Migration.DIAGRAM_INDEX, facade);
 //		
 //		if (dialog.open() == Dialog.OK) {
-//			// 編集後のスナップショットを保存
-//			SavePoint afterEditSavePoint = facade.save();
-//			
 //			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
 //			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 //			viewer.getEditDomain().getCommandStack().execute(command);
-//		} else {
-//			// 編集前にロールバック
-//			facade.rollback(beforeEditSavePoint);
 //		}
 	}
+	
+//	@Override
+//	protected DirectEditManager getDirectEditManager() {
+//		StickyFigure figure = (StickyFigure) getFigure();
+//		CellEditorLocator locator = new NodeCellEditorLocator(figure.getContentsLabel());
+//		return new StickyDirectEditManager(this, MultiLineTextCellEditor.class, locator);
+//	}
 	
 	@Override
 	protected IFigure createFigure() {
@@ -114,13 +111,6 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		updateFigure(figure);
 		return figure;
 	}
-	
-//	@Override
-//	protected DirectEditManager getDirectEditManager() {
-//		StickyFigure figure = (StickyFigure) getFigure();
-//		CellEditorLocator locator = new NodeCellEditorLocator(figure.getContentsLabel());
-//		return new StickyDirectEditManager(this, MultiLineTextCellEditor.class, locator);
-//	}
 	
 	/**
 	 * StickyFigureのアップデートを行う。

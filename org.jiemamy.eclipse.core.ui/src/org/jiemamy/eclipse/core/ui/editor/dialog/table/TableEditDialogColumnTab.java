@@ -71,6 +71,7 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.EditListener;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
+import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.column.DefaultColumnModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
@@ -130,9 +131,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			logger.warn("Dialectのロスト", e);
 		}
 		
-		allTypes = Lists.newArrayListWithExpectedSize(context.getDomains().size() + dialect.getAllDataTypes().size());
+		allTypes =
+				Lists.newArrayListWithExpectedSize(context.getDomains().size() + dialect.getAllTypeReferences().size());
 		
-		allTypes.addAll(dialect.getAllDataTypes());
+		allTypes.addAll(dialect.getAllTypeReferences());
 		for (DomainModel domainModel : context.getDomains()) {
 			allTypes.add(domainModel.asType());
 		}
@@ -159,12 +161,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener {
+	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener<DatabaseObjectModel> {
 		
 		private Viewer viewer;
 		
 
-		public void commandExecuted(StoredEvent<?> command) {
+		public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
 			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: commandExecuted");
 			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}

@@ -55,13 +55,4 @@ public class ForeignKeyCreation implements Creation {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	public ForeignKeyConstraintModel getCoreElement() {
-		return fk;
-	}
-	
-	public ConnectionModel getDiagramElement() {
-		return connection;
-	}
-	
 }

@@ -22,7 +22,6 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DefaultDatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.NodeModel;
 import org.jiemamy.utils.NamingUtil;
 
 /**
@@ -34,7 +33,7 @@ import org.jiemamy.utils.NamingUtil;
 public abstract class NodeCreation implements Creation {
 	
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
-		NodeModel nodeModel = getDiagramElement();
+		DefaultNodeModel nodeModel = getDiagramElement();
 		DefaultDatabaseObjectModel coreModel = getCoreElement();
 		NamingUtil.autoName(coreModel, context);
 		context.store(coreModel);

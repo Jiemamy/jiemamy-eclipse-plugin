@@ -21,9 +21,7 @@ package org.jiemamy.eclipse.core.ui.model;
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultDatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
 
 /**
@@ -32,7 +30,7 @@ import org.jiemamy.model.StickyNodeModel;
  * @version $Id$
  * @author daisuke
  */
-public class StickyCreation extends NodeCreation {
+public class StickyCreation implements Creation {
 	
 	/** {@link StickyNodeModel}が作られた時、はじめに設定されている値 */
 	private static final String DEFAULT_STICKY_CONTENTS = "memo";
@@ -51,20 +49,8 @@ public class StickyCreation extends NodeCreation {
 		this.stickyNodeModel = stickyNodeModel;
 	}
 	
-	@Override
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
 		stickyNodeModel.setContents(DEFAULT_STICKY_CONTENTS);
 		diagramModel.store(stickyNodeModel);
-	}
-	
-	@Override
-	public DefaultDatabaseObjectModel getCoreElement() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public DefaultNodeModel getDiagramElement() {
-		return stickyNodeModel;
 	}
 }

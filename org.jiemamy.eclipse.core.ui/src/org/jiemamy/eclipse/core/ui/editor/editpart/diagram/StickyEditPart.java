@@ -23,14 +23,20 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.StackLayout;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
+import org.jiemamy.eclipse.core.ui.TODO;
+import org.jiemamy.eclipse.core.ui.editor.dialog.sticky.StickyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.StickyFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
@@ -67,8 +73,7 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	
 	@Override
 	public Entity getTargetModel() {
-		// TODO Auto-generated method stub
-		return null;
+		return getModel();
 	}
 	
 	public void openEditDialog() {
@@ -77,14 +82,19 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		StickyNodeModel stickyModel = getModel();
 		
-//		Shell shell = getViewer().getControl().getShell();
-//		StickyEditDialog dialog = new StickyEditDialog(shell, stickyModel, Migration.DIAGRAM_INDEX, facade);
-//		
-//		if (dialog.open() == Dialog.OK) {
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		
+		Shell shell = getViewer().getControl().getShell();
+		StickyEditDialog dialog = new StickyEditDialog(shell, context, stickyModel, diagramModel);
+		
+		if (dialog.open() == Dialog.OK) {
 //			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
 //			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 //			viewer.getEditDomain().getCommandStack().execute(command);
-//		}
+			diagramModel.store(stickyModel);
+			facet.store(diagramModel);
+		}
 	}
 	
 //	@Override
@@ -113,7 +123,7 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	}
 	
 	/**
-	 * StickyFigureのアップデートを行う。
+	 * {@link StickyFigure}のアップデートを行う。
 	 * 
 	 * @param figure アップデート対象のフィギュア
 	 */

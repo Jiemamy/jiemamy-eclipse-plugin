@@ -319,7 +319,10 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	 * 
 	 * @author daisuke
 	 */
-	private class EditListenerImpl extends AbstractEditListener {
+	public class EditListenerImpl extends AbstractEditListener {
+		
+		public EditListenerImpl() {
+		}
 		
 		@Override
 		protected void process(TypedEvent e) {

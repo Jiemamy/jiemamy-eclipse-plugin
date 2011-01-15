@@ -46,6 +46,7 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	 * @param context コンテキスト
 	 * @param targetCoreModel 編集対象モデルの型
 	 * @param type 編集対象モデルの型
+	 * @param diagramIndex 
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
 	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetCoreModel, Class<?> type,

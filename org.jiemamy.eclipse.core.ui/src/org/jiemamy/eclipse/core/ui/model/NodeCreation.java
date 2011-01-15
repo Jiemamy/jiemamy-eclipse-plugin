@@ -40,8 +40,8 @@ public abstract class NodeCreation implements Creation {
 		diagramModel.store(nodeModel);
 	}
 	
-	public abstract DefaultDatabaseObjectModel getCoreElement();
-	
 	public abstract DefaultNodeModel getDiagramElement();
+	
+	abstract DefaultDatabaseObjectModel getCoreElement();
 	
 }

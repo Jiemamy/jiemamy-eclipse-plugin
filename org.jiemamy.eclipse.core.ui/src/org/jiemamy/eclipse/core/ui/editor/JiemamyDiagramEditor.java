@@ -241,7 +241,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		ByteArrayInputStream in = null;
 		try {
 			out = new ByteArrayOutputStream();
-			JiemamyContext.findSerializer().serialize(context, out);
+			context.findSerializer().serialize(context, out);
 			
 			in = new ByteArrayInputStream(out.toByteArray());
 			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
@@ -280,7 +280,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 							ByteArrayInputStream in = null;
 							try {
 								out = new ByteArrayOutputStream();
-								JiemamyContext.findSerializer().serialize(context, out);
+								context.findSerializer().serialize(context, out);
 								
 								in = new ByteArrayInputStream(out.toByteArray());
 								file.create(in, true, monitor);
@@ -547,7 +547,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// 最上位モデルの設定
 		IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 		try {
-			JiemamySerializer serializer = JiemamyContext.findSerializer();
+			JiemamySerializer serializer = context.findSerializer();
 			context = serializer.deserialize(file.getContents(), DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 			context.getEventBroker().addListener(this); // THINK require?
 		} catch (SerializationException e) {

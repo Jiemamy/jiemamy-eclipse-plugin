@@ -134,7 +134,7 @@ public final class NewDiagramWizard extends Wizard implements INewWizard {
 			
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			try {
-				JiemamyContext.findSerializer().serialize(context, out);
+				context.findSerializer().serialize(context, out);
 			} catch (Exception e) {
 				ExceptionHandler.handleException(e);
 			} finally {

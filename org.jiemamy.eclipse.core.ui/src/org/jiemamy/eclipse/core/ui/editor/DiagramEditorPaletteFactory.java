@@ -39,7 +39,6 @@ import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
 import org.jiemamy.eclipse.core.ui.model.StickyCreation;
 import org.jiemamy.eclipse.core.ui.model.TableCreation;
 import org.jiemamy.eclipse.core.ui.model.ViewCreation;
-import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultNodeModel;
@@ -208,7 +207,7 @@ public final class DiagramEditorPaletteFactory {
 					
 					public Object getNewObject() {
 						DefaultForeignKeyConstraintModel fk = new DefaultForeignKeyConstraintModel(UUID.randomUUID());
-						ConnectionModel conn = new DefaultConnectionModel(UUID.randomUUID(), fk.toReference());
+						DefaultConnectionModel conn = new DefaultConnectionModel(UUID.randomUUID(), fk.toReference());
 						return new ForeignKeyCreation(fk, conn);
 					}
 					

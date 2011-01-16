@@ -18,6 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.command;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,7 +102,9 @@ public abstract class AbstractMovePositionCommand extends Command {
 			((DefaultNodeModel) node).setBoundary(newBoundary);
 			
 			// ベンドポイントの移動
-			Iterator<? extends ConnectionModel> itr = node.getSourceConnections().iterator();
+			Collection<? extends ConnectionModel> sourceConnections =
+					diagramModel.getSourceConnectionsFor(node.toReference());
+			Iterator<? extends ConnectionModel> itr = sourceConnections.iterator();
 			for (int i = 0; itr.hasNext(); i++) {
 				ConnectionModel connection = itr.next();
 				List<JmPoint> bendpoints = connection.getBendpoints();

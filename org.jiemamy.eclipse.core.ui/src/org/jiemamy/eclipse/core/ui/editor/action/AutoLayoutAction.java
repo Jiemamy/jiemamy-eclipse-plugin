@@ -146,14 +146,14 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		/**
 		 * インスタンスを生成する。
 		 * 
-		 * @param rootModel ルートモデル
+		 * @param context ルートモデル
 		 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
 		 * @param target 対象ノード
 		 * @param x X座標
 		 * @param y Y座標
 		 */
-		public LayoutCommand(JiemamyContext rootModel, int diagramIndex, DefaultNodeModel target, int x, int y) {
-			context = rootModel;
+		public LayoutCommand(JiemamyContext context, int diagramIndex, DefaultNodeModel target, int x, int y) {
+			this.context = context;
 			this.diagramIndex = diagramIndex;
 			this.target = target;
 			this.x = x;
@@ -165,13 +165,12 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		@Override
 		public void execute() {
-			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
-			DefaultDiagramModel presentation =
-					(DefaultDiagramModel) diagramPresentations.getDiagrams().get(diagramIndex);
+			DiagramFacet facet = context.getFacet(DiagramFacet.class);
+			DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 			target.setBoundary(new JmRectangle(x, y, -1, -1));
-			presentation.store(target);
+			diagramModel.store(target);
 			oldBendpoints.clear();
-			for (ConnectionModel conn : target.getSourceConnections()) {
+			for (ConnectionModel conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				oldBendpoints.put(conn, new ArrayList<JmPoint>(bendpoints));
 				bendpoints.clear();
@@ -180,10 +179,9 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		@Override
 		public void undo() {
-			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
-			DefaultDiagramModel presentation =
-					(DefaultDiagramModel) diagramPresentations.getDiagrams().get(diagramIndex);
-			for (ConnectionModel conn : target.getSourceConnections()) {
+			DiagramFacet facet = context.getFacet(DiagramFacet.class);
+			DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+			for (ConnectionModel conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				bendpoints.clear();
 				for (JmPoint bendpoint : oldBendpoints.get(conn)) {
@@ -191,17 +189,16 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 				}
 			}
 			target.setBoundary(new JmRectangle(oldX, oldY, -1, -1));
-			presentation.store(target);
+			diagramModel.store(target);
 		}
 	}
 	
 	private static class Operation implements IRunnableWithProgress {
 		
-		final GraphicalViewer viewer;
+		private final GraphicalViewer viewer;
 		
 
 		public Operation(GraphicalViewer viewer) {
-			super();
 			this.viewer = viewer;
 		}
 		
@@ -224,7 +221,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			final List<Edge> graphEdges = new EdgeList();
 			
 			CompoundCommand commands = new CompoundCommand();
-			JiemamyContext rootModel = ((JiemamyContextEditPart) viewer.getContents()).getModel();
+			JiemamyContext context = ((JiemamyContextEditPart) viewer.getContents()).getModel();
 			
 			// assemble nodes
 			monitor.setTaskName(Messages.AutoLayoutAction_name + " - assemble nodes."); // RESOURCE
@@ -238,7 +235,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			
 			// amnalyze graph
 			monitor.setTaskName(Messages.AutoLayoutAction_name + " - analyze graph."); // RESOURCE
-			analyzeGraph(graphNodes, graphEdges, commands, rootModel);
+			analyzeGraph(graphNodes, graphEdges, commands, context);
 			monitor.worked(++worked);
 			
 			monitor.setTaskName(Messages.AutoLayoutAction_name + " - execute command stack."); // RESOURCE
@@ -251,7 +248,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			monitor.done();
 		}
 		
-		private void analyzeGraph(final List<Node> graphNodes, final List<Edge> graphEdges, CompoundCommand commands,
+		private void analyzeGraph(List<Node> graphNodes, List<Edge> graphEdges, CompoundCommand commands,
 				JiemamyContext context) {
 			DirectedGraph graph = new DirectedGraph();
 			graph.setDefaultPadding(new Insets(PADDING));
@@ -264,10 +261,15 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			}
 		}
 		
-		private void assembleEdges(final List<Node> graphNodes, final List<Edge> graphEdges) {
+		private void assembleEdges(List<Node> graphNodes, List<Edge> graphEdges) {
+			JiemamyContext context = ((JiemamyContextEditPart) viewer.getContents()).getModel();
+			DiagramFacet facet = context.getFacet(DiagramFacet.class);
+			DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 			for (Object obj : graphNodes) {
 				EntityNode node = (EntityNode) obj;
-				Collection<? extends ConnectionModel> conns = node.model.getSourceConnections();
+				
+				Collection<? extends ConnectionModel> conns =
+						diagramModel.getSourceConnectionsFor(node.model.toReference());
 				CONN_LOOP: for (ConnectionModel conn : conns) {
 					if (conn.isSelfConnection()) {
 						continue;
@@ -289,7 +291,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			}
 		}
 		
-		private void assembleNodes(final List<EditPart> editParts, final List<Node> graphNodes) {
+		private void assembleNodes(List<EditPart> editParts, List<Node> graphNodes) {
 			for (EditPart obj : editParts) {
 				if (obj instanceof AbstractJmNodeEditPart) {
 					AbstractJmNodeEditPart editPart = (AbstractJmNodeEditPart) obj;

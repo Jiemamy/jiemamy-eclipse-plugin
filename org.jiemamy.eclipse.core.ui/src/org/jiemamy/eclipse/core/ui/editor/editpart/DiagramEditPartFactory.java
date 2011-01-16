@@ -29,13 +29,16 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
+import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.ForeignKeyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.JiemamyContextEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.StickyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.TableEditPart;
 import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.ViewEditPart;
+import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.table.TableModel;
 import org.jiemamy.model.view.ViewModel;
 import org.jiemamy.utils.LogMarker;
@@ -92,12 +95,12 @@ public class DiagramEditPartFactory implements EditPartFactory {
 			}
 		} else if (model instanceof StickyNodeModel) {
 			part = new StickyEditPart((StickyNodeModel) model);
-//		} else if (model instanceof ConnectionModel) {
-//			ConnectionModel connectionAdapter = (ConnectionModel) model;
-//			ForeignKeyConstraintModel foreignKey = connectionAdapter.unwrap();
-//			if (foreignKey != null) {
-//				part = new ForeignKeyEditPart(connectionAdapter);
-//			}
+		} else if (model instanceof ConnectionModel) {
+			ConnectionModel connectionModel = (ConnectionModel) model;
+			ForeignKeyConstraintModel foreignKey = context.resolve(connectionModel.getCoreModelRef());
+			if (foreignKey != null) {
+				part = new ForeignKeyEditPart(connectionModel);
+			}
 		}
 		
 		if (part == null) {

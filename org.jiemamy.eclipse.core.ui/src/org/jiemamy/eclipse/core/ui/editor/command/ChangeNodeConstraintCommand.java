@@ -134,11 +134,12 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 			selectedModels.add(ep.getModel());
 		}
 		
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		
 		// ベンドポイントも同時に移動させる（必要なもののみ）
-		for (ConnectionModel connection : nodeModel.getSourceConnections()) {
+		for (ConnectionModel connection : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
 			if (selectedModels.contains(connection.getSource()) && selectedModels.contains(connection.getTarget())) {
-				DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-				DefaultDiagramModel diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
 				List<JmPoint> bendpoints = connection.getBendpoints();
 				for (int i = 0; i < bendpoints.size(); i++) {
 					JmPoint bendpoint = bendpoints.get(i);
@@ -149,9 +150,8 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 						newLocation = JmPointUtil.shiftNegative(bendpoint, delta);
 					}
 					((DefaultConnectionModel) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
-					nodeModel.store(connection);
-					diagramModel.store(nodeModel);
-					diagramFacet.store(diagramModel);
+					diagramModel.store(connection);
+					facet.store(diagramModel);
 				}
 			}
 		}

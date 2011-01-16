@@ -54,7 +54,7 @@ public class DeleteNodeCommand extends Command {
 	
 	@Override
 	public void execute() {
-		diagramModel.delete(nodeModel.toReference());
+		diagramModel.deleteNode(nodeModel.toReference());
 		diagramFacet.store(diagramModel);
 	}
 	

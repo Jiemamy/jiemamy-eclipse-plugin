@@ -18,7 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpart.diagram;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,8 +47,8 @@ import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmComponentEditPolicy;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.geometory.JmRectangle;
 import org.jiemamy.transaction.StoredEvent;
@@ -195,18 +194,12 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		if (getParent() == null) {
 			return Collections.emptyList();
 		}
-		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		List<ConnectionModel> result = Lists.newArrayList();
-		Collection<? extends ConnectionModel> connections = getModel().getSourceConnections();
-		for (ConnectionModel connectionAdapter : connections) {
-			// FIXME
-//			if (connectionProfiles.containsKey(connectionAdapter)) {
-//				result.add(connectionAdapter);
-//			}
-		}
+		List<ConnectionModel> result =
+				Lists.newArrayList(diagramModel.getSourceConnectionsFor(getModel().toReference()));
 		logger.debug(getModel() + " sourceConnections = " + result);
 		return result;
 	}
@@ -216,18 +209,11 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		if (getParent() == null) {
 			return Collections.emptyList();
 		}
-		JiemamyContext rootModel = (JiemamyContext) getRoot().getContents().getModel();
-		DiagramFacet diagramPresentations = rootModel.getFacet(DiagramFacet.class);
-		DiagramModel diagramPresentationModel = diagramPresentations.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		List<ConnectionModel> result = Lists.newArrayList();
-		Collection<? extends ConnectionModel> connections = getModel().getTargetConnections();
-		for (ConnectionModel connectionAdapter : connections) {
-			// FIXME
-//			if (connectionProfiles.containsKey(connectionAdapter)) {
-//				result.add(connectionAdapter);
-//			}
-		}
+		List<ConnectionModel> result = Lists.newArrayList(diagramModel.getTargetConnections(getModel().toReference()));
 		logger.debug(getModel() + " targetConnections = " + result);
 		return result;
 	}

@@ -20,10 +20,15 @@ package org.jiemamy.eclipse.core.ui.model;
 
 import org.apache.commons.lang.Validate;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.dddbase.EntityRef;
+import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.NodeModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.table.TableModel;
 
 /**
  * TODO for daisuke
@@ -35,7 +40,11 @@ public class ForeignKeyCreation implements Creation {
 	
 	private final ForeignKeyConstraintModel fk;
 	
-	private final ConnectionModel connection;
+	private final DefaultConnectionModel connection;
+	
+	private DefaultTableModel sourceTable;
+	
+	private TableModel targetTable;
 	
 
 	/**
@@ -44,7 +53,7 @@ public class ForeignKeyCreation implements Creation {
 	 * @param fk 作成する外部キー
 	 * @param connection 作成するコネクション
 	 */
-	public ForeignKeyCreation(ForeignKeyConstraintModel fk, ConnectionModel connection) {
+	public ForeignKeyCreation(ForeignKeyConstraintModel fk, DefaultConnectionModel connection) {
 		Validate.notNull(fk);
 		Validate.notNull(connection);
 		this.fk = fk;
@@ -52,7 +61,45 @@ public class ForeignKeyCreation implements Creation {
 	}
 	
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
-		// TODO Auto-generated method stub
-		
+		sourceTable.store(fk);
+		context.store(sourceTable);
+		diagramModel.store(connection);
+		context.getFacet(DiagramFacet.class).store(diagramModel);
+	}
+	
+	/**
+	 * TODO for daisuke
+	 * 
+	 * @param sourceRef 起点ノードの参照
+	 */
+	public void setSource(EntityRef<? extends NodeModel> sourceRef) {
+		connection.setSource(sourceRef);
+	}
+	
+	/**
+	 * TODO for daisuke
+	 * 
+	 * @param sourceTable
+	 */
+	public void setSourceTable(DefaultTableModel sourceTable) {
+		this.sourceTable = sourceTable;
+	}
+	
+	/**
+	 * TODO for daisuke
+	 * 
+	 * @param targetRef 終点ノードの参照
+	 */
+	public void setTarget(EntityRef<? extends NodeModel> targetRef) {
+		connection.setTarget(targetRef);
+	}
+	
+	/**
+	 * TODO for daisuke
+	 * 
+	 * @param targetTable
+	 */
+	public void setTargetTable(TableModel targetTable) {
+		this.targetTable = targetTable;
 	}
 }

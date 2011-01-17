@@ -77,10 +77,9 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	}
 	
 	public void openEditDialog() {
-		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
-		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		StickyNodeModel stickyModel = getModel();
+		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", stickyModel);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);

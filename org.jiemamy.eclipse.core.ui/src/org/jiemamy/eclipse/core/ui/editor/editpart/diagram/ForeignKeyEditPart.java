@@ -26,6 +26,7 @@ import org.eclipse.draw2d.PolylineDecoration;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
@@ -34,10 +35,13 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
+import org.jiemamy.eclipse.core.ui.editor.dialog.foreignkey.ForeignKeyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
@@ -79,26 +83,23 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 	public void openEditDialog() {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		ConnectionModel connection = getModel();
-		ForeignKeyConstraintModel foreignKey = context.resolve(connection.getCoreModelRef());
+		DefaultForeignKeyConstraintModel foreignKey =
+				(DefaultForeignKeyConstraintModel) context.resolve(connection.getCoreModelRef());
 		
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", foreignKey);
 		
-//		// 編集前のスナップショットを保存
-//		JiemamyFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
-//		SavePoint beforeEditSavePoint = facade.save();
-//		
-//		ForeignKeyEditDialog dialog = new ForeignKeyEditDialog(getViewer().getControl().getShell(), foreignKey, facade);
-//		
-//		if (dialog.open() == Dialog.OK) {
-//			// 編集後のスナップショットを保存
-//			SavePoint afterEditSavePoint = facade.save();
+		ForeignKeyEditDialog dialog =
+				new ForeignKeyEditDialog(getViewer().getControl().getShell(), context, foreignKey);
+		
+		if (dialog.open() == Dialog.OK) {
+			DefaultTableModel tableModel =
+					(DefaultTableModel) DefaultTableModel.findDeclaringTable(context.getTables(), foreignKey);
+			tableModel.store(foreignKey);
+			context.store(tableModel);
 //			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
 //			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 //			viewer.getEditDomain().getCommandStack().execute(command);
-//		} else {
-//			// 編集前にロールバック
-//			facade.rollback(beforeEditSavePoint);
-//		}
+		}
 	}
 	
 	@Override

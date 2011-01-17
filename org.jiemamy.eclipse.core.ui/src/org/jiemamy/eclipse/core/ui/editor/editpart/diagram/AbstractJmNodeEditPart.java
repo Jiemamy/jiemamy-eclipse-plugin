@@ -165,9 +165,9 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	}
 	
 	/**
-	 * DirectEditManager（直接編集マネージャ）を取得する。
+	 * {@link DirectEditManager} （直接編集マネージャ）を取得する。
 	 * 
-	 * @return DirectEditManager
+	 * @return {@link DirectEditManager}
 	 */
 	protected DirectEditManager createDirectEditManager() {
 		return null;

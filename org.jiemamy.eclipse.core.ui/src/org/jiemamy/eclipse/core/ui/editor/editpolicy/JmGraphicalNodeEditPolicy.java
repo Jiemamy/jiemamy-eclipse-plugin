@@ -18,57 +18,64 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpolicy;
 
-//import java.util.UUID;
-//
-//import org.eclipse.gef.commands.Command;
-//import org.eclipse.gef.editpolicies.GraphicalNodeEditPolicy;
-//import org.eclipse.gef.requests.CreateConnectionRequest;
-//import org.eclipse.gef.requests.ReconnectRequest;
-//
-//import org.jiemamy.JiemamyContext;
-//import org.jiemamy.eclipse.core.ui.TODO;
-//import org.jiemamy.model.DefaultConnectionModel;
-//import org.jiemamy.model.NodeModel;
-//import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
-//
-///**
-// * GraphicalNodeののEditPolicy。
-// * 
-// * @author daisuke
-// */
-//public class JmGraphicalNodeEditPolicy extends GraphicalNodeEditPolicy {
-//	
-//	@Override
-//	protected Command getConnectionCompleteCommand(CreateConnectionRequest request) {
-//		CreateConnectionCommand command = (CreateConnectionCommand) request.getStartCommand();
-//		command.setTarget((NodeModel) getHost().getModel());
-//		return command;
-//	}
-//	
-//	@Override
-//	protected Command getConnectionCreateCommand(CreateConnectionRequest request) {
-//		DefaultForeignKeyConstraintModel model = (DefaultForeignKeyConstraintModel) request.getNewObject();
-//		DefaultConnectionModel connection = new DefaultConnectionModel(UUID.randomUUID(), model.toReference());
-//		CreateConnectionCommand command =
-//				new CreateConnectionCommand(getJiemamyContext(), TODO.DIAGRAM_INDEX, connection);
-//		command.setSource((NodeModel) getHost().getModel());
-//		command.setFigureSize(getHostFigure().getSize());
-//		request.setStartCommand(command);
-//		
-//		return command;
-//	}
-//	
-//	@Override
-//	protected Command getReconnectSourceCommand(ReconnectRequest request) {
-//		return null;
-//	}
-//	
-//	@Override
-//	protected Command getReconnectTargetCommand(ReconnectRequest request) {
-//		return null;
-//	}
-//	
-//	private JiemamyContext getJiemamyContext() {
-//		return (JiemamyContext) getHost().getRoot().getContents().getModel();
-//	}
-//}
+import org.eclipse.gef.commands.Command;
+import org.eclipse.gef.editpolicies.GraphicalNodeEditPolicy;
+import org.eclipse.gef.requests.CreateConnectionRequest;
+import org.eclipse.gef.requests.ReconnectRequest;
+
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.core.ui.TODO;
+import org.jiemamy.eclipse.core.ui.editor.command.CreateConnectionCommand;
+import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
+import org.jiemamy.model.NodeModel;
+
+/**
+ * GraphicalNodeののEditPolicy。
+ * 
+ * @author daisuke
+ */
+public class JmGraphicalNodeEditPolicy extends GraphicalNodeEditPolicy {
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * memo: 多分、コネクションを引き終わる時（終点ノードをクリックした時）に呼ばれる。
+	 */
+	@Override
+	protected Command getConnectionCompleteCommand(CreateConnectionRequest request) {
+		CreateConnectionCommand command = (CreateConnectionCommand) request.getStartCommand();
+		command.setTarget((NodeModel) getHost().getModel());
+		return command;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * memo: 多分、コネクションを引き始める時（起点ノードをクリックした時）に呼ばれる。
+	 */
+	@Override
+	protected Command getConnectionCreateCommand(CreateConnectionRequest request) {
+		ForeignKeyCreation creation = (ForeignKeyCreation) request.getNewObject();
+		CreateConnectionCommand command =
+				new CreateConnectionCommand(getJiemamyContext(), TODO.DIAGRAM_INDEX, creation);
+		command.setSource((NodeModel) getHost().getModel());
+		command.setFigureSize(getHostFigure().getSize());
+		request.setStartCommand(command);
+		
+		return command;
+	}
+	
+	@Override
+	protected Command getReconnectSourceCommand(ReconnectRequest request) {
+		return null;
+	}
+	
+	@Override
+	protected Command getReconnectTargetCommand(ReconnectRequest request) {
+		return null;
+	}
+	
+	private JiemamyContext getJiemamyContext() {
+		return (JiemamyContext) getHost().getRoot().getContents().getModel();
+	}
+}

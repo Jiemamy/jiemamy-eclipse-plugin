@@ -44,6 +44,7 @@ import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmComponentEditPolicy;
+import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmGraphicalNodeEditPolicy;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DatabaseObjectModel;
@@ -175,8 +176,8 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	@Override
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.COMPONENT_ROLE, new JmComponentEditPolicy());
+		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new JmGraphicalNodeEditPolicy());
 		// FIXME
-//		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new JmGraphicalNodeEditPolicy());
 //		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new JmDirectEditPolicy());
 	}
 	

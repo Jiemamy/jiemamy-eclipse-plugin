@@ -18,7 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.apache.commons.lang.Validate;
+import java.util.UUID;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
@@ -26,9 +26,10 @@ import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
+import org.jiemamy.utils.ForeignKeyFactory;
 
 /**
  * TODO for daisuke
@@ -38,29 +39,21 @@ import org.jiemamy.model.table.TableModel;
  */
 public class ForeignKeyCreation implements Creation {
 	
-	private final ForeignKeyConstraintModel fk;
-	
-	private final DefaultConnectionModel connection;
-	
 	private DefaultTableModel sourceTable;
 	
 	private TableModel targetTable;
 	
-
-	/**
-	 * インスタンスを生成する。
-	 * 
-	 * @param fk 作成する外部キー
-	 * @param connection 作成するコネクション
-	 */
-	public ForeignKeyCreation(ForeignKeyConstraintModel fk, DefaultConnectionModel connection) {
-		Validate.notNull(fk);
-		Validate.notNull(connection);
-		this.fk = fk;
-		this.connection = connection;
-	}
+	private EntityRef<? extends NodeModel> sourceRef;
 	
+	private EntityRef<? extends NodeModel> targetRef;
+	
+
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		DefaultForeignKeyConstraintModel fk = ForeignKeyFactory.create(context, sourceTable, targetTable);
+		DefaultConnectionModel connection = new DefaultConnectionModel(UUID.randomUUID(), fk.toReference());
+		connection.setSource(sourceRef);
+		connection.setTarget(targetRef);
+		
 		sourceTable.store(fk);
 		context.store(sourceTable);
 		diagramModel.store(connection);
@@ -73,7 +66,7 @@ public class ForeignKeyCreation implements Creation {
 	 * @param sourceRef 起点ノードの参照
 	 */
 	public void setSource(EntityRef<? extends NodeModel> sourceRef) {
-		connection.setSource(sourceRef);
+		this.sourceRef = sourceRef;
 	}
 	
 	/**
@@ -91,7 +84,7 @@ public class ForeignKeyCreation implements Creation {
 	 * @param targetRef 終点ノードの参照
 	 */
 	public void setTarget(EntityRef<? extends NodeModel> targetRef) {
-		connection.setTarget(targetRef);
+		this.targetRef = targetRef;
 	}
 	
 	/**

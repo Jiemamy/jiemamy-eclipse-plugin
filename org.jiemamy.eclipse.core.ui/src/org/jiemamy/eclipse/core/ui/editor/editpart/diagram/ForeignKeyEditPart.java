@@ -64,6 +64,11 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		logger.debug(LogMarker.LIFECYCLE, "construct");
 	}
 	
+	public void commandExecuted(StoredEvent<ForeignKeyConstraintModel> command) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public Entity getTargetModel() {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		ConnectionModel connection = getModel();
@@ -72,11 +77,11 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 	}
 	
 	public void openEditDialog() {
-		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
-		
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		ConnectionModel connection = getModel();
 		ForeignKeyConstraintModel foreignKey = context.resolve(connection.getCoreModelRef());
+		
+		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", foreignKey);
 		
 //		// 編集前のスナップショットを保存
 //		JiemamyFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
@@ -140,10 +145,5 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		
 		String labelString = LabelStringUtil.getString(context, foreignKey, DisplayPlace.FIGURE);
 		label.setText(labelString);
-	}
-	
-	public void commandExecuted(StoredEvent<ForeignKeyConstraintModel> command) {
-		// TODO Auto-generated method stub
-		
 	}
 }

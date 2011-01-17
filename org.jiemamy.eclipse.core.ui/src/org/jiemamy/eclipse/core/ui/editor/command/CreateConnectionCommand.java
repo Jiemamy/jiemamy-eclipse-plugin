@@ -86,15 +86,15 @@ public class CreateConnectionCommand extends Command {
 		this.diagramIndex = diagramIndex;
 		this.creation = creation;
 		
-		logger.debug(LogMarker.LIFECYCLE, "construct");
+		logger.trace(LogMarker.LIFECYCLE, "construct");
 	}
 	
 	@Override
 	public boolean canExecute() {
-		logger.debug(LogMarker.LIFECYCLE, "canExecute");
+		logger.trace(LogMarker.LIFECYCLE, "canExecute");
 		
 		if (source == null || target == null) {
-			logger.debug("source or target is null: " + source + " " + target);
+			logger.trace("source or target is null: " + source + " " + target);
 			return false;
 		}
 		
@@ -165,8 +165,8 @@ public class CreateConnectionCommand extends Command {
 	 * @param source 接続元ノード
 	 */
 	public void setSource(NodeModel source) {
-		logger.debug(LogMarker.LIFECYCLE, "setSource");
-		logger.debug(LogMarker.DETAIL, "source = " + source);
+		logger.trace(LogMarker.LIFECYCLE, "setSource");
+		logger.trace(LogMarker.DETAIL, "source = " + source);
 		this.source = source;
 		if (source instanceof DefaultDatabaseObjectNodeModel) {
 			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) source;
@@ -181,11 +181,11 @@ public class CreateConnectionCommand extends Command {
 	 * @param target 接続先ノード
 	 */
 	public void setTarget(NodeModel target) {
-		logger.debug(LogMarker.LIFECYCLE, "setTarget");
-		logger.debug(LogMarker.DETAIL, "target = " + target);
+		logger.trace(LogMarker.LIFECYCLE, "setTarget");
+		logger.trace(LogMarker.DETAIL, "target = " + target);
 		this.target = target;
-		if (source instanceof DefaultDatabaseObjectNodeModel) {
-			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) source;
+		if (target instanceof DefaultDatabaseObjectNodeModel) {
+			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) target;
 			targetCore = context.resolve(dboNodeModel.getCoreModelRef());
 		}
 		creation.setTarget(target.toReference());

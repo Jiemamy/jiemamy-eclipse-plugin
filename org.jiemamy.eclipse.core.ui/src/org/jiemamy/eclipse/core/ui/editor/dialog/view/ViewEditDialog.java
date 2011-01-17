@@ -249,7 +249,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 			facet.store(aroundScript);
 		} else {
 			try {
-				facet.delete(aroundScript.toReference());
+				facet.deleteScript(aroundScript.toReference());
 			} catch (EntityNotFoundException e) {
 				// ignore
 			}

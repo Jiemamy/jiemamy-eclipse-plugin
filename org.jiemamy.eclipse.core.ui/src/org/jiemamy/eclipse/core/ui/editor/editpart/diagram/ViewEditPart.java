@@ -147,7 +147,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		ViewFigure viewFigure = (ViewFigure) figure;
 		
 		String labelString = LabelStringUtil.getString(context, viewModel, DisplayPlace.FIGURE);
-		DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		
 		viewFigure.setDatabaseObjectName(labelString);
 		

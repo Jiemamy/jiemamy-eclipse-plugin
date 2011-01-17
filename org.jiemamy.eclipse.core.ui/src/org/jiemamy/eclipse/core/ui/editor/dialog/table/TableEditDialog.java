@@ -269,7 +269,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			facet.store(aroundScript);
 		} else {
 			try {
-				facet.delete(aroundScript.toReference());
+				facet.deleteScript(aroundScript.toReference());
 			} catch (EntityNotFoundException e) {
 				// ignore
 			}

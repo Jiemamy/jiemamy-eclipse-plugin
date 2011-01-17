@@ -35,15 +35,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 
-import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
-import org.jiemamy.model.DiagramModel;
 
 /**
  * Jiemamyのモデル編集ダイアログ抽象クラス。
@@ -105,9 +102,6 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 		this.context = context;
 		this.targetCoreModel = targetCoreModel;
 		this.type = type;
-		
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DiagramModel diagramModel = facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
 		readConfiguration();
 	}

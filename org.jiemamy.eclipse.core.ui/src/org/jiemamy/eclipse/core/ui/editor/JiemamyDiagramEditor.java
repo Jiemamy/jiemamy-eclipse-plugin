@@ -229,8 +229,8 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		logger.debug(LogMarker.LIFECYCLE, "disposed");
 		
 		// FIXME 以下debugコード
-		List<StoredEventListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
-		for (StoredEventListener listener : listeners) {
+		List<StoredEventListener<?>> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
+		for (StoredEventListener<?> listener : listeners) {
 			logger.warn(listener + " is not removed from EventBroker.");
 		}
 	}
@@ -344,7 +344,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// FIXME 無差別ディスパッチになってる。
 		context.getEventBroker().setDefaultStrategy(new DispatchStrategy() {
 			
-			public boolean needToDispatch(StoredEventListener listener, StoredEvent command) {
+			public boolean needToDispatch(StoredEventListener<?> listener, StoredEvent<?> command) {
 				return true;
 			}
 			

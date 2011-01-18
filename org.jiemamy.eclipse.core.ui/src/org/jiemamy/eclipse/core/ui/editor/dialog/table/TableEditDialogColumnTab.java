@@ -120,8 +120,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			DefaultTableModel tableModel) {
 		super(parentTabFolder, style, Messages.Tab_Table_Columns);
 		
-		this.tableModel = tableModel;
 		this.context = context;
+		this.tableModel = tableModel;
 		
 		Dialect dialect;
 		try {
@@ -163,16 +163,13 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 */
 	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener<DatabaseObjectModel> {
 		
-		private Viewer viewer;
-		
-
 		public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
-			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: commandExecuted");
+			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
 			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
 		public void dispose() {
-			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: disposed");
+			logger.debug(LogMarker.LIFECYCLE, "disposed");
 		}
 		
 		public Object[] getElements(Object inputElement) {
@@ -183,16 +180,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			return new Object[0];
 		}
 		
-		public Entity getTargetModel() {
-			return (Entity) viewer.getInput();
-		}
-		
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			logger.debug(LogMarker.LIFECYCLE, "ColumnContentProvider: input changed");
+			logger.debug(LogMarker.LIFECYCLE, "input changed");
 			logger.trace(LogMarker.LIFECYCLE, "oldInput: " + oldInput);
 			logger.trace(LogMarker.LIFECYCLE, "newInput: " + newInput);
-			
-			this.viewer = viewer;
 		}
 	}
 	
@@ -205,6 +196,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		public Image getColumnImage(Object element, int columnIndex) {
 			if ((element instanceof ColumnModel) == false) {
+				logger.error("unknown element: " + element.getClass().getName());
 				return null;
 			}
 			
@@ -226,6 +218,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		public String getColumnText(Object element, int columnIndex) {
 			if ((element instanceof ColumnModel) == false) {
+				logger.error("unknown element: " + element.getClass().getName());
 				return StringUtils.EMPTY;
 			}
 			
@@ -256,9 +249,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private static final int COL_WIDTH_NN = 40;
 		
-		private final EditListener editListener = new EditListenerImpl();
-		
 		private Dialect dialect;
+		
+		private final EditListener editListener = new EditListenerImpl();
 		
 		private Text txtColumnName;
 		
@@ -578,7 +571,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected Entity performAddItem() {
+		protected ColumnModel performAddItem() {
 			Table table = getTableViewer().getTable();
 			DefaultColumnModel columnModel = new DefaultColumnModel(UUID.randomUUID());
 			
@@ -602,7 +595,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected Entity performInsertItem() {
+		protected ColumnModel performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
@@ -695,27 +688,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		private void createAdvancedEditComponents(Composite parent) {
 			GridLayout layout;
 			Label label;
-//			ExpandBar expandBar = new ExpandBar(parent, SWT.V_SCROLL);
-//			expandBar.setSpacing(8);
-//			expandBar.setBackground(ColorConstants.lightGray);
-//			gd = new GridData(GridData.FILL_HORIZONTAL);
-//			gd.horizontalSpan = 4;
-//			expandBar.setLayoutData(gd);
-//			layout = new GridLayout(1, false);
-//			layout.marginHeight = 0;
-//			layout.marginWidth = 0;
-//			expandBar.setLayout(layout);
-//			ExpandItem expAdvanced = new ExpandItem(expandBar, SWT.NULL);
-//			expAdvanced.setText("高度な設定"); // RESOURCE
 			Group cmpAdvanced = new Group(parent, SWT.NULL);
 			cmpAdvanced.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			layout = new GridLayout(4, false);
-//			layout.marginHeight = 0;
-//			layout.marginWidth = 0;
 			cmpAdvanced.setLayout(layout);
 			cmpAdvanced.setText("高度な設定"); // RESOURCE
-//			expAdvanced.setControl(cmpAdvanced);
-//			expAdvanced.setHeight(cmpAdvanced.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 			
 			label = new Label(cmpAdvanced, SWT.NULL);
 			label.setText("デフォルト値(&F)"); // RESOURCE
@@ -726,18 +703,18 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			label = new Label(cmpAdvanced, SWT.NULL);
 			label.setText("説明(&D)"); // RESOURCE
 			
-			txtDescription = new Text(cmpAdvanced, SWT.MULTI | SWT.BORDER);
+			txtDescription = new Text(cmpAdvanced, SWT.BORDER | SWT.BORDER);
 			txtDescription.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		}
 		
 		private void updateModel() {
-			int columnEditIndex = getTableViewer().getTable().getSelectionIndex();
+			int editIndex = getTableViewer().getTable().getSelectionIndex();
 			
-			if (columnEditIndex == -1) {
+			if (editIndex == -1) {
 				return;
 			}
 			
-			DefaultColumnModel columnModel = (DefaultColumnModel) tableModel.getColumns().get(columnEditIndex);
+			DefaultColumnModel columnModel = (DefaultColumnModel) tableModel.getColumns().get(editIndex);
 			
 			String columnName = StringUtils.defaultString(txtColumnName.getText());
 			columnModel.setName(columnName);

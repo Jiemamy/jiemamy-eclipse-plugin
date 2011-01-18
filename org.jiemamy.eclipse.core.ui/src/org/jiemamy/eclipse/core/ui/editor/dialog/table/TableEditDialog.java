@@ -287,18 +287,13 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		tabColumn.addKeyListener(editListener);
 		addTab(tabColumn);
 		
-//		// ---- B-2. キー制約
-//		AbstractTab tabLocalKey = new TableEditDialogLocalKeyTab(tabFolder, SWT.NULL, tableModel, jiemamyFacade);
-//		tabLocalKey.addKeyListener(editListener);
-//		addTab(tabLocalKey);
-//		
-//		// ---- B-3. チェック制約
-//		AbstractTab tabCheck = new TableEditDialogCheckTab(tabFolder, SWT.NULL, tableModel, jiemamyFacade);
-//		tabCheck.addKeyListener(editListener);
-//		addTab(tabCheck);
-//		
-//		// ---- B-4. インデックス
-//		AbstractTab tabIndex = new TableEditDialogIndexTab(tabFolder, SWT.NULL, tableModel, jiemamyFacade);
+		// ---- B-2. 制約
+		AbstractTab tabConstraint = new TableEditDialogConstraintTab(tabFolder, SWT.NULL, getContext(), tableModel);
+		tabConstraint.addKeyListener(editListener);
+		addTab(tabConstraint);
+		
+//		// ---- B-3. インデックス
+//		AbstractTab tabIndex = new TableEditDialogIndexTab(tabFolder, SWT.NULL, getContext(), tableModel);
 //		tabIndex.addKeyListener(editListener);
 //		addTab(tabIndex);
 		
@@ -314,15 +309,15 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			// ignore
 		}
 		
-		// ---- B-6. BeginScript
+		// ---- B-4. BeginScript
 		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_Table_BeginScript, beginScript);
 		addTab(tabBeginScript);
 		
-		// ---- B-7. EndScript
+		// ---- B-5. EndScript
 		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_Table_EndScript, endScript);
 		addTab(tabEndScript);
 		
-		// ---- B-8. Description
+		// ---- B-6. Description
 		String description = StringUtils.defaultString(tableModel.getDescription());
 		tabDescription = new TextEditTab(tabFolder, Messages.Tab_Table_Description, description);
 		addTab(tabDescription);

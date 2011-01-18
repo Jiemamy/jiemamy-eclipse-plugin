@@ -43,11 +43,8 @@ class Messages extends NLS {
 	/** カラムタブ */
 	public static String Tab_Table_Columns;
 	
-	/** キー制約タブ */
-	public static String Tab_Table_Keys;
-	
-	/** チェック制約タブ */
-	public static String Tab_Table_Checks;
+	/** 制約タブ */
+	public static String Tab_Table_Constraints;
 	
 	/** インデックスタブ */
 	public static String Tab_Table_Indexes;

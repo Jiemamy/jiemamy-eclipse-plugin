@@ -167,7 +167,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	}
 	
 	/**
-	 * 制約用{@link LabelProvider}実装クラス。
+	 * 制約用{@link ITableLabelProvider}実装クラス。
 	 * 
 	 * @author daisuke
 	 */

@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -131,8 +130,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			logger.warn("Dialectのロスト", e);
 		}
 		
-		allTypes =
-				Lists.newArrayListWithExpectedSize(context.getDomains().size() + dialect.getAllTypeReferences().size());
+		int size = context.getDomains().size() + dialect.getAllTypeReferences().size();
+		allTypes = Lists.newArrayListWithExpectedSize(size);
 		
 		allTypes.addAll(dialect.getAllTypeReferences());
 		for (DomainModel domainModel : context.getDomains()) {
@@ -188,7 +187,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	}
 	
 	/**
-	 * カラム用{@link LabelProvider}実装クラス。
+	 * カラム用{@link ITableLabelProvider}実装クラス。
 	 * 
 	 * @author daisuke
 	 */
@@ -748,12 +747,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			DefaultPrimaryKeyConstraintModel primaryKey = (DefaultPrimaryKeyConstraintModel) tableModel.getPrimaryKey();
 			if (chkIsPK.getSelection() == false) {
 				if (primaryKey != null) {
-					if (primaryKey.getKeyColumns().size() <= 1) {
-						tableModel.deleteConstraint(primaryKey.toReference());
-					} else {
-						primaryKey.removeKeyColumn(columnModel.toReference());
-						tableModel.store(primaryKey);
-					}
+					primaryKey.removeKeyColumn(columnModel.toReference());
+					tableModel.store(primaryKey);
 				}
 			} else {
 				if (primaryKey == null) {
@@ -762,6 +757,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					primaryKey.addKeyColumn(columnModel.toReference());
 				}
 				tableModel.store(primaryKey);
+			}
+			if (primaryKey != null && primaryKey.getKeyColumns().size() <= 0) {
+				tableModel.deleteConstraint(primaryKey.toReference());
 			}
 			
 //			if (chkIsDisabled.getSelection() == false) {

@@ -325,6 +325,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 			foreignKey.setDeferrability(null);
 		}
 		
+		foreignKey.clearKeyColumns();
 		int selectionIndex = cmbReferenceKey.getSelectionIndex();
 		LocalKeyConstraintModel referenceKeyConstraint = referenceKeys.get(selectionIndex);
 		for (EntityRef<? extends ColumnModel> referenceColumnRef : referenceKeyConstraint.getKeyColumns()) {

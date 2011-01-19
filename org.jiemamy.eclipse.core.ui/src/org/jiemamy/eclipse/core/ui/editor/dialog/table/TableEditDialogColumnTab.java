@@ -321,12 +321,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 						return;
 					}
 					
-					ColumnModel columnModel = (ColumnModel) getTableViewer().getElementAt(index);
+					DefaultColumnModel columnModel = (DefaultColumnModel) getTableViewer().getElementAt(index);
 					TypeParameterManager typeOptionManager = typeOptionManagers.get(columnModel.toReference());
 					TypeReference dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
 					Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataTypeMold);
 					Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
-					typeOptionManager.createTypeOptionControl(keys);
+					typeOptionManager.createTypeOptionControl(columnModel, keys);
 				}
 			});
 			
@@ -379,7 +379,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			typeOptionManagers.clear();
 			for (ColumnModel columnModel : tableModel.getColumns()) {
 				TypeParameterManager typeOptionManager =
-						new TypeParameterManager(dialect, columnModel, cmpTypeOption, editListener, typeOptionHandler);
+						new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
 				typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
 			}
 		}
@@ -499,7 +499,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			ColumnModel columnModel = (ColumnModel) getTableViewer().getElementAt(index);
+			DefaultColumnModel columnModel = (DefaultColumnModel) getTableViewer().getElementAt(index);
 			
 			txtColumnName.setEnabled(true);
 			txtColumnLogicalName.setEnabled(true);
@@ -514,7 +514,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
 			Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
 			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
-			manager.createTypeOptionControl(keys);
+			manager.createTypeOptionControl(columnModel, keys);
 			
 			// 現在値の設定
 			txtColumnName.setText(columnModel.getName());
@@ -528,7 +528,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				cmbDataType.setText(domainModel.getName());
 			} else {
 				cmbDataType.setText(dataType.getTypeReference().getTypeName());
-				typeOptionManagers.get(columnModel.toReference()).setValue();
+				typeOptionManagers.get(columnModel.toReference()).setValue(columnModel);
 			}
 			txtDefaultValue.setText(StringUtils.defaultString(columnModel.getDefaultValue()));
 			txtDescription.setText(StringUtils.defaultString(columnModel.getDescription()));
@@ -556,7 +556,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			tableModel.store(columnModel);
 			
 			TypeParameterManager typeOptionManager =
-					new TypeParameterManager(dialect, columnModel, cmpTypeOption, editListener, typeOptionHandler);
+					new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
 			typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
 			
 			int addedIndex = columnModel.getIndex();
@@ -583,7 +583,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			tableModel.store(columnModel);
 			
 			TypeParameterManager typeOptionManager =
-					new TypeParameterManager(dialect, columnModel, cmpTypeOption, editListener, typeOptionHandler);
+					new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
 			typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
 			
 			int addedIndex = tableModel.getColumns().indexOf(columnModel);
@@ -707,8 +707,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			String description = StringUtils.defaultString(txtDescription.getText());
 			columnModel.setDescription(description);
 			
-			tableModel.store(columnModel);
-			
 			if (chkIsNotNull.getSelection() == false) {
 				NotNullConstraintModel nn = tableModel.getNotNullConstraintFor(columnModel.toReference());
 				if (nn != null) {
@@ -747,7 +745,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 //				columnModel.getAdapter(Disablable.class).setDisabled(true);
 //			}
 			
-			typeOptionManagers.get(columnModel.toReference()).writeBackToAdapter();
+			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
+			manager.writeBackToAdapter(columnModel);
+			
+			tableModel.store(columnModel);
 		}
 		
 

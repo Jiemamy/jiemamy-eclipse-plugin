@@ -45,6 +45,7 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
 import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.column.DefaultColumnModel;
 import org.jiemamy.model.datatype.DefaultTypeVariant;
 import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeVariant;
@@ -67,8 +68,6 @@ class TypeParameterManager {
 	public static final Color COLOR_ERROR = new Color(null, 255, 200, 200);
 	
 	private final Dialect dialect;
-	
-	private final ColumnModel columnModel;
 	
 	/** オプションコントロール描画対象の親 */
 	private final Composite composite;
@@ -104,14 +103,12 @@ class TypeParameterManager {
 	 * @param handler may be null
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TypeParameterManager(Dialect dialect, ColumnModel columnModel, Composite composite,
-			EditListener editListener, TypeParameterHandler handler) {
+	public TypeParameterManager(Dialect dialect, Composite composite, EditListener editListener,
+			TypeParameterHandler handler) {
 		Validate.notNull(dialect);
-		Validate.notNull(columnModel);
 		Validate.notNull(composite);
 		Validate.notNull(editListener);
 		this.dialect = dialect;
-		this.columnModel = columnModel;
 		this.composite = composite;
 		this.editListener = editListener;
 		this.handler = handler;
@@ -134,7 +131,7 @@ class TypeParameterManager {
 	 * 
 	 * @param keys データ型パラメータキー集合
 	 */
-	public void createTypeOptionControl(Collection<TypeParameterKey<?>> keys) {
+	public void createTypeOptionControl(DefaultColumnModel columnModel, Collection<TypeParameterKey<?>> keys) {
 		clearTypeOptionControl();
 		
 		TypeVariant dataType = columnModel.getDataType();
@@ -241,7 +238,7 @@ class TypeParameterManager {
 	/**
 	 * アダプタからコントロールに値を格納する。
 	 */
-	public void setValue() {
+	public void setValue(DefaultColumnModel columnModel) {
 		TypeVariant dataType = columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;
@@ -277,7 +274,7 @@ class TypeParameterManager {
 	/**
 	 * コントロールからアダプタにデータを書き戻す。
 	 */
-	public void writeBackToAdapter() {
+	public void writeBackToAdapter(DefaultColumnModel columnModel) {
 		DefaultTypeVariant dataType = (DefaultTypeVariant) columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;
@@ -286,7 +283,7 @@ class TypeParameterManager {
 		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
 		Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
 		
-		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SERIAL)) {
+		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SIZE)) {
 			String text = txtSize.getText();
 			Integer value = 0;
 			try {
@@ -334,5 +331,6 @@ class TypeParameterManager {
 		if (handler != null) {
 			handler.writeBackToAdapter();
 		}
+		columnModel.setDataType(dataType);
 	}
 }

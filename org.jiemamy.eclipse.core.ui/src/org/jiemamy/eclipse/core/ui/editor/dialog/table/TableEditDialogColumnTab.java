@@ -18,11 +18,16 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.dialog.table;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -57,7 +62,9 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.dialect.Dialect;
+import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -68,7 +75,9 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTableEditor;
 import org.jiemamy.eclipse.core.ui.editor.dialog.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.core.ui.editor.dialog.EditListener;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
+import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
+import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
 import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
@@ -77,11 +86,11 @@ import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.NotNullConstraintModel;
 import org.jiemamy.model.datatype.DefaultTypeVariant;
+import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeReference;
 import org.jiemamy.model.datatype.TypeVariant;
 import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
 import org.jiemamy.model.domain.DomainModel;
-import org.jiemamy.model.parameter.ParameterMap;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
 import org.jiemamy.transaction.EventBroker;
@@ -101,6 +110,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	private final JiemamyContext context;
 	
 	private final DefaultTableModel tableModel;
+	
+	private final Dialect dialect;
 	
 	private List<TypeReference> allTypes;
 	
@@ -122,13 +133,15 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		this.context = context;
 		this.tableModel = tableModel;
 		
-		Dialect dialect;
+		Dialect dialect = null;
 		try {
 			dialect = context.findDialect();
 		} catch (ClassNotFoundException e) {
 			dialect = JiemamyCorePlugin.getDialectResolver().getAllInstance().get(0);
 			logger.warn("Dialectのロスト", e);
 		}
+		assert dialect != null;
+		this.dialect = dialect;
 		
 		int size = context.getDomains().size() + dialect.getAllTypeReferences().size();
 		allTypes = Lists.newArrayListWithExpectedSize(size);
@@ -224,10 +237,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			ColumnModel columnModel = (ColumnModel) element;
 			switch (columnIndex) {
 				case 1:
-					return LabelStringUtil.getString(context, columnModel, DisplayPlace.TABLE);
+					return LabelStringUtil.toString(context, columnModel, DisplayPlace.TABLE);
 					
 				case 2:
-					return LabelStringUtil.getString(context, columnModel.getDataType(), DisplayPlace.TABLE);
+					return LabelStringUtil.toString(dialect, columnModel.getDataType(), DisplayPlace.TABLE);
 					
 				case 3:
 					return columnModel.getDefaultValue();
@@ -247,8 +260,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		private static final int COL_WIDTH_DEFAULT = 120;
 		
 		private static final int COL_WIDTH_NN = 40;
-		
-		private Dialect dialect;
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
@@ -270,11 +281,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Composite cmpTypeOption;
 		
+		private Map<EntityRef<? extends ColumnModel>, TypeParameterManager> typeOptionManagers = Maps.newHashMap();
+		
+		private TypeParameterHandler typeOptionHandler;
+		
 
-//		private Map<ColumnModel, TypeOptionManager> typeOptionManagers = CollectionsUtil.newHashMap();
-		
-//		private TypeOptionHandler typeOptionHandler;
-		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -283,16 +294,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		 */
 		public ColumnTableEditor(Composite parent, int style) {
 			super(parent, style, new DefaultTableEditorConfig("カラム情報")); // RESOURCE
-			
-			try {
-				dialect = context.findDialect();
-			} catch (ClassNotFoundException e) {
-				// TODO GeneriDialectをセットするように
-				dialect = JiemamyCorePlugin.getDialectResolver().getAllInstance().get(0);
-				logger.warn("Dialectのロスト", e);
-			}
-			
-			assert dialect != null;
 		}
 		
 		@Override
@@ -321,14 +322,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					}
 					
 					ColumnModel columnModel = (ColumnModel) getTableViewer().getElementAt(index);
-//					TypeOptionManager typeOptionManager = typeOptionManagers.get(columnModel);
-//					DataTypeMold<?> dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
-//					if (dataTypeMold instanceof BuiltinDataTypeMold) {
-//						BuiltinDataTypeMold builtinDataTypeMold = (BuiltinDataTypeMold) dataTypeMold;
-//						typeOptionManager.createTypeOptionControl(builtinDataTypeMold.getSupportedAdapterClasses());
-//					} else {
-//						typeOptionManager.clearTypeOptionControl();
-//					}
+					TypeParameterManager typeOptionManager = typeOptionManagers.get(columnModel.toReference());
+					TypeReference dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
+					Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataTypeMold);
+					Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
+					typeOptionManager.createTypeOptionControl(keys);
 				}
 			});
 			
@@ -337,8 +335,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsNotNull.addSelectionListener(editListener);
 			
 			chkIsDisabled.addSelectionListener(editListener);
-			
-//			chkIsRepresentation.addSelectionListener(editListener);
 			
 			txtDefaultValue.addFocusListener(new TextSelectionAdapter(txtDefaultValue));
 			txtDefaultValue.addKeyListener(editListener);
@@ -369,21 +365,23 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			ExtensionResolver<Dialect> dialectResolver = JiemamyCorePlugin.getDialectResolver();
 			IConfigurationElement dialectElement =
 					dialectResolver.getExtensionConfigurationElements().get(context.getDialectClassName());
-//			IConfigurationElement[] children = dialectElement.getChildren("typeOptionHandler");
-//			if (ArrayUtils.isEmpty(children) == false) {
-//				try {
-//					typeOptionHandler = (TypeOptionHandler) children[0].createExecutableExtension("class");
-//				} catch (Exception e) {
-//					ExceptionHandler.handleException(e);
-//				}
-//			}
-//			
-//			typeOptionManagers.clear();
-//			for (ColumnModel columnModel : columns) {
-//				TypeOptionManager typeOptionManager =
-//						new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
-//				typeOptionManagers.put(columnModel, typeOptionManager);
-//			}
+			if (dialectElement != null) {
+				IConfigurationElement[] children = dialectElement.getChildren("typeOptionHandler");
+				if (ArrayUtils.isEmpty(children) == false) {
+					try {
+						typeOptionHandler = (TypeParameterHandler) children[0].createExecutableExtension("class");
+					} catch (Exception e) {
+						ExceptionHandler.handleException(e);
+					}
+				}
+			}
+			
+			typeOptionManagers.clear();
+			for (ColumnModel columnModel : tableModel.getColumns()) {
+				TypeParameterManager typeOptionManager =
+						new TypeParameterManager(dialect, columnModel, cmpTypeOption, editListener, typeOptionHandler);
+				typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
+			}
 		}
 		
 		@Override
@@ -447,9 +445,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			chkIsDisabled = new Button(cmpChecks, SWT.CHECK);
 			chkIsDisabled.setText("無効(&G)"); // RESOURCE
-			
-//			chkIsRepresentation = new Button(cmpChecks, SWT.CHECK);
-//			chkIsRepresentation.setText("代表"); // RESOURCE
 			
 			createAdvancedEditComponents(parent);
 		}
@@ -516,18 +511,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsDisabled.setEnabled(true);
 			
 			TypeVariant dataType = columnModel.getDataType();
-//			if (dataType instanceof BuiltinDataType) {
-//				List<Object> adapters = ((BuiltinDataType) dataType).getAdapters();
-//				ArrayList<Class<?>> adapterClasses = Lists.newArrayList();
-//				for (Object adapter : adapters) {
-//					adapterClasses.add(adapter.getClass());
-//				}
-//				typeOptionManagers.get(columnModel).createTypeOptionControl(adapterClasses);
-//			} else {
-//				for (Control control : cmpTypeOption.getChildren()) {
-//					control.dispose();
-//				}
-//			}
+			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
+			Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
+			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
+			manager.createTypeOptionControl(keys);
 			
 			// 現在値の設定
 			txtColumnName.setText(columnModel.getName());
@@ -540,19 +527,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				DomainModel domainModel = context.resolve(domainRef);
 				cmbDataType.setText(domainModel.getName());
 			} else {
-//				cmbDataType.setText(dataType.getTypeName());
-//				if (dataType.getParam(TypeParameterKey.SIZE) != null) {
-//					typeOptionManagers.get(columnModel).setValue(SizedDataTypeAdapter.class);
-//				}
-//				if (dataType.getParam(TypeParameterKey.SCALE) != null) {
-//					typeOptionManagers.get(columnModel).setValue(PrecisionedDataTypeAdapter.class);
-//				}
-//				if (dataType.getParam(TypeParameterKey.PRECISION) != null) {
-//					typeOptionManagers.get(columnModel).setValue(PrecisionedDataTypeAdapter.class);
-//				}
-//				if (dataType.getParam(TypeParameterKey.WITH_TIMEZONE) != null) {
-//					typeOptionManagers.get(columnModel).setValue(TimezonedDataTypeAdapter.class);
-//				}
+				cmbDataType.setText(dataType.getTypeReference().getTypeName());
+				typeOptionManagers.get(columnModel.toReference()).setValue();
 			}
 			txtDefaultValue.setText(StringUtils.defaultString(columnModel.getDefaultValue()));
 			txtDescription.setText(StringUtils.defaultString(columnModel.getDescription()));
@@ -565,8 +541,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 //			} else {
 //				chkIsDisabled.setSelection(false);
 //			}
-			
-//			chkIsTypical.setSelection(column.getConstraint(DefinitionModel.CONSTRAINT_TYPICAL));
 		}
 		
 		@Override
@@ -577,13 +551,13 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			columnModel.setName(newName); // TODO autoname
 			
-			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0), new ParameterMap());
+			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0));
 			columnModel.setDataType(type);
 			tableModel.store(columnModel);
 			
-//			TypeOptionManager typeOptionManager =
-//					new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
-//			typeOptionManagers.put(columnModel, typeOptionManager);
+			TypeParameterManager typeOptionManager =
+					new TypeParameterManager(dialect, columnModel, cmpTypeOption, editListener, typeOptionHandler);
+			typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
 			
 			int addedIndex = columnModel.getIndex();
 			table.setSelection(addedIndex);
@@ -603,14 +577,14 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			columnModel.setName(newName); // TODO autoname
 			
-			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0), new ParameterMap());
+			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0));
 			columnModel.setDataType(type);
 			columnModel.setIndex(index);
 			tableModel.store(columnModel);
 			
-//			TypeOptionManager typeOptionManager =
-//					new TypeOptionManager(columnModel, cmpTypeOption, editListener, typeOptionHandler);
-//			typeOptionManagers.put(columnModel, typeOptionManager);
+			TypeParameterManager typeOptionManager =
+					new TypeParameterManager(dialect, columnModel, cmpTypeOption, editListener, typeOptionHandler);
+			typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
 			
 			int addedIndex = tableModel.getColumns().indexOf(columnModel);
 			table.setSelection(addedIndex);
@@ -674,7 +648,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			table.setFocus();
 			
-//			typeOptionManagers.remove(subject);
+			typeOptionManagers.remove(subject);
 			
 			return subject;
 		}
@@ -723,7 +697,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			int selectionInedx = cmbDataType.getSelectionIndex();
 			if (selectionInedx != -1) {
-				TypeVariant dataType = new DefaultTypeVariant(allTypes.get(selectionInedx), new ParameterMap());
+				DefaultTypeVariant dataType = new DefaultTypeVariant(allTypes.get(selectionInedx));
 				columnModel.setDataType(dataType);
 			}
 			
@@ -773,7 +747,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 //				columnModel.getAdapter(Disablable.class).setDisabled(true);
 //			}
 			
-//			typeOptionManagers.get(columnModel).writeBackToAdapter();
+			typeOptionManagers.get(columnModel.toReference()).writeBackToAdapter();
 		}
 		
 

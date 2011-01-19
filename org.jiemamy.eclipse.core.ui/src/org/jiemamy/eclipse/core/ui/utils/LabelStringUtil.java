@@ -18,16 +18,21 @@
  */
 package org.jiemamy.eclipse.core.ui.utils;
 
+import java.util.Collection;
+
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
+import org.jiemamy.dialect.Dialect;
+import org.jiemamy.dialect.TypeParameterSpec;
+import org.jiemamy.dialect.TypeParameterSpec.Necessity;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.PrimaryKeyConstraintModel;
+import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeVariant;
-import org.jiemamy.model.domain.DomainModel;
 
 /**
  * UI表示用文字列を生成するユーティリティクラス。
@@ -37,6 +42,49 @@ import org.jiemamy.model.domain.DomainModel;
 public class LabelStringUtil {
 	
 	/**
+	 * DataTypeに対する表示用文字列を取得する。
+	 * 
+	 * @param dialect {@link Dialect}
+	 * @param dataType 表示対象DataType
+	 * @param place 表示しようと考えている場所
+	 * @return 表示用文字列
+	 */
+	public static String toString(Dialect dialect, TypeVariant dataType, DisplayPlace place) {
+		StringBuilder typeName = new StringBuilder(dataType.getTypeReference().getTypeName());
+		String suffix = "";
+		
+		Integer size = null;
+		Integer precision = null;
+		Integer scale = null;
+		
+		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
+		for (TypeParameterSpec spec : specs) {
+			if (spec.getNecessity() == Necessity.REQUIRED) {
+				if (spec.getKey().equals(TypeParameterKey.SERIAL)) {
+					typeName.insert(0, "SERIAL ");
+				} else if (spec.getKey().equals(TypeParameterKey.WITH_TIMEZONE)) {
+					suffix = " WITH TIMEZONE";
+				} else if (spec.getKey().equals(TypeParameterKey.SIZE)) {
+					size = dataType.getParam(TypeParameterKey.SIZE);
+				} else if (spec.getKey().equals(TypeParameterKey.PRECISION)) {
+					precision = dataType.getParam(TypeParameterKey.PRECISION);
+				} else if (spec.getKey().equals(TypeParameterKey.SCALE)) {
+					scale = dataType.getParam(TypeParameterKey.SCALE);
+				}
+			}
+		}
+		
+		if (size != null) {
+			typeName.append("(").append(size).append(")");
+		}
+		if (precision != null && scale != null) {
+			typeName.append("(").append(precision).append(", ").append(scale).append(")");
+		}
+		
+		return typeName.append(suffix).toString();
+	}
+	
+	/**
 	 * JiemamyEntityに対する表示用文字列を取得する。
 	 * 
 	 * @param context ルートモデル
@@ -44,11 +92,8 @@ public class LabelStringUtil {
 	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
 	 */
-	public static String getString(JiemamyContext context, Entity targetElement, DisplayPlace place) {
-		if (targetElement instanceof DomainModel) {
-			DomainModel domainModel = (DomainModel) targetElement;
-			return domainModel.getName();
-		} else if (targetElement instanceof DatabaseObjectModel) {
+	public static String toString(JiemamyContext context, Entity targetElement, DisplayPlace place) {
+		if (targetElement instanceof DatabaseObjectModel) {
 			DatabaseObjectModel doModel = (DatabaseObjectModel) targetElement;
 			return doModel.getName();
 		} else if (targetElement instanceof ColumnModel) {
@@ -98,36 +143,6 @@ public class LabelStringUtil {
 			return sb.toString();
 		}
 		return "unknown label: " + targetElement.getClass().getName();
-	}
-	
-	/**
-	 * DataTypeに対する表示用文字列を取得する。
-	 * 
-	 * @param context ルートモデル
-	 * @param dataType 表示対象DataType
-	 * @param place 表示しようと考えている場所
-	 * @return 表示用文字列
-	 */
-	public static String getString(JiemamyContext context, TypeVariant dataType, DisplayPlace place) {
-//		try {
-//			Dialect dialect = context.findDialect();
-//			List<Token> tokens = dialect.getDataTypeResolver().resolveDataType(dataType, resolver);
-//			StringBuilder sb = new StringBuilder();
-//			Token lastToken = null;
-//			for (Token token : tokens) {
-//				if ((DefaultSqlFormatter.isSeparator(lastToken) == false && DefaultSqlFormatter.isSeparator(token) == false)
-//						|| lastToken == null || lastToken.equals(Separator.COMMA)) {
-//					sb.append(DefaultSqlFormatter.WHITESPACE);
-//				}
-//				sb.append(token);
-//				lastToken = token;
-//			}
-//			return sb.toString();
-//		} catch (ClassNotFoundException e) {
-//			logger.warn("Dialectのロスト", e);
-//			return dataType.toBuiltinDataType(context).getTypeName();
-//		}
-		return "FOOBAR"; // FIXME
 	}
 	
 	private LabelStringUtil() {

@@ -144,7 +144,7 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		ConnectionModel connection = getModel();
 		ForeignKeyConstraintModel foreignKey = context.resolve(connection.getCoreModelRef());
 		
-		String labelString = LabelStringUtil.getString(context, foreignKey, DisplayPlace.FIGURE);
+		String labelString = LabelStringUtil.toString(context, foreignKey, DisplayPlace.FIGURE);
 		label.setText(labelString);
 	}
 }

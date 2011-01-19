@@ -34,8 +34,14 @@ import org.osgi.framework.BundleContext;
 import org.seasar.eclipse.common.util.ImageManager;
 import org.seasar.eclipse.common.util.StatusUtil;
 
+import org.jiemamy.DefaultServiceLocator;
+import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreferenceImpl;
+import org.jiemamy.eclipse.extension.EclipseDialectServiceLocator;
+import org.jiemamy.eclipse.extension.EclipseExporterServiceLocator;
+import org.jiemamy.eclipse.extension.EclipseImporterServiceLocator;
+import org.jiemamy.utils.CompositeServiceLocator;
 
 /**
  * Jiemamy Eclipse Core PluginのActivatorクラス。
@@ -105,6 +111,15 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		pref = new JiemamyPreferenceImpl();
+		
+		// FORMAT-OFF
+		JiemamyContext.setServiceLocator(new CompositeServiceLocator(
+				new DefaultServiceLocator(),
+				new EclipseDialectServiceLocator(),
+				new EclipseImporterServiceLocator(),
+				new EclipseExporterServiceLocator()
+		));
+		// FORMAT-ON
 	}
 	
 	@Override

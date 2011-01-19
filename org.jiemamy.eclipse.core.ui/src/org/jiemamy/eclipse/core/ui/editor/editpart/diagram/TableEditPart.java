@@ -159,7 +159,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
 		TableFigure tableFigure = (TableFigure) figure;
 		
-		String labelString = LabelStringUtil.getString(context, tableModel, DisplayPlace.FIGURE);
+		String labelString = LabelStringUtil.toString(context, tableModel, DisplayPlace.FIGURE);
 		
 		tableFigure.setDatabaseObjectName(labelString);
 		
@@ -187,8 +187,14 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		ColumnFigure nameLabel = new ColumnFigure();
 		ColumnFigure typeLabel = new ColumnFigure();
 		
-		nameLabel.setText(LabelStringUtil.getString(context, columnModel, DisplayPlace.FIGURE));
-		typeLabel.setText(LabelStringUtil.getString(context, columnModel.getDataType(), DisplayPlace.FIGURE));
+		nameLabel.setText(LabelStringUtil.toString(context, columnModel, DisplayPlace.FIGURE));
+		try {
+			typeLabel.setText(LabelStringUtil.toString(context.findDialect(), columnModel.getDataType(),
+					DisplayPlace.FIGURE));
+		} catch (ClassNotFoundException e) {
+			logger.error("lost dialect", e);
+			typeLabel.setText(columnModel.getDataType().getTypeReference().getTypeName());
+		}
 		
 		DatabaseObjectNodeModel node = getModel();
 		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());

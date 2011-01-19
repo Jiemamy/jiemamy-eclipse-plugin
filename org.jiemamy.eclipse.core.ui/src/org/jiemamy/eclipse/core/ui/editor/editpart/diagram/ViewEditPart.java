@@ -146,7 +146,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
 		ViewFigure viewFigure = (ViewFigure) figure;
 		
-		String labelString = LabelStringUtil.getString(context, viewModel, DisplayPlace.FIGURE);
+		String labelString = LabelStringUtil.toString(context, viewModel, DisplayPlace.FIGURE);
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		
 		viewFigure.setDatabaseObjectName(labelString);

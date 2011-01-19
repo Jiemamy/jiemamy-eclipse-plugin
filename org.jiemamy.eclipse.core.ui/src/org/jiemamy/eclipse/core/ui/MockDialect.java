@@ -18,11 +18,14 @@
  */
 package org.jiemamy.eclipse.core.ui;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
 import org.jiemamy.dialect.Dialect;
+import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.model.datatype.DataTypeCategory;
 import org.jiemamy.model.datatype.DefaultTypeReference;
 import org.jiemamy.model.datatype.TypeReference;
@@ -60,6 +63,10 @@ public class MockDialect implements Dialect {
 	
 	public String getName() {
 		return this.getClass().getName();
+	}
+	
+	public Collection<TypeParameterSpec> getTypeParameterSpecs(TypeReference reference) {
+		return Collections.emptyList();
 	}
 	
 	public Validator getValidator() {

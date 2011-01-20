@@ -37,7 +37,6 @@
       <import plugin="org.eclipse.gef"/>
       <import plugin="org.eclipse.update.core"/>
       <import plugin="org.eclipse.debug.core"/>
-      <import plugin="org.eclipse.jdt.ui"/>
    </requires>
 
    <plugin

@@ -175,8 +175,8 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		JiemamyContext context = getTargetCoreModel();
 		
 		int selectionIndex = cmbDialect.getSelectionIndex();
-		String dialectClassName = dialects.get(selectionIndex).toString();
-		context.setDescription(dialectClassName);
+		String dialectClassName = dialects.get(selectionIndex).getClass().getName();
+		context.setDialectClassName(dialectClassName);
 		
 		String schemaName = StringUtils.defaultString(txtSchema.getText());
 		context.setSchemaName(schemaName);

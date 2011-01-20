@@ -148,7 +148,11 @@ public class ExtensionResolver<T> {
 	 * @throws CoreException if an instance of the executable extension could not be created for any reason
 	 */
 	public T getInstance(String identifier, String classAttributeName) throws CoreException {
-		Object obj = extensionConfigurationElements.get(identifier).createExecutableExtension(classAttributeName);
+		IConfigurationElement element = extensionConfigurationElements.get(identifier);
+		if (element == null) {
+			return null;
+		}
+		Object obj = element.createExecutableExtension(classAttributeName);
 		T instance;
 		try {
 			@SuppressWarnings("unchecked")

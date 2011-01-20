@@ -43,7 +43,7 @@ import org.jiemamy.eclipse.JiemamyCorePlugin;
  */
 public class ExtensionResolver<T> {
 	
-	/** 拡張のMap */
+	/** 拡張のMap key=Dialect-ID, value=IConfigurationElement */
 	private Map<String, IConfigurationElement> extensionConfigurationElements;
 	
 	private List<T> allInstance;

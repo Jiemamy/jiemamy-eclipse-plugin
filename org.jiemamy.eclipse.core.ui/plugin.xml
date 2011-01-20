@@ -3,7 +3,7 @@
 <plugin>
 
    <extension point="org.jiemamy.eclipse.core.dialects">
-	  <dialect class="org.jiemamy.eclipse.core.ui.MockDialect"/>
+	  <dialect class="org.jiemamy.dialect.GenericDialect"/>
    </extension>
 
 <!--

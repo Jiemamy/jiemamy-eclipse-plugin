@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.eclipse.core.ui.editor.dialog.foreignkey.ForeignKeyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
@@ -69,16 +68,18 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 	}
 	
 	public void commandExecuted(StoredEvent<ForeignKeyConstraintModel> command) {
-		// TODO Auto-generated method stub
-		
+		// TODO ↓適当です
+		updateLabel();
+		refresh();
+		refreshVisuals();
 	}
 	
-	public Entity getTargetModel() {
-		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		ConnectionModel connection = getModel();
-		ForeignKeyConstraintModel foreignKey = context.resolve(connection.getCoreModelRef());
-		return foreignKey;
-	}
+//	public Entity getTargetModel() {
+//		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
+//		ConnectionModel connection = getModel();
+//		ForeignKeyConstraintModel foreignKey = context.resolve(connection.getCoreModelRef());
+//		return foreignKey;
+//	}
 	
 	public void openEditDialog() {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();

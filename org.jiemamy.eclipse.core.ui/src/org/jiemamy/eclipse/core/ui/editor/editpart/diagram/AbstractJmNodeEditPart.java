@@ -47,6 +47,7 @@ import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmGraphicalNodeEditPolicy;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.NodeModel;
@@ -198,7 +199,16 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		
 		List<ConnectionModel> result =
 				Lists.newArrayList(diagramModel.getSourceConnectionsFor(getModel().toReference()));
-		logger.debug(getModel() + " sourceConnections = " + result);
+		
+		// 以下ログのためのロジック
+		NodeModel model = getModel();
+		if (model instanceof DefaultDatabaseObjectNodeModel) {
+			DefaultDatabaseObjectNodeModel databaseObjectNodeModel = (DefaultDatabaseObjectNodeModel) model;
+			DatabaseObjectModel core = context.resolve(databaseObjectNodeModel.getCoreModelRef());
+			logger.debug(core + " sourceConnections = " + result);
+		} else {
+			logger.debug(model + " sourceConnections = " + result);
+		}
 		return result;
 	}
 	
@@ -212,7 +222,16 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
 		List<ConnectionModel> result = Lists.newArrayList(diagramModel.getTargetConnections(getModel().toReference()));
-		logger.debug(getModel() + " targetConnections = " + result);
+		
+		// 以下ログのためのロジック
+		NodeModel model = getModel();
+		if (model instanceof DefaultDatabaseObjectNodeModel) {
+			DefaultDatabaseObjectNodeModel databaseObjectNodeModel = (DefaultDatabaseObjectNodeModel) model;
+			DatabaseObjectModel core = context.resolve(databaseObjectNodeModel.getCoreModelRef());
+			logger.debug(core + " sourceConnections = " + result);
+		} else {
+			logger.debug(model + " sourceConnections = " + result);
+		}
 		return result;
 	}
 	

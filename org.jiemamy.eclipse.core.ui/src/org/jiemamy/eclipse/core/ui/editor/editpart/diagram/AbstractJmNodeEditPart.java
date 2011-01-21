@@ -175,7 +175,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.COMPONENT_ROLE, new JmComponentEditPolicy());
 		installEditPolicy(EditPolicy.GRAPHICAL_NODE_ROLE, new JmGraphicalNodeEditPolicy());
-		// FIXME
+		// TODO direct-edit
 //		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new JmDirectEditPolicy());
 	}
 	

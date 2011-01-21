@@ -142,7 +142,7 @@ public class CreateConnectionCommand extends Command {
 		DefaultDiagramModel diagramModel =
 				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
 		DefaultTableModel sourceTable = (DefaultTableModel) sourceCore;
-		TableModel targetTable = (TableModel) targetCore;
+		DefaultTableModel targetTable = (DefaultTableModel) targetCore;
 		creation.setSourceTable(sourceTable);
 		creation.setTargetTable(targetTable);
 		creation.execute(context, diagramModel);
@@ -194,7 +194,7 @@ public class CreateConnectionCommand extends Command {
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
-		// TODO
+		// TODO undo create connection
 	}
 	
 	/**

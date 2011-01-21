@@ -178,7 +178,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				// FIXME
+				// TODO disable-model
 //				if (tableModel.hasAdapter(Disablable.class) == false) {
 //					JiemamyFactory factory = tableModel.getJiemamy().getFactory();
 //					tableModel.registerAdapter(factory.newAdapter(Disablable.class));

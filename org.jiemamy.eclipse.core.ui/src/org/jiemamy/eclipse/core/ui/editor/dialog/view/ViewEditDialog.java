@@ -177,7 +177,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				// FIXME
+				// TODO disable-model
 //				if (viewModel.hasAdapter(Disablable.class) == false) {
 //					JiemamyFactory factory = viewModel.getJiemamy().getFactory();
 //					viewModel.registerAdapter(factory.newAdapter(Disablable.class));

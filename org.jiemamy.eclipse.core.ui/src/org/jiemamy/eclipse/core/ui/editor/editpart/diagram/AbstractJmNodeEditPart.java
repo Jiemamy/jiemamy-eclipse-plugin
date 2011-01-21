@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmComponentEditPolicy;
@@ -138,8 +137,6 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	public ConnectionAnchor getTargetConnectionAnchor(Request connection) {
 		return new ChopboxAnchor(getFigure());
 	}
-	
-	public abstract Entity getTargetModel();
 	
 	@Override
 	public void performRequest(Request req) {

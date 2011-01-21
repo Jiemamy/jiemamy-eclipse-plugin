@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.dialog.sticky.StickyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.StickyFigure;
@@ -69,11 +68,6 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	@Override
 	public StickyNodeModel getModel() {
 		return (StickyNodeModel) super.getModel();
-	}
-	
-	@Override
-	public Entity getTargetModel() {
-		return getModel();
 	}
 	
 	public void openEditDialog() {

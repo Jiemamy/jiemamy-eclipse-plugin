@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.dddbase.Entity;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.eclipse.core.ui.editor.dialog.table.TableEditDialog;
@@ -87,12 +86,6 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	@Override
 	public DatabaseObjectNodeModel getModel() {
 		return (DatabaseObjectNodeModel) super.getModel();
-	}
-	
-	@Override
-	public Entity getTargetModel() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	public void openEditDialog() {

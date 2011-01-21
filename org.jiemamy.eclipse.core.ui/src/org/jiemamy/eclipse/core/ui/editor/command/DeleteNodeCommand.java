@@ -18,9 +18,15 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.command;
 
+import java.util.Collection;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.DiagramFacet;
+import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
 
@@ -38,6 +44,9 @@ public class DeleteNodeCommand extends Command {
 	/** 削除されるノード */
 	private final NodeModel nodeModel;
 	
+	/** 削除されるノード */
+	private final Collection<ConnectionModel> connectionModels;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -50,10 +59,23 @@ public class DeleteNodeCommand extends Command {
 		this.diagramFacet = diagramFacet;
 		this.diagramModel = diagramModel;
 		this.nodeModel = nodeModel;
+		
+		Collection<ConnectionModel> connectionModels = Lists.newArrayList();
+		for (ConnectionModel connectionModel : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
+			connectionModels.add(connectionModel);
+		}
+		for (ConnectionModel connectionModel : diagramModel.getTargetConnections(nodeModel.toReference())) {
+			connectionModels.add(connectionModel);
+		}
+		this.connectionModels = ImmutableList.copyOf(connectionModels);
 	}
 	
 	@Override
 	public void execute() {
+		for (ConnectionModel connectionModel : connectionModels) {
+			diagramModel.deleteConnection(connectionModel.toReference());
+		}
+		
 		diagramModel.deleteNode(nodeModel.toReference());
 		diagramFacet.store(diagramModel);
 	}
@@ -61,6 +83,11 @@ public class DeleteNodeCommand extends Command {
 	@Override
 	public void undo() {
 		diagramModel.store(nodeModel);
+		
+		for (ConnectionModel connectionModel : connectionModels) {
+			diagramModel.store(connectionModel);
+		}
+		
 		diagramFacet.store(diagramModel);
 	}
 }

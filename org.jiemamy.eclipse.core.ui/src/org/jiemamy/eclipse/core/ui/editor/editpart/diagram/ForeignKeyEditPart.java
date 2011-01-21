@@ -38,6 +38,7 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.foreignkey.ForeignKeyEditDialog
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.table.DefaultTableModel;
@@ -67,10 +68,9 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		logger.debug(LogMarker.LIFECYCLE, "construct");
 	}
 	
-	public void commandExecuted(StoredEvent<ForeignKeyConstraintModel> command) {
+	public void commandExecuted(StoredEvent<DefaultDiagramModel> event) {
+		logger.info("commandExecuted");
 		// TODO ↓適当です
-		updateLabel();
-		refresh();
 		refreshVisuals();
 	}
 	

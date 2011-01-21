@@ -34,7 +34,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmBendpointEditPolicy;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmConnectionEditPolicy;
 import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.transaction.StoredEventListener;
 
@@ -44,7 +44,7 @@ import org.jiemamy.transaction.StoredEventListener;
  * @author daisuke
  */
 public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEditPart implements
-		StoredEventListener<ForeignKeyConstraintModel> {
+		StoredEventListener<DefaultDiagramModel> {
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractJmConnectionEditPart.class);
 	
@@ -63,19 +63,13 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	@Override
 	public void activate() {
 		super.activate();
-		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		context.getEventBroker().addListener(this);
+		getJiemamyContext().getEventBroker().addListener(this);
 		logger.debug("activate");
 	}
 	
-//	public void commandExecuted(Command command) {
-//		refreshVisuals();
-//	}
-	
 	@Override
 	public void deactivate() {
-		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		context.getEventBroker().removeListener(this);
+		getJiemamyContext().getEventBroker().removeListener(this);
 		super.deactivate();
 		logger.debug("deactivate");
 	}
@@ -107,11 +101,19 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 		installEditPolicy(EditPolicy.CONNECTION_BENDPOINTS_ROLE, new JmBendpointEditPolicy());
 	}
 	
+	/**
+	 * コンテキストを取得する。
+	 * 
+	 * @return {@link JiemamyContext}
+	 */
+	protected JiemamyContext getJiemamyContext() {
+		return (JiemamyContext) getRoot().getContents().getModel();
+	}
+	
 	private void refreshBendpoints() {
 		if (getParent() == null) {
 			return;
 		}
-//		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 //		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
 //		DiagramModel diagramModel = diagramFacet.getDiagrams().get(Migration.DIAGRAM_INDEX);
 		ConnectionModel connection = getModel();

@@ -18,11 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultDatabaseObjectModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.utils.NamingUtil;
+import org.jiemamy.model.geometory.JmRectangle;
 
 /**
  * TODO for daisuke
@@ -30,18 +26,8 @@ import org.jiemamy.utils.NamingUtil;
  * @version $Id$
  * @author daisuke
  */
-public abstract class NodeCreation implements Creation {
+public interface NodeCreation extends Creation {
 	
-	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
-		DefaultNodeModel nodeModel = getDiagramElement();
-		DefaultDatabaseObjectModel coreModel = getCoreElement();
-		NamingUtil.autoName(coreModel, context);
-		context.store(coreModel);
-		diagramModel.store(nodeModel);
-	}
-	
-	public abstract DefaultNodeModel getDiagramElement();
-	
-	abstract DefaultDatabaseObjectModel getCoreElement();
+	void setBoundary(JmRectangle boundary);
 	
 }

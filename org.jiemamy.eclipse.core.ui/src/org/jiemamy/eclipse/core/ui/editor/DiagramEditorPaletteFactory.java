@@ -18,8 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor;
 
-import java.util.UUID;
-
 import org.eclipse.gef.palette.CombinedTemplateCreationEntry;
 import org.eclipse.gef.palette.ConnectionCreationToolEntry;
 import org.eclipse.gef.palette.MarqueeToolEntry;
@@ -39,11 +37,7 @@ import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
 import org.jiemamy.eclipse.core.ui.model.StickyCreation;
 import org.jiemamy.eclipse.core.ui.model.TableCreation;
 import org.jiemamy.eclipse.core.ui.model.ViewCreation;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.view.DefaultViewModel;
 
 /**
  * {@link JiemamyDiagramEditor}用のパレット（デフォルトで右側にある奴）を生成するファクトリ。
@@ -140,10 +134,7 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						DefaultTableModel table = new DefaultTableModel(UUID.randomUUID());
-						DefaultNodeModel node =
-								new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), table.toReference());
-						return new TableCreation(table, node);
+						return new TableCreation();
 					}
 					
 					public Object getObjectType() {
@@ -158,10 +149,7 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						DefaultViewModel view = new DefaultViewModel(UUID.randomUUID());
-						DefaultNodeModel node =
-								new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), view.toReference());
-						return new ViewCreation(view, node);
+						return new ViewCreation();
 					}
 					
 					public Object getObjectType() {
@@ -182,8 +170,7 @@ public final class DiagramEditorPaletteFactory {
 				new CreationFactory() {
 					
 					public Object getNewObject() {
-						StickyNodeModel stickyNodeModel = new StickyNodeModel(UUID.randomUUID());
-						return new StickyCreation(stickyNodeModel);
+						return new StickyCreation();
 					}
 					
 					public Object getObjectType() {

@@ -31,4 +31,6 @@ public interface Creation {
 	
 	void execute(JiemamyContext context, DefaultDiagramModel diagramModel);
 	
+	void undo(JiemamyContext context, DefaultDiagramModel diagramModel);
+	
 }

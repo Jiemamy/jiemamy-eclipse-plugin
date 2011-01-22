@@ -66,7 +66,7 @@ public class JmXYLayoutEditPolicy extends XYLayoutEditPolicy {
 		JiemamyContext context = (JiemamyContext) getHost().getModel();
 		
 		Rectangle rect = (Rectangle) getConstraintFor(request);
-		creation.getDiagramElement().setBoundary(ConvertUtil.convert(rect));
+		creation.setBoundary(ConvertUtil.convert(rect));
 		
 		return new CreateNodeCommand(context, TODO.DIAGRAM_INDEX, creation);
 	}

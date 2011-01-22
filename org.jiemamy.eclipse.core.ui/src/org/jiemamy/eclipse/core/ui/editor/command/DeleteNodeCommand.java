@@ -75,6 +75,7 @@ public class DeleteNodeCommand extends Command {
 		for (ConnectionModel connectionModel : connectionModels) {
 			diagramModel.deleteConnection(connectionModel.toReference());
 		}
+		diagramFacet.store(diagramModel);
 		
 		diagramModel.deleteNode(nodeModel.toReference());
 		diagramFacet.store(diagramModel);

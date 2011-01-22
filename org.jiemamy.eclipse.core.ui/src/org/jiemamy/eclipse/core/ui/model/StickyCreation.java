@@ -18,13 +18,13 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.apache.commons.lang.Validate;
+import java.util.UUID;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultDatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.geometory.JmRectangle;
 
 /**
  * TODO for daisuke
@@ -32,7 +32,7 @@ import org.jiemamy.model.StickyNodeModel;
  * @version $Id$
  * @author daisuke
  */
-public class StickyCreation extends NodeCreation {
+public class StickyCreation implements NodeCreation {
 	
 	/** {@link StickyNodeModel}が作られた時、はじめに設定されている値 */
 	private static final String DEFAULT_STICKY_CONTENTS = "memo";
@@ -42,28 +42,23 @@ public class StickyCreation extends NodeCreation {
 
 	/**
 	 * インスタンスを生成する。
-	 * 
-	 * @param stickyNodeModel 作成する付箋モデル
-	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public StickyCreation(StickyNodeModel stickyNodeModel) {
-		Validate.notNull(stickyNodeModel);
-		this.stickyNodeModel = stickyNodeModel;
-	}
-	
-	@Override
-	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public StickyCreation() {
+		stickyNodeModel = new StickyNodeModel(UUID.randomUUID());
 		stickyNodeModel.setContents(DEFAULT_STICKY_CONTENTS);
+	}
+	
+	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
 		diagramModel.store(stickyNodeModel);
+		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
 	
-	@Override
-	public DefaultNodeModel getDiagramElement() {
-		return stickyNodeModel;
+	public void setBoundary(JmRectangle boundary) {
+		stickyNodeModel.setBoundary(boundary);
 	}
 	
-	@Override
-	DefaultDatabaseObjectModel getCoreElement() {
-		throw new UnsupportedOperationException();
+	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		diagramModel.deleteNode(stickyNodeModel.toReference());
+		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
 }

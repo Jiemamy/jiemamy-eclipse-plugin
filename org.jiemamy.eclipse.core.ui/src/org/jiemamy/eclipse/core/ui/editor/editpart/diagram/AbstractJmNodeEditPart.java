@@ -197,6 +197,10 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
+		if (diagramModel.contains(getModel().toReference()) == false) {
+			return Collections.emptyList();
+		}
+		
 		List<ConnectionModel> result =
 				Lists.newArrayList(diagramModel.getSourceConnectionsFor(getModel().toReference()));
 		
@@ -220,6 +224,10 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		
+		if (diagramModel.contains(getModel().toReference()) == false) {
+			return Collections.emptyList();
+		}
 		
 		List<ConnectionModel> result = Lists.newArrayList(diagramModel.getTargetConnections(getModel().toReference()));
 		

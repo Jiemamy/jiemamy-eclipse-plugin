@@ -141,10 +141,8 @@ public class CreateConnectionCommand extends Command {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
 		DefaultDiagramModel diagramModel =
 				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
-		DefaultTableModel sourceTable = (DefaultTableModel) sourceCore;
-		DefaultTableModel targetTable = (DefaultTableModel) targetCore;
-		creation.setSourceTable(sourceTable);
-		creation.setTargetTable(targetTable);
+		creation.setSourceTable((DefaultTableModel) sourceCore);
+		creation.setTargetTable((DefaultTableModel) targetCore);
 		creation.execute(context, diagramModel);
 		
 //		jiemamyFacade.resetBendpoint(diagramIndex, connection);
@@ -194,7 +192,9 @@ public class CreateConnectionCommand extends Command {
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
-		// TODO undo create connection
+		DefaultDiagramModel diagramModel =
+				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		creation.undo(context, diagramModel);
 	}
 	
 	/**

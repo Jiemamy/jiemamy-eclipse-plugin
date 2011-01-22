@@ -18,10 +18,16 @@
  */
 package org.jiemamy.eclipse.core.ui.model;
 
-import org.apache.commons.lang.Validate;
+import java.util.UUID;
 
+import org.jiemamy.DiagramFacet;
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
+import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.geometory.JmRectangle;
 import org.jiemamy.model.view.DefaultViewModel;
+import org.jiemamy.utils.NamingUtil;
 
 /**
  * TODO for daisuke
@@ -29,7 +35,7 @@ import org.jiemamy.model.view.DefaultViewModel;
  * @version $Id$
  * @author daisuke
  */
-public class ViewCreation extends NodeCreation {
+public class ViewCreation implements NodeCreation {
 	
 	private final DefaultViewModel view;
 	
@@ -38,24 +44,26 @@ public class ViewCreation extends NodeCreation {
 
 	/**
 	 * インスタンスを生成する。
-	 * 
-	 * @param node 作成するノード
-	 * @param view 作成するビュー
 	 */
-	public ViewCreation(DefaultViewModel view, DefaultNodeModel node) {
-		Validate.notNull(view);
-		Validate.notNull(node);
-		this.view = view;
-		this.node = node;
+	public ViewCreation() {
+		view = new DefaultViewModel(UUID.randomUUID());
+		node = new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), view.toReference());
 	}
 	
-	@Override
-	public DefaultViewModel getCoreElement() {
-		return view;
+	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		NamingUtil.autoName(view, context);
+		context.store(view);
+		diagramModel.store(node);
+		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
 	
-	@Override
-	public DefaultNodeModel getDiagramElement() {
-		return node;
+	public void setBoundary(JmRectangle boundary) {
+		node.setBoundary(boundary);
+	}
+	
+	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		diagramModel.deleteNode(node.toReference());
+		context.getFacet(DiagramFacet.class).store(diagramModel);
+		context.deleteDatabaseObject(view.toReference());
 	}
 }

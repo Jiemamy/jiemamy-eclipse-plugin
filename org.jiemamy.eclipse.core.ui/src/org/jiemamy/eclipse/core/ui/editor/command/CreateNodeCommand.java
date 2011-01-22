@@ -62,15 +62,16 @@ public class CreateNodeCommand extends Command {
 	public void execute() {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
 		
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
-		
+		DefaultDiagramModel diagramModel =
+				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
 		creation.execute(context, diagramModel);
-		facet.store(diagramModel);
 	}
 	
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
+		DefaultDiagramModel diagramModel =
+				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		creation.undo(context, diagramModel);
 	}
 }

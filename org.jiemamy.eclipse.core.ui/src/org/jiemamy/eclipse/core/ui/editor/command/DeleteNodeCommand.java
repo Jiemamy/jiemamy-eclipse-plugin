@@ -20,8 +20,8 @@ package org.jiemamy.eclipse.core.ui.editor.command;
 
 import java.util.Collection;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import org.eclipse.gef.commands.Command;
 
@@ -60,14 +60,14 @@ public class DeleteNodeCommand extends Command {
 		this.diagramModel = diagramModel;
 		this.nodeModel = nodeModel;
 		
-		Collection<ConnectionModel> connectionModels = Lists.newArrayList();
+		Collection<ConnectionModel> connectionModels = Sets.newHashSet();
 		for (ConnectionModel connectionModel : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
 			connectionModels.add(connectionModel);
 		}
 		for (ConnectionModel connectionModel : diagramModel.getTargetConnections(nodeModel.toReference())) {
 			connectionModels.add(connectionModel);
 		}
-		this.connectionModels = ImmutableList.copyOf(connectionModels);
+		this.connectionModels = ImmutableSet.copyOf(connectionModels);
 	}
 	
 	@Override

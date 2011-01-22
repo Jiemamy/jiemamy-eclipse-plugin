@@ -602,9 +602,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			ColumnModel object = (ColumnModel) getTableViewer().getElementAt(index + 1);
-			object.setIndex(index);
-			tableModel.store(object);
+			tableModel.swapColumn(index, index + 1);
 			
 			table.setSelection(index + 1);
 			enableEditControls(index + 1);
@@ -618,9 +616,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
-			subject.setIndex(index - 1);
-			tableModel.store(subject);
+			tableModel.swapColumn(index - 1, index);
 			
 			table.setSelection(index - 1);
 			enableEditControls(index - 1);

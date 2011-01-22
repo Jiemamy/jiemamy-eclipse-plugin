@@ -252,13 +252,12 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		tableModel.setLogicalName(logicalName);
 		
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		DefaultAroundScriptModel aroundScript;
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		try {
-			aroundScript = (DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
-		} catch (EntityNotFoundException e) {
+		DefaultAroundScriptModel aroundScript =
+				(DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+		if (aroundScript == null) {
 			aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
 			aroundScript.setCoreModelRef(tableModel.toReference());
 		}
@@ -299,14 +298,12 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		
 		String beginScript = "";
 		String endScript = "";
-		try {
-			SqlFacet facet = getContext().getFacet(SqlFacet.class);
-			DefaultAroundScriptModel aroundScript =
-					(DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		DefaultAroundScriptModel aroundScript =
+				(DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
-		} catch (EntityNotFoundException e) {
-			// ignore
 		}
 		
 		// ---- B-4. BeginScript

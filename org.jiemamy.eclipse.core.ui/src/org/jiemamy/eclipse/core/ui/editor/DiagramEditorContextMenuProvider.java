@@ -38,9 +38,13 @@ import org.jiemamy.composer.Exporter;
 import org.jiemamy.composer.ImportConfig;
 import org.jiemamy.composer.Importer;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
+import org.jiemamy.eclipse.core.ui.composer.ExporterWizard;
+import org.jiemamy.eclipse.core.ui.composer.ImporterWizard;
 import org.jiemamy.eclipse.core.ui.editor.action.AutoLayoutAction;
 import org.jiemamy.eclipse.core.ui.editor.action.ChangeNodeBackgroundColorAction;
+import org.jiemamy.eclipse.core.ui.editor.action.ExportAction;
 import org.jiemamy.eclipse.core.ui.editor.action.FitNodeConstraintAction;
+import org.jiemamy.eclipse.core.ui.editor.action.ImportAction;
 import org.jiemamy.eclipse.core.ui.editor.action.PropertyAction;
 import org.jiemamy.eclipse.core.ui.editor.action.SaveDiagramImageAction;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
@@ -209,10 +213,10 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 		try {
 			@SuppressWarnings("unchecked")
 			Exporter<ExportConfig> exporter = (Exporter<ExportConfig>) element.createExecutableExtension("class");
-//			@SuppressWarnings("unchecked")
-//			ExporterWizard<Exporter<ExportConfig>, ExportConfig> wizard =
-//					(ExporterWizard<Exporter<ExportConfig>, ExportConfig>) element.createExecutableExtension("wizard");
-//			menu.add(new ExportAction(exporter, wizard, viewer, editorPart));
+			@SuppressWarnings("unchecked")
+			ExporterWizard<Exporter<ExportConfig>, ExportConfig> wizard =
+					(ExporterWizard<Exporter<ExportConfig>, ExportConfig>) element.createExecutableExtension("wizard");
+			menu.add(new ExportAction(exporter, wizard, viewer, editorPart));
 		} catch (ClassCastException e) {
 			ExceptionHandler.handleException(e);
 		} catch (CoreException e) {
@@ -224,10 +228,10 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 		try {
 			@SuppressWarnings("unchecked")
 			Importer<ImportConfig> importer = (Importer<ImportConfig>) element.createExecutableExtension("class");
-//			@SuppressWarnings("unchecked")
-//			ImporterWizard<Importer<ImportConfig>, ImportConfig> wizard =
-//					(ImporterWizard<Importer<ImportConfig>, ImportConfig>) element.createExecutableExtension("wizard");
-//			menu.add(new ImportAction(importer, wizard, viewer, editorPart));
+			@SuppressWarnings("unchecked")
+			ImporterWizard<Importer<ImportConfig>, ImportConfig> wizard =
+					(ImporterWizard<Importer<ImportConfig>, ImportConfig>) element.createExecutableExtension("wizard");
+			menu.add(new ImportAction(importer, wizard, viewer, editorPart));
 		} catch (ClassCastException e) {
 			ExceptionHandler.handleException(e);
 		} catch (CoreException e) {

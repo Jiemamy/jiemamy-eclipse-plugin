@@ -41,7 +41,7 @@ import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextEditTab;
-import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
+import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 
 /**
  * {@link JiemamyContext}設定ダイアログクラス。

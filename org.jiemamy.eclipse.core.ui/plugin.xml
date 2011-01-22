@@ -6,23 +6,19 @@
 	  <dialect class="org.jiemamy.dialect.GenericDialect"/>
    </extension>
 
-<!--
    <extension point="org.jiemamy.eclipse.core.exporters">
 	  <exporter
 	        name="SQL"
             class="org.jiemamy.composer.exporter.SqlExporter"
-            wizard="org.jiemamy.eclipse.composer.SqlExportWizard"/>
+            wizard="org.jiemamy.eclipse.core.ui.composer.SqlExportWizard"/>
    </extension>
--->
 
-<!--
    <extension point="org.jiemamy.eclipse.core.importers">
 	  <importer
 	        name="Database"
             class="org.jiemamy.composer.importer.DatabaseImporter"
-            wizard="org.jiemamy.eclipse.composer.DatabaseImportWizard"/>
+            wizard="org.jiemamy.eclipse.core.ui.composer.DatabaseImportWizard"/>
    </extension>
--->
 
    <extension point="org.eclipse.ui.newWizards">
       <category

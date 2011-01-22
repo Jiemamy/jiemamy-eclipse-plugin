@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog0;
-import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
+import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.DefaultDeferrabilityModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;

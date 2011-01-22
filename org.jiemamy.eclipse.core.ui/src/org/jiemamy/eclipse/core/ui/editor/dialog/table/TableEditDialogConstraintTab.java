@@ -60,7 +60,7 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTab;
 import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTableEditor;
 import org.jiemamy.eclipse.core.ui.editor.dialog.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.core.ui.editor.dialog.EditListener;
-import org.jiemamy.eclipse.core.ui.editor.dialog.TextSelectionAdapter;
+import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.AbstractConstraintModel;

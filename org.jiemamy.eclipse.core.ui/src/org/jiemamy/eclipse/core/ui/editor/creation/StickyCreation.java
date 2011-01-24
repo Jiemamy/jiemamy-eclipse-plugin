@@ -16,7 +16,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.jiemamy.eclipse.core.ui.model;
+package org.jiemamy.eclipse.core.ui.editor.creation;
 
 import java.util.UUID;
 

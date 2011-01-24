@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.eclipse.core.ui.model.NodeCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.NodeCreation;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.utils.LogMarker;
 

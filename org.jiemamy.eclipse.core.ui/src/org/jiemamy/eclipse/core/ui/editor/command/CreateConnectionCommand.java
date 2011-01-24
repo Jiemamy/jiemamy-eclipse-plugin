@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.ForeignKeyCreation;
 import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDiagramModel;

@@ -26,7 +26,7 @@ import org.eclipse.gef.requests.ReconnectRequest;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.command.CreateConnectionCommand;
-import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.ForeignKeyCreation;
 import org.jiemamy.model.NodeModel;
 
 /**

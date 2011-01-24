@@ -30,7 +30,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.command.ChangeNodeConstraintCommand;
 import org.jiemamy.eclipse.core.ui.editor.command.CreateNodeCommand;
-import org.jiemamy.eclipse.core.ui.model.NodeCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.NodeCreation;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.DefaultNodeModel;
 

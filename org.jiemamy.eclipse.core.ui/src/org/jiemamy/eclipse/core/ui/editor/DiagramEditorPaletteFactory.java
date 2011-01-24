@@ -33,10 +33,10 @@ import org.eclipse.jface.resource.ImageRegistry;
 
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.model.ForeignKeyCreation;
-import org.jiemamy.eclipse.core.ui.model.StickyCreation;
-import org.jiemamy.eclipse.core.ui.model.TableCreation;
-import org.jiemamy.eclipse.core.ui.model.ViewCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.ForeignKeyCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.StickyCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.TableCreation;
+import org.jiemamy.eclipse.core.ui.editor.creation.ViewCreation;
 import org.jiemamy.model.StickyNodeModel;
 
 /**

@@ -16,7 +16,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.jiemamy.eclipse.core.ui.model;
+package org.jiemamy.eclipse.core.ui.editor.creation;
 
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.geometory.JmRectangle;
-import org.jiemamy.model.view.DefaultViewModel;
+import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.utils.NamingUtil;
 
 /**
@@ -35,9 +35,9 @@ import org.jiemamy.utils.NamingUtil;
  * @version $Id$
  * @author daisuke
  */
-public class ViewCreation implements NodeCreation {
+public class TableCreation implements NodeCreation {
 	
-	private final DefaultViewModel view;
+	private final DefaultTableModel table;
 	
 	private final DefaultNodeModel node;
 	
@@ -45,14 +45,14 @@ public class ViewCreation implements NodeCreation {
 	/**
 	 * インスタンスを生成する。
 	 */
-	public ViewCreation() {
-		view = new DefaultViewModel(UUID.randomUUID());
-		node = new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), view.toReference());
+	public TableCreation() {
+		table = new DefaultTableModel(UUID.randomUUID());
+		node = new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), table.toReference());
 	}
 	
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
-		NamingUtil.autoName(view, context);
-		context.store(view);
+		NamingUtil.autoName(table, context);
+		context.store(table);
 		diagramModel.store(node);
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
@@ -64,6 +64,6 @@ public class ViewCreation implements NodeCreation {
 	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
 		diagramModel.deleteNode(node.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
-		context.deleteDatabaseObject(view.toReference());
+		context.deleteDatabaseObject(table.toReference());
 	}
 }

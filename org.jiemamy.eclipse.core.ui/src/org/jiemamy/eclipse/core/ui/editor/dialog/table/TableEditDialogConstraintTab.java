@@ -222,7 +222,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 					} else if (constraintModel instanceof NotNullConstraintModel) {
 						EntityRef<? extends ColumnModel> ref =
 								((NotNullConstraintModel) constraintModel).getColumnRef();
-						return ref == null ? StringUtils.EMPTY : context.resolve(ref).getName();
+						return ref == null ? StringUtils.EMPTY : tableModel.resolve(ref).getName();
 					}
 					return StringUtils.EMPTY;
 					
@@ -303,7 +303,10 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public ConstraintModel getModel() {
-					return new DefaultPrimaryKeyConstraintModel(UUID.randomUUID());
+					DefaultPrimaryKeyConstraintModel constraint =
+							new DefaultPrimaryKeyConstraintModel(UUID.randomUUID());
+					constraint.addKeyColumn(tableModel.getColumns().get(0).toReference());
+					return constraint;
 				}
 			});
 			
@@ -313,7 +316,9 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public ConstraintModel getModel() {
-					return new DefaultUniqueKeyConstraintModel(UUID.randomUUID());
+					DefaultUniqueKeyConstraintModel constraint = new DefaultUniqueKeyConstraintModel(UUID.randomUUID());
+					constraint.addKeyColumn(tableModel.getColumns().get(0).toReference());
+					return constraint;
 				}
 			});
 			
@@ -328,7 +333,8 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public ConstraintModel getModel() {
-					return new DefaultCheckConstraintModel(UUID.randomUUID());
+					DefaultCheckConstraintModel constraint = new DefaultCheckConstraintModel(UUID.randomUUID());
+					return constraint;
 				}
 			});
 			
@@ -338,7 +344,9 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public ConstraintModel getModel() {
-					return new DefaultNotNullConstraintModel(UUID.randomUUID());
+					DefaultNotNullConstraintModel constraint = new DefaultNotNullConstraintModel(UUID.randomUUID());
+					constraint.setColumn(tableModel.getColumns().get(0).toReference());
+					return constraint;
 				}
 			});
 		}
@@ -402,13 +410,13 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			txtCheckExpression.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			
 			label = new Label(cmpNames, SWT.NULL);
-			label.setText("構成カラム(&O)"); // RESOURCE
+			label.setText("キー構成カラム(&O)"); // RESOURCE
 			
 			lstKeyColumns = new org.eclipse.swt.widgets.List(cmpNames, SWT.BORDER | SWT.MULTI);
 			lstKeyColumns.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			
 			label = new Label(cmpNames, SWT.NULL);
-			label.setText("対象カラム(&R)"); // RESOURCE
+			label.setText("Not-null対象カラム(&R)"); // RESOURCE
 			
 			lstTargetColumn = new org.eclipse.swt.widgets.List(cmpNames, SWT.BORDER | SWT.SINGLE);
 			lstTargetColumn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -425,7 +433,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			colName.setWidth(COL_WIDTH_NAME);
 			
 			TableColumn colData = new TableColumn(table, SWT.LEFT);
-			colData.setText("構成カラム/対象カラム/チェック制約式"); // RESOURCE
+			colData.setText("キー構成カラム/NN対象カラム/チェック制約式"); // RESOURCE
 			colData.setWidth(COL_WIDTH_DATA);
 		}
 		
@@ -512,10 +520,22 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				Rectangle bounds = button.getBounds();
 				Point menuLoc = button.getParent().toDisplay(bounds.x, bounds.y + bounds.height);
 				
-				if (tableModel.getPrimaryKey() == null) {
-					addMenu.getItem(0).setEnabled(true);
-				} else {
+				if (tableModel.getPrimaryKey() != null || tableModel.getColumns().isEmpty()) {
 					addMenu.getItem(0).setEnabled(false);
+				} else {
+					addMenu.getItem(0).setEnabled(true);
+				}
+				
+				if (tableModel.getColumns().isEmpty()) {
+					addMenu.getItem(1).setEnabled(false); // UK
+					addMenu.getItem(2).setEnabled(false); // FK
+					addMenu.getItem(3).setEnabled(true); // CC
+					addMenu.getItem(4).setEnabled(false); // NN
+				} else {
+					addMenu.getItem(1).setEnabled(true); // UK
+					addMenu.getItem(2).setEnabled(false); // FK
+					addMenu.getItem(3).setEnabled(true); // CC
+					addMenu.getItem(4).setEnabled(true); // NN
 				}
 				
 				addMenu.setLocation(menuLoc.x, menuLoc.y);

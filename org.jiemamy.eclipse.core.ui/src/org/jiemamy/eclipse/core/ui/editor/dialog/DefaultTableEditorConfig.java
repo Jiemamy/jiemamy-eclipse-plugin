@@ -58,7 +58,7 @@ public class DefaultTableEditorConfig implements TableEditorConfig {
 	}
 	
 	public boolean isFreeOrder() {
-		return false;
+		return true;
 	}
 	
 }

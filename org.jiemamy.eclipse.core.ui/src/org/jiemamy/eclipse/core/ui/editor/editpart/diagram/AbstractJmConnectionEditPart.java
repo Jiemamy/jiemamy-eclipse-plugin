@@ -68,7 +68,6 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	}
 	
 	public void commandExecuted(StoredEvent event) {
-		logger.info("commandExecuted: " + event.getAfter().getClass().getName());
 		// TODO ↓適当です
 		refresh();
 	}

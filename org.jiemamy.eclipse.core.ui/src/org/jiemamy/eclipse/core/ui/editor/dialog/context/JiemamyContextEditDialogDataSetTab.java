@@ -68,9 +68,9 @@ import org.jiemamy.utils.LogMarker;
  * 
  * @author daisuke
  */
-public class RootEditDialogDataSetTab extends AbstractTab {
+public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 	
-	private static Logger logger = LoggerFactory.getLogger(RootEditDialogDataSetTab.class);
+	private static Logger logger = LoggerFactory.getLogger(JiemamyContextEditDialogDataSetTab.class);
 	
 	private final JiemamyContext context;
 	
@@ -84,7 +84,7 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 	 * @param style SWTスタイル値
 	 * @param context 編集対象{@link JiemamyContext}
 	 */
-	public RootEditDialogDataSetTab(TabFolder parentTabFolder, int style, JiemamyContext context) {
+	public JiemamyContextEditDialogDataSetTab(TabFolder parentTabFolder, int style, JiemamyContext context) {
 		super(parentTabFolder, style, "データセット(&T)"); // RESOURCE
 		Validate.notNull(context);
 		
@@ -202,8 +202,8 @@ public class RootEditDialogDataSetTab extends AbstractTab {
 					int selectionIndex = dataSetTableEditor.getTableViewer().getTable().getSelectionIndex();
 					DefaultDataSetModel dataSetModel = (DefaultDataSetModel) context.getDataSets().get(selectionIndex);
 					DataSetEditDialog dataSetEditDialog = new DataSetEditDialog(getShell(), context, dataSetModel);
-					if (dataSetEditDialog.open() != Window.OK) {
-						// TODO
+					if (dataSetEditDialog.open() == Window.OK) {
+						context.store(dataSetModel);
 					}
 				}
 			});

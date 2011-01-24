@@ -203,7 +203,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		}
 		
 		DataSetModel dataSetModel = getTargetCoreModel();
-		TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex());
+		TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex()); // FIXME タブが1つもないこともあるよ
 		TableModel tableModel = (TableModel) item.getData();
 		
 		OutputStream out = null;
@@ -265,7 +265,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		}
 		
 		DataSetModel dataSetModel = getTargetCoreModel();
-		TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex());
+		TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex()); // FIXME タブが1つもないこともあるよ
 		TableModel tableModel = (TableModel) item.getData();
 		
 		try {

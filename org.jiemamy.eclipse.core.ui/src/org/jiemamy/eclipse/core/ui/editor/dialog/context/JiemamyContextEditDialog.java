@@ -143,7 +143,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		tabFolder.setLayoutData(gd);
 		
 		// ---- B-1. DataSets
-		AbstractTab tabDataSets = new RootEditDialogDataSetTab(tabFolder, SWT.NONE, context);
+		AbstractTab tabDataSets = new JiemamyContextEditDialogDataSetTab(tabFolder, SWT.NONE, context);
 		addTab(tabDataSets);
 		
 //		// ---- B-2. Domains

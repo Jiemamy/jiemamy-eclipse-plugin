@@ -19,6 +19,7 @@
 package org.jiemamy.eclipse.core.ui.editor.dialog.context;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -37,11 +38,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
+import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTab;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
+import org.jiemamy.model.script.DefaultAroundScriptModel;
+import org.jiemamy.model.script.Position;
 
 /**
  * {@link JiemamyContext}設定ダイアログクラス。
@@ -137,23 +142,30 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		gd.horizontalSpan = 4;
 		tabFolder.setLayoutData(gd);
 		
-//		// ---- B-1. DataSets
-//		AbstractTab tabDataSets = new RootEditDialogDataSetTab(tabFolder, SWT.NONE, context);
-//		addTab(tabDataSets);
+		// ---- B-1. DataSets
+		AbstractTab tabDataSets = new RootEditDialogDataSetTab(tabFolder, SWT.NONE, context);
+		addTab(tabDataSets);
 		
 //		// ---- B-2. Domains
 //		AbstractTab tabDomains = new RootEditDialogDomainTab(tabFolder, SWT.NONE, context);
 //		addTab(tabDomains);
 		
-//		// ---- B-3. BeginScript
-//		String beginScript = StringUtils.defaultString(rootModel.getBeginScript());
-//		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_BeginScript, beginScript);
-//		addTab(tabBeginScript);
-//		
-//		// ---- B-4. EndScript
-//		String endScript = StringUtils.defaultString(rootModel.getEndScript());
-//		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_EndScript, endScript);
-//		addTab(tabEndScript);
+		String beginScript = "";
+		String endScript = "";
+		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		DefaultAroundScriptModel aroundScript = (DefaultAroundScriptModel) facet.getUniversalAroundScript();
+		if (aroundScript != null) {
+			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
+			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
+		}
+		
+		// ---- B-3. BeginScript
+		tabBeginScript = new TextEditTab(tabFolder, Messages.Tab_BeginScript, beginScript);
+		addTab(tabBeginScript);
+		
+		// ---- B-4. EndScript
+		tabEndScript = new TextEditTab(tabFolder, Messages.Tab_EndScript, endScript);
+		addTab(tabEndScript);
 		
 		// ---- B-5. Description
 		String description = StringUtils.defaultString(context.getDescription());
@@ -181,11 +193,21 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		String schemaName = StringUtils.defaultString(txtSchema.getText());
 		context.setSchemaName(schemaName);
 		
-//		String beginScript = JiemamyPropertyUtil.careNull(tabBeginScript.getTextWidget().getText(), true);
-//		jiemamyFacade.changeModelProperty(rootModel, RootProperty.beginScript, beginScript);
-//		
-//		String endScript = JiemamyPropertyUtil.careNull(tabEndScript.getTextWidget().getText(), true);
-//		jiemamyFacade.changeModelProperty(rootModel, RootProperty.endScript, endScript);
+		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
+		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
+		
+		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
+			DefaultAroundScriptModel aroundScript = (DefaultAroundScriptModel) facet.getUniversalAroundScript();
+			if (aroundScript == null) {
+				aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+			}
+			aroundScript.setScript(Position.BEGIN, beginScript);
+			aroundScript.setScript(Position.END, endScript);
+			facet.setUniversalAroundScript(aroundScript);
+		} else {
+			facet.setUniversalAroundScript(null);
+		}
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
 		context.setDescription(description);

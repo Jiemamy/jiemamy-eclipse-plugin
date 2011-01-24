@@ -61,7 +61,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.dialect.TypeParameterSpec;
@@ -543,7 +542,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected ColumnModel performAddItem() {
+		protected void performAddItem() {
 			Table table = getTableViewer().getTable();
 			DefaultColumnModel columnModel = new DefaultColumnModel(UUID.randomUUID());
 			
@@ -562,12 +561,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtColumnName.setFocus();
-			
-			return columnModel;
 		}
 		
 		@Override
-		protected ColumnModel performInsertItem() {
+		protected void performInsertItem() {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
@@ -589,8 +586,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtColumnName.setFocus();
-			
-			return columnModel;
 		}
 		
 		@Override
@@ -622,12 +617,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected Entity performRemoveItem() {
+		protected void performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();
 			if (index < 0 || index > table.getItemCount()) {
-				return null;
+				return;
 			}
 			
 			ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
@@ -643,9 +638,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			table.setFocus();
 			
-			typeOptionManagers.remove(subject);
-			
-			return subject;
+			typeOptionManagers.remove(subject.toReference());
 		}
 		
 		/**
@@ -677,7 +670,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private void updateModel() {
 			int editIndex = getTableViewer().getTable().getSelectionIndex();
-			
 			if (editIndex == -1) {
 				return;
 			}

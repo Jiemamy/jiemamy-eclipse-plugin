@@ -85,50 +85,6 @@ class Messages extends NLS {
 	/** ドメイン一覧テーブル チェック制約カラム */
 	public static String Column_Domain_CheckConstraint;
 	
-	/** データセット編集ダイアログ タイトル */
-	public static String DataSetEditDialog_title;
-	
-	/** データセット編集ダイアログ インポートボタン */
-	public static String DataSetEditDialog_btn_import;
-	
-	/** データセット編集ダイアログ エクスポートボタン */
-	public static String DataSetEditDialog_btn_export;
-	
-	/** データセット編集ダイアログ 注意ラベル */
-	public static String DataSetEditDialog_label_notice;
-	
-	/** データセット編集ダイアログ タブメニュー 追加 */
-	public static String DataSetEditDialog_tabMenu_add;
-	
-	/** データセット編集ダイアログ タブメニュー 削除 */
-	public static String DataSetEditDialog_tabMenu_remove;
-	
-	/** データセット編集ダイアログ テーブル削除 確認 */
-	public static String DataSetEditDialog_deleteTable_confirm;
-	
-	/** データセット編集ダイアログ CSVエクスポート タイトル */
-	public static String DataSetEditDialog_export_title;
-	
-	/** データセット編集ダイアログ CSVエクスポート 完了(Windows) */
-	public static String DataSetEditDialog_export_success_windows;
-	
-	/** データセット編集ダイアログ CSVエクスポート 完了 */
-	public static String DataSetEditDialog_export_success;
-	
-	/** データセット編集ダイアログ CSVエクスポート ファイルオープンに失敗 */
-	public static String DataSetEditDialog_export_openFailed;
-	
-	/** データセット編集ダイアログ CSVインポート タイトル */
-	public static String DataSetEditDialog_import_title;
-	
-	/** データセット編集ダイアログ CSVインポート 確認メッセージ */
-	public static String DataSetEditDialog_import_confirm;
-	
-	/** データセット編集ダイアログ CSVインポート 完了 */
-	public static String DataSetEditDialog_import_success;
-	
-	// CHECKSTYLE:ON
-	
 	private static final String BUNDLE_NAME = Messages.class.getName().toLowerCase(Locale.US);
 	
 	static {

@@ -61,7 +61,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -514,7 +513,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		}
 		
 		@Override
-		protected ConstraintModel performAddItem() {
+		protected void performAddItem() {
 			if (addMenu.isVisible() == false) {
 				Button button = getBtnAdd();
 				Rectangle bounds = button.getBounds();
@@ -541,16 +540,15 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				addMenu.setLocation(menuLoc.x, menuLoc.y);
 				addMenu.setVisible(true);
 			}
-			return null;
 		}
 		
 		@Override
-		protected Entity performRemoveItem() {
+		protected void performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
 			Table table = tableViewer.getTable();
 			int index = table.getSelectionIndex();
 			if (index < 0 || index > table.getItemCount()) {
-				return null;
+				return;
 			}
 			
 			ConstraintModel subject = (ConstraintModel) getTableViewer().getElementAt(index);
@@ -565,8 +563,6 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				disableEditorControls();
 			}
 			table.setFocus();
-			
-			return subject;
 		}
 		
 		private void updateModel() {

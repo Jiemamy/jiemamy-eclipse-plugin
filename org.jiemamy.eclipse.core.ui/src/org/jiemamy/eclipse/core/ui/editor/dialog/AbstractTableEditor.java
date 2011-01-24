@@ -374,20 +374,15 @@ public abstract class AbstractTableEditor extends Composite {
 	
 	/**
 	 * 追加ボタンが押された時の処理を行う。
-	 * 
-	 * @return 追加されたモデル
 	 */
-	protected abstract Object performAddItem();
+	protected abstract void performAddItem();
 	
 	/**
 	 * 挿入ボタンが押された時の処理を行う。
 	 * 
 	 * <p>必要に応じて、適宜オーバーライドすること。</p>
-	 * 
-	 * @return 追加されたモデル
 	 */
-	protected Object performInsertItem() {
-		return null;
+	protected void performInsertItem() {
 	}
 	
 	/**
@@ -411,7 +406,7 @@ public abstract class AbstractTableEditor extends Composite {
 	 * 
 	 * @return 削除されたモデル
 	 */
-	protected abstract Object performRemoveItem();
+	protected abstract void performRemoveItem();
 	
 	/**
 	 * テーブルコンポーネントからカラムコンポーネントを全て削除する。

@@ -60,8 +60,8 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTab;
 import org.jiemamy.eclipse.core.ui.editor.dialog.AbstractTableEditor;
 import org.jiemamy.eclipse.core.ui.editor.dialog.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.core.ui.editor.dialog.EditListener;
+import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.AbstractConstraintModel;
 import org.jiemamy.model.constraint.CheckConstraintModel;
@@ -80,7 +80,6 @@ import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.ConstraintComparator;
-import org.jiemamy.utils.KeyConstraintUtil;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -136,10 +135,9 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ConstraintContentProvider implements IStructuredContentProvider,
-			StoredEventListener<DatabaseObjectModel> {
+	private class ConstraintContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
+		public void commandExecuted(StoredEvent command) {
 			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
 			constraintTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
@@ -216,9 +214,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			}
 		}
 		
-		/*
-		 * TODO utilじゃね？
-		 */
+		// TODO utilじゃね？
 		private String constraintToString(ConstraintModel constraintModel) {
 			if (constraintModel instanceof PrimaryKeyConstraintModel) {
 				return "PK";

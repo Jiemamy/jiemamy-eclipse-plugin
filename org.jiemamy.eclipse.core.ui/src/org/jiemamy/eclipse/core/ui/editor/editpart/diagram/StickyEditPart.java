@@ -34,10 +34,8 @@ import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.dialog.sticky.StickyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.StickyFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -58,11 +56,6 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	 */
 	public StickyEditPart(StickyNodeModel stickyModel) {
 		super(stickyModel);
-	}
-	
-	@Override
-	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
-		refresh();
 	}
 	
 	@Override

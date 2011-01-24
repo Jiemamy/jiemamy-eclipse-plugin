@@ -26,7 +26,11 @@ import com.google.common.collect.Sets;
 import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.DiagramFacet;
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
 
@@ -47,6 +51,10 @@ public class DeleteNodeCommand extends Command {
 	/** 削除されるノード */
 	private final Collection<ConnectionModel> connectionModels;
 	
+	private final JiemamyContext context;
+	
+	private DatabaseObjectModel deletedCore;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -55,9 +63,10 @@ public class DeleteNodeCommand extends Command {
 	 * @param diagramModel ダイアグラム
 	 * @param nodeModel 削除されるノード
 	 */
-	public DeleteNodeCommand(DiagramFacet diagramFacet, DefaultDiagramModel diagramModel, NodeModel nodeModel) {
-		this.diagramFacet = diagramFacet;
-		this.diagramModel = diagramModel;
+	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, NodeModel nodeModel) {
+		this.context = context;
+		diagramFacet = context.getFacet(DiagramFacet.class);
+		diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
 		this.nodeModel = nodeModel;
 		
 		Collection<ConnectionModel> connectionModels = Sets.newHashSet();
@@ -79,10 +88,19 @@ public class DeleteNodeCommand extends Command {
 		
 		diagramModel.deleteNode(nodeModel.toReference());
 		diagramFacet.store(diagramModel);
+		
+		if (nodeModel instanceof DatabaseObjectNodeModel) {
+			DatabaseObjectNodeModel databaseObjectNodeModel = (DatabaseObjectNodeModel) nodeModel;
+			EntityRef<? extends DatabaseObjectModel> coreRef = databaseObjectNodeModel.getCoreModelRef();
+			deletedCore = context.resolve(coreRef);
+			context.deleteDatabaseObject(coreRef);
+		}
 	}
 	
 	@Override
 	public void undo() {
+		context.store(deletedCore);
+		
 		diagramModel.store(nodeModel);
 		
 		for (ConnectionModel connectionModel : connectionModels) {

@@ -29,6 +29,7 @@ import org.eclipse.draw2d.ConnectionRouter;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Layer;
 import org.eclipse.draw2d.XYLayout;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.Request;
@@ -48,7 +49,6 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.context.JiemamyContextEditDialo
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmXYLayoutEditPolicy;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
 import org.jiemamy.transaction.StoredEvent;
@@ -56,12 +56,12 @@ import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 
 /**
- * {@link JiemamyContext}に対するDiagram用EditPart。
+ * {@link JiemamyContext}に対するDiagram用{@link EditPart}。
  * 
  * @author daisuke
  */
 public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements EditDialogSupport,
-		IPropertyChangeListener, StoredEventListener<DatabaseObjectModel> {
+		IPropertyChangeListener, StoredEventListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyContextEditPart.class);
 	
@@ -79,7 +79,6 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 	
 	@Override
 	public void activate() {
-		logger.debug(LogMarker.LIFECYCLE, "activated");
 		super.activate();
 		
 		IPreferenceStore ps = JiemamyUIPlugin.getDefault().getPreferenceStore();
@@ -87,16 +86,17 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		
 		JiemamyContext context = getModel();
 		context.getEventBroker().addListener(this);
+		
+		logger.trace(LogMarker.LIFECYCLE, "activated");
 	}
 	
-	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
+	public void commandExecuted(StoredEvent command) {
 		refresh();
 //		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}
 	
 	@Override
 	public void deactivate() {
-		logger.debug(LogMarker.LIFECYCLE, "deactivate");
 		JiemamyContext context = getModel();
 		context.getEventBroker().removeListener(this);
 		
@@ -104,15 +104,12 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		ps.removePropertyChangeListener(this);
 		
 		super.deactivate();
+		logger.trace(LogMarker.LIFECYCLE, "deactivated");
 	}
 	
 	@Override
 	public JiemamyContext getModel() {
 		return (JiemamyContext) super.getModel();
-	}
-	
-	public JiemamyContext getTargetModel() {
-		return getModel();
 	}
 	
 	/**

@@ -33,18 +33,14 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
-import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.eclipse.core.ui.editor.dialog.view.ViewEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.ViewFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.model.view.DefaultViewModel;
 import org.jiemamy.model.view.ViewModel;
-import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -65,11 +61,6 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	 */
 	public ViewEditPart(DefaultDatabaseObjectNodeModel nodeModel) {
 		super(nodeModel);
-	}
-	
-	@Override
-	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
-		refresh();
 	}
 	
 	@Override
@@ -139,7 +130,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
 		ViewFigure viewFigure = (ViewFigure) figure;
 		
-		String labelString = LabelStringUtil.toString(context, viewModel, DisplayPlace.FIGURE);
+		String labelString = viewModel.getName();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		
 		viewFigure.setDatabaseObjectName(labelString);

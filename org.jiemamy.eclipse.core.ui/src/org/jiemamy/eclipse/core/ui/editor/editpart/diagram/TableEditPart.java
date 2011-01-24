@@ -39,7 +39,6 @@ import org.jiemamy.eclipse.core.ui.editor.figure.ColumnFigure;
 import org.jiemamy.eclipse.core.ui.editor.figure.TableFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DiagramModel;
@@ -48,7 +47,6 @@ import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.geometory.JmColor;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
-import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -77,11 +75,6 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 //		CellEditorLocator locator = new NodeCellEditorLocator(figure.getEntityNameLabel());
 //		return new EntityDirectEditManager(this, TextCellEditor.class, locator);
 //	}
-	
-	@Override
-	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
-		refresh();
-	}
 	
 	@Override
 	public DatabaseObjectNodeModel getModel() {
@@ -149,12 +142,10 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		
 		DatabaseObjectNodeModel node = getModel();
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
+		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(node.getCoreModelRef());
 		TableFigure tableFigure = (TableFigure) figure;
 		
-		String labelString = LabelStringUtil.toString(context, tableModel, DisplayPlace.FIGURE);
-		
-		tableFigure.setDatabaseObjectName(labelString);
+		tableFigure.setDatabaseObjectName(tableModel.getName());
 		
 		JmColor color = node.getColor();
 		tableFigure.setBgColor(ConvertUtil.convert(color));
@@ -169,18 +160,18 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	
 	private ColumnFigure[] createColumnFigure(ColumnModel columnModel) {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DiagramModel diagramModel = facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(getModel().getCoreModelRef());
 		
-		DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
-		DiagramModel presentation = diagramPresentations.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		
-		if (presentation.getLevel() == Level.ENTITY) {
+		if (diagramModel.getLevel() == Level.ENTITY) {
 			return new ColumnFigure[0];
 		}
 		
 		ColumnFigure nameLabel = new ColumnFigure();
 		ColumnFigure typeLabel = new ColumnFigure();
 		
-		nameLabel.setText(LabelStringUtil.toString(context, columnModel, DisplayPlace.FIGURE));
+		nameLabel.setText(columnModel.getName());
 		try {
 			typeLabel.setText(LabelStringUtil.toString(context.findDialect(), columnModel.getDataType(),
 					DisplayPlace.FIGURE));
@@ -188,9 +179,6 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 			logger.error("lost dialect", e);
 			typeLabel.setText(columnModel.getDataType().getTypeReference().getTypeName());
 		}
-		
-		DatabaseObjectNodeModel node = getModel();
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
 		
 		if (tableModel.isPrimaryKeyColumn(columnModel.toReference())) {
 			nameLabel.setUnderline(true);

@@ -18,8 +18,10 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.command;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
@@ -29,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.Entity;
+import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
@@ -106,36 +110,43 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
 		nodeModel.setBoundary(boundary);
 		
-		// ベンドポイントの移動
-		shiftBendpoints(false);
-		
-		// FIXME
-		// 負領域に移動した際、全体を移動させ、すべて正領域に
-		shiftPosition(false);
-		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(nodeModel);
+		
+		// ベンドポイントの移動
+		shiftBendpoints(false, diagramModel);
+		
+		// 負領域に移動した際、全体を移動させ、すべて正領域に
+		shiftPosition(false, diagramModel);
+		
 		facet.store(diagramModel);
 	}
 	
 	@Override
 	public void undo() {
-		nodeModel.setBoundary(oldBoundary);
-	}
-	
-	private void shiftBendpoints(boolean positive) {
-		JmPoint delta = JmPointUtil.delta(oldBoundary, boundary);
-		
-		// 選択されたモデルのリストを得る
-		List<Object> selectedModels = new ArrayList<Object>();
-		for (Object obj : viewer.getSelectedEditParts()) {
-			EditPart ep = (EditPart) obj;
-			selectedModels.add(ep.getModel());
-		}
-		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		
+		nodeModel.setBoundary(oldBoundary);
+		
+		// ベンドポイントの移動
+		shiftBendpoints(true, diagramModel);
+		
+		diagramModel.store(nodeModel);
+		facet.store(diagramModel);
+	}
+	
+	private void shiftBendpoints(boolean positive, DefaultDiagramModel diagramModel) {
+		JmPoint delta = JmPointUtil.delta(oldBoundary, boundary);
+		
+		// 選択しているノードに対応するモデルのリストを得る
+		Collection<EntityRef<? extends Entity>> selectedModels = Lists.newArrayList();
+		for (Object obj : viewer.getSelectedEditParts()) {
+			EditPart ep = (EditPart) obj;
+			Entity model = (Entity) ep.getModel();
+			selectedModels.add(model.toReference());
+		}
 		
 		// ベンドポイントも同時に移動させる（必要なもののみ）
 		for (ConnectionModel connection : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
@@ -150,9 +161,8 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 						newLocation = JmPointUtil.shiftNegative(bendpoint, delta);
 					}
 					((DefaultConnectionModel) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
-					diagramModel.store(connection);
-					facet.store(diagramModel);
 				}
+				diagramModel.store(connection);
 			}
 		}
 	}

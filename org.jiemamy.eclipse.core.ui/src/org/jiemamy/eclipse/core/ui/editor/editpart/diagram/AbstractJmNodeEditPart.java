@@ -62,7 +62,7 @@ import org.jiemamy.utils.LogMarker;
  * @author daisuke
  */
 public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart implements EditDialogSupport,
-		NodeEditPart, StoredEventListener<DatabaseObjectModel> {
+		NodeEditPart, StoredEventListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractJmNodeEditPart.class);
 	
@@ -83,12 +83,11 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	@Override
 	public void activate() {
 		super.activate();
-		
 		getJiemamyContext().getEventBroker().addListener(this);
-		logger.debug("activate");
+		logger.trace("activated");
 	}
 	
-	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
+	public void commandExecuted(StoredEvent event) {
 		// THINK どのメソッドを呼ばなければならないのか精査
 		refresh();
 	}
@@ -96,9 +95,8 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	@Override
 	public void deactivate() {
 		getJiemamyContext().getEventBroker().removeListener(this);
-		
 		super.deactivate();
-		logger.debug("deactivate");
+		logger.trace("deactivated");
 	}
 	
 //	@Override

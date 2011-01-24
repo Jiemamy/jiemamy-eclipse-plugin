@@ -79,7 +79,6 @@ import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.column.DefaultColumnModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
@@ -173,9 +172,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener<DatabaseObjectModel> {
+	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
+		public void commandExecuted(StoredEvent command) {
 			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
 			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
@@ -237,7 +236,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			ColumnModel columnModel = (ColumnModel) element;
 			switch (columnIndex) {
 				case 1:
-					return LabelStringUtil.toString(context, columnModel, DisplayPlace.TABLE);
+					return columnModel.getName();
 					
 				case 2:
 					return LabelStringUtil.toString(dialect, columnModel.getDataType(), DisplayPlace.TABLE);

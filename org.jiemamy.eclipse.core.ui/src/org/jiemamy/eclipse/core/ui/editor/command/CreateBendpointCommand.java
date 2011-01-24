@@ -78,9 +78,8 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
 		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(connectionModel);
+		shiftPosition(false, diagramModel);
 		facet.store(diagramModel);
-		
-		shiftPosition(false);
 	}
 	
 	@Override

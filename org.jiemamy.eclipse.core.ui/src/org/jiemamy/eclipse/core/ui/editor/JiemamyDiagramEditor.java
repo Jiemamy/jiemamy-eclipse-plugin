@@ -85,7 +85,6 @@ import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.core.ui.editor.editpart.DiagramEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
-import org.jiemamy.model.DatabaseObjectModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.serializer.JiemamySerializer;
 import org.jiemamy.serializer.SerializationException;
@@ -105,7 +104,7 @@ import org.jiemamy.validator.Validator;
  * @author daisuke
  */
 public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette implements IResourceChangeListener,
-		StoredEventListener<DatabaseObjectModel>, JiemamyEditor {
+		StoredEventListener, JiemamyEditor {
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyDiagramEditor.class);
 	
@@ -188,7 +187,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	 * 
 	 * <p>こも実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
 	 */
-	public void commandExecuted(StoredEvent<DatabaseObjectModel> command) {
+	public void commandExecuted(StoredEvent command) {
 		Validator validator;
 		try {
 			Dialect dialect = context.findDialect();

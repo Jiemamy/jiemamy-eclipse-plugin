@@ -19,16 +19,11 @@
 package org.jiemamy.eclipse.core.ui.editor.command;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.eclipse.gef.commands.Command;
 
-import org.jiemamy.DiagramFacet;
-import org.jiemamy.JiemamyContext;
-import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
-import org.jiemamy.eclipse.core.ui.utils.EditorUtil;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.DefaultConnectionModel;
 import org.jiemamy.model.DefaultDiagramModel;
@@ -84,44 +79,45 @@ public abstract class AbstractMovePositionCommand extends Command {
 	 * 
 	 * @param negative 正方向に移動させる場合は{@code true}、負方向の場合は{@code false}
 	 */
-	protected void shiftPosition(boolean negative) {
-		JiemamyEditor editor = (JiemamyEditor) EditorUtil.getActiveEditor();
-		JiemamyContext context = editor.getJiemamyContext();
-		
-		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
+	protected void shiftPosition(boolean negative, DefaultDiagramModel diagramModel) {
 		for (NodeModel node : diagramModel.getNodes()) {
+			if (node instanceof DefaultNodeModel == false) {
+				continue;
+			}
+			DefaultNodeModel nodeModel = (DefaultNodeModel) node;
+			
 			// ノードの移動
-			JmRectangle old = node.getBoundary();
+			JmRectangle old = nodeModel.getBoundary();
 			JmRectangle newBoundary;
 			if (negative) {
 				newBoundary = new JmRectangle(old.x - shift.x, old.y - shift.y, old.width, old.height);
 			} else {
 				newBoundary = new JmRectangle(old.x + shift.x, old.y + shift.y, old.width, old.height);
 			}
-			((DefaultNodeModel) node).setBoundary(newBoundary);
+			nodeModel.setBoundary(newBoundary);
 			
 			// ベンドポイントの移動
 			Collection<? extends ConnectionModel> sourceConnections =
-					diagramModel.getSourceConnectionsFor(node.toReference());
-			Iterator<? extends ConnectionModel> itr = sourceConnections.iterator();
-			for (int i = 0; itr.hasNext(); i++) {
-				ConnectionModel connection = itr.next();
-				List<JmPoint> bendpoints = connection.getBendpoints();
-				for (JmPoint bendpoint : bendpoints) {
+					diagramModel.getSourceConnectionsFor(nodeModel.toReference());
+			for (ConnectionModel connection : sourceConnections) {
+				if (connection instanceof DefaultConnectionModel == false) {
+					continue;
+				}
+				DefaultConnectionModel connectionModel = (DefaultConnectionModel) connection;
+				List<JmPoint> bendpoints = connectionModel.getBendpoints();
+				for (int bendpointIndex = 0; bendpointIndex < connectionModel.getBendpoints().size(); bendpointIndex++) {
+					JmPoint bendpoint = bendpoints.get(bendpointIndex);
 					JmPoint newLocation;
 					if (negative) {
 						newLocation = new JmPoint(bendpoint.x - shift.x, bendpoint.y - shift.y);
 					} else {
 						newLocation = new JmPoint(bendpoint.x + shift.x, bendpoint.y + shift.y);
 					}
-					((DefaultConnectionModel) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
-//					jiemamyFacade.moveBendpoint(diagramIndex, connection, bendpoints.indexOf(bendpoint), newLocation);
+					connectionModel.breachEncapsulationOfBendpoints().set(bendpointIndex, newLocation);
 				}
+				diagramModel.store(connectionModel);
 			}
-			
-			diagramModel.store(node);
+			diagramModel.store(nodeModel);
 		}
-		diagramFacet.store(diagramModel);
 	}
 }

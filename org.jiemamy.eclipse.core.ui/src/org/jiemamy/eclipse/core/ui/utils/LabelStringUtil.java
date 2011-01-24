@@ -20,7 +20,6 @@ package org.jiemamy.eclipse.core.ui.utils;
 
 import java.util.Collection;
 
-import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.dialect.Dialect;
@@ -33,6 +32,7 @@ import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.PrimaryKeyConstraintModel;
 import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeVariant;
+import org.jiemamy.model.table.DefaultTableModel;
 
 /**
  * UI表示用文字列を生成するユーティリティクラス。
@@ -82,67 +82,6 @@ public class LabelStringUtil {
 		}
 		
 		return typeName.append(suffix).toString();
-	}
-	
-	/**
-	 * JiemamyEntityに対する表示用文字列を取得する。
-	 * 
-	 * @param context ルートモデル
-	 * @param targetElement 表示対象JiemamyEntity
-	 * @param place 表示しようと考えている場所
-	 * @return 表示用文字列
-	 */
-	public static String toString(JiemamyContext context, Entity targetElement, DisplayPlace place) {
-		if (targetElement instanceof DatabaseObjectModel) {
-			DatabaseObjectModel doModel = (DatabaseObjectModel) targetElement;
-			return doModel.getName();
-		} else if (targetElement instanceof ColumnModel) {
-			ColumnModel columnModel = (ColumnModel) targetElement;
-			return columnModel.getName();
-		} else if (targetElement instanceof PrimaryKeyConstraintModel) {
-			PrimaryKeyConstraintModel primaryKey = (PrimaryKeyConstraintModel) targetElement;
-			StringBuilder sb = new StringBuilder("PK ");
-			if (primaryKey.getName() != null) {
-				sb.append(" ");
-				sb.append(primaryKey.getName());
-			}
-			sb.append("(");
-			sb.append(primaryKey.getKeyColumns().toString());
-			sb.append(")");
-			return sb.toString();
-		} else if (targetElement instanceof ForeignKeyConstraintModel) {
-			ForeignKeyConstraintModel foreignKey = (ForeignKeyConstraintModel) targetElement;
-			StringBuilder sb = new StringBuilder();
-			
-			if (foreignKey.getName() != null) {
-				sb.append(foreignKey.getName()).append("\n");
-			}
-			
-			int size = Math.max(foreignKey.getReferenceColumns().size(), foreignKey.getKeyColumns().size());
-			for (int i = 0; i < size; i++) {
-				if (i != 0) {
-					sb.append("\n");
-				}
-				if (foreignKey.getKeyColumns().size() > i) {
-					EntityRef<? extends ColumnModel> keyColumnRef = foreignKey.getKeyColumns().get(i);
-					ColumnModel keyColumn = context.resolve(keyColumnRef);
-					sb.append(keyColumn.getName());
-				} else {
-					sb.append("UNKNOWN");
-				}
-				sb.append(" -> ");
-				if (foreignKey.getReferenceColumns().size() > i) {
-					EntityRef<? extends ColumnModel> referenceColumnRef = foreignKey.getReferenceColumns().get(i);
-					ColumnModel referenceColumn = context.resolve(referenceColumnRef);
-					sb.append(referenceColumn.getName());
-				} else {
-					sb.append("UNKNOWN");
-				}
-			}
-			
-			return sb.toString();
-		}
-		return "unknown label: " + targetElement.getClass().getName();
 	}
 	
 	private LabelStringUtil() {

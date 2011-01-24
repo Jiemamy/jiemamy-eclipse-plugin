@@ -18,8 +18,9 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpart.diagram;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.AbsoluteBendpoint;
@@ -34,8 +35,8 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmBendpointEditPolicy;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmConnectionEditPolicy;
 import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.geometory.JmPoint;
+import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 
 /**
@@ -43,8 +44,7 @@ import org.jiemamy.transaction.StoredEventListener;
  * 
  * @author daisuke
  */
-public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEditPart implements
-		StoredEventListener<DefaultDiagramModel> {
+public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEditPart implements StoredEventListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractJmConnectionEditPart.class);
 	
@@ -64,14 +64,20 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	public void activate() {
 		super.activate();
 		getJiemamyContext().getEventBroker().addListener(this);
-		logger.debug("activate");
+		logger.trace("activated");
+	}
+	
+	public void commandExecuted(StoredEvent event) {
+		logger.info("commandExecuted: " + event.getAfter().getClass().getName());
+		// TODO ↓適当です
+		refresh();
 	}
 	
 	@Override
 	public void deactivate() {
 		getJiemamyContext().getEventBroker().removeListener(this);
 		super.deactivate();
-		logger.debug("deactivate");
+		logger.trace("deactivated");
 	}
 	
 	@Override
@@ -112,21 +118,17 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	
 	private void refreshBendpoints() {
 		if (getParent() == null) {
+			// モデルが削除された場合にeditPart==nullとなる。その時は描画処理は行わない。
 			return;
 		}
-//		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-//		DiagramModel diagramModel = diagramFacet.getDiagrams().get(Migration.DIAGRAM_INDEX);
-		ConnectionModel connection = getModel();
 		
+		ConnectionModel connection = getModel();
 		if (connection == null) {
 			return;
 		}
-		List<JmPoint> bendpoints = connection.getBendpoints();
-//		if (connection.containsKey(connection) == false) {
-//			bendpoints.clear();
-//		}
-		List<AbsoluteBendpoint> constraint = new ArrayList<AbsoluteBendpoint>(bendpoints.size());
 		
+		List<JmPoint> bendpoints = connection.getBendpoints();
+		List<AbsoluteBendpoint> constraint = Lists.newArrayListWithCapacity(bendpoints.size());
 		for (JmPoint bendpoint : bendpoints) {
 			constraint.add(new AbsoluteBendpoint(new Point(bendpoint.x, bendpoint.y)));
 		}

@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog0;
+import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.DefaultDeferrabilityModel;
@@ -57,7 +58,6 @@ import org.jiemamy.model.constraint.KeyConstraintModel;
 import org.jiemamy.model.constraint.LocalKeyConstraintModel;
 import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
-import org.jiemamy.utils.KeyConstraintUtil;
 import org.jiemamy.utils.LogMarker;
 
 /**

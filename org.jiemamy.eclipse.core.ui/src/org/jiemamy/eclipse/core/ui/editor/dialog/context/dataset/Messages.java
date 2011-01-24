@@ -22,6 +22,8 @@ import java.util.Locale;
 
 import org.eclipse.osgi.util.NLS;
 
+import org.jiemamy.eclipse.core.ui.editor.dialog.context.JiemamyContextEditDialog;
+
 /**
  * {@link JiemamyContextEditDialog}用メッセージリソースクラス。
  * 

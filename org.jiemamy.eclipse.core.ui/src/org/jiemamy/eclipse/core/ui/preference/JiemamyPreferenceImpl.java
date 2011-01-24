@@ -46,8 +46,8 @@ public class JiemamyPreferenceImpl implements JiemamyPreference {
 	}
 	
 	public void loadDefaultValues() {
-		ps.setValue(PreferenceKey.CREATE_COLUMNS_WITH_FK.toString(), PreferenceKey.CREATE_COLUMNS_WITH_FK
-			.getDefaultBoolean());
+		ps.setValue(PreferenceKey.CREATE_COLUMNS_WITH_FK.toString(),
+				PreferenceKey.CREATE_COLUMNS_WITH_FK.getDefaultBoolean());
 		ps.setValue(PreferenceKey.CONNECTION_ROUTER.toString(), PreferenceKey.CONNECTION_ROUTER.getDefaultString());
 	}
 	

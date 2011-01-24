@@ -35,9 +35,9 @@ public class JiemamyPreferenceInitializer extends AbstractPreferenceInitializer 
 //		String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getRawLocation().toOSString();
 		Preferences preferences = JiemamyUIPlugin.getDefault().getPluginPreferences();
 		
-		preferences.setDefault(PreferenceKey.CREATE_COLUMNS_WITH_FK.toString(), PreferenceKey.CREATE_COLUMNS_WITH_FK
-			.getDefaultBoolean());
-		preferences.setDefault(PreferenceKey.CONNECTION_ROUTER.toString(), PreferenceKey.CONNECTION_ROUTER
-			.getDefaultString());
+		preferences.setDefault(PreferenceKey.CREATE_COLUMNS_WITH_FK.toString(),
+				PreferenceKey.CREATE_COLUMNS_WITH_FK.getDefaultBoolean());
+		preferences.setDefault(PreferenceKey.CONNECTION_ROUTER.toString(),
+				PreferenceKey.CONNECTION_ROUTER.getDefaultString());
 	}
 }

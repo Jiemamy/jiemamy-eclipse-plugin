@@ -20,19 +20,12 @@ package org.jiemamy.eclipse.core.ui.utils;
 
 import java.util.Collection;
 
-import org.jiemamy.dddbase.Entity;
-import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.dialect.TypeParameterSpec.Necessity;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.constraint.PrimaryKeyConstraintModel;
 import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeVariant;
-import org.jiemamy.model.table.DefaultTableModel;
 
 /**
  * UI表示用文字列を生成するユーティリティクラス。

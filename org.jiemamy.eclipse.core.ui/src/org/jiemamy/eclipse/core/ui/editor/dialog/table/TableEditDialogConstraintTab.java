@@ -18,11 +18,13 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.dialog.table;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -37,15 +39,23 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +74,12 @@ import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.AbstractConstraintModel;
+import org.jiemamy.model.constraint.AbstractLocalKeyConstraintModel;
 import org.jiemamy.model.constraint.CheckConstraintModel;
 import org.jiemamy.model.constraint.ConstraintModel;
 import org.jiemamy.model.constraint.DefaultCheckConstraintModel;
+import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
+import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultUniqueKeyConstraintModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.KeyConstraintModel;
@@ -206,6 +219,10 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 						return KeyConstraintUtil.toStringKeyColumns(context, keyConstraintModel);
 					} else if (constraintModel instanceof CheckConstraintModel) {
 						return ((CheckConstraintModel) constraintModel).getExpression();
+					} else if (constraintModel instanceof NotNullConstraintModel) {
+						EntityRef<? extends ColumnModel> ref =
+								((NotNullConstraintModel) constraintModel).getColumnRef();
+						return ref == null ? StringUtils.EMPTY : context.resolve(ref).getName();
 					}
 					return StringUtils.EMPTY;
 					
@@ -242,11 +259,15 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		
 		private final EditListener editListener = new EditListenerImpl();
 		
+		private Menu addMenu;
+		
 		private Text txtConstraintName;
+		
+		private Text txtCheckExpression;
 		
 		private org.eclipse.swt.widgets.List lstKeyColumns;
 		
-		private Text txtCheckExpression;
+		private org.eclipse.swt.widgets.List lstTargetColumn;
 		
 
 		/**
@@ -256,7 +277,70 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		 * @param style SWTスタイル値
 		 */
 		public ConstraintTableEditor(Composite parent, int style) {
-			super(parent, style, new DefaultTableEditorConfig("制約情報")); // RESOURCE
+			super(parent, style, new DefaultTableEditorConfig("制約情報") { // RESOURCE
+					
+						@Override
+						public String getInsertLabel() {
+							return null;
+						}
+						
+						@Override
+						public boolean isFreeOrder() {
+							return false;
+						}
+					});
+		}
+		
+		@Override
+		protected void configureEditButtons() {
+			super.configureEditButtons();
+			
+			addMenu = new Menu(getBtnAdd());
+			
+			MenuItem menuItemAddPk = new MenuItem(addMenu, SWT.PUSH);
+			menuItemAddPk.setText("Primary Key Constraint"); // RESOURCE
+			menuItemAddPk.addSelectionListener(new SelectionAdapterExtension() {
+				
+				@Override
+				public ConstraintModel getModel() {
+					return new DefaultPrimaryKeyConstraintModel(UUID.randomUUID());
+				}
+			});
+			
+			MenuItem menuItemAddUk = new MenuItem(addMenu, SWT.PUSH);
+			menuItemAddUk.setText("Unique Key Constraint"); // RESOURCE
+			menuItemAddUk.addSelectionListener(new SelectionAdapterExtension() {
+				
+				@Override
+				public ConstraintModel getModel() {
+					return new DefaultUniqueKeyConstraintModel(UUID.randomUUID());
+				}
+			});
+			
+			MenuItem menuItemAddFk = new MenuItem(addMenu, SWT.PUSH);
+			menuItemAddFk.setText("Foreign Key Constraint"); // RESOURCE
+			menuItemAddFk.setEnabled(false);
+			// TODO
+			
+			MenuItem menuItemAddCc = new MenuItem(addMenu, SWT.PUSH);
+			menuItemAddCc.setText("Check Constraint"); // RESOURCE
+			menuItemAddCc.addSelectionListener(new SelectionAdapterExtension() {
+				
+				@Override
+				public ConstraintModel getModel() {
+					return new DefaultCheckConstraintModel(UUID.randomUUID());
+				}
+			});
+			
+			MenuItem menuItemAddNn = new MenuItem(addMenu, SWT.PUSH);
+			menuItemAddNn.setText("Not-null Constraint"); // RESOURCE
+			menuItemAddNn.addSelectionListener(new SelectionAdapterExtension() {
+				
+				@Override
+				public ConstraintModel getModel() {
+					return new DefaultNotNullConstraintModel(UUID.randomUUID());
+				}
+			});
 		}
 		
 		@Override
@@ -266,10 +350,12 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			txtConstraintName.addFocusListener(new TextSelectionAdapter(txtConstraintName));
 			txtConstraintName.addKeyListener(editListener);
 			
-			lstKeyColumns.addSelectionListener(editListener);
-			
 			txtCheckExpression.addFocusListener(new TextSelectionAdapter(txtCheckExpression));
 			txtCheckExpression.addKeyListener(editListener);
+			
+			lstKeyColumns.addSelectionListener(editListener);
+			
+			lstTargetColumn.addSelectionListener(editListener);
 		}
 		
 		@Override
@@ -278,14 +364,6 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			final ConstraintContentProvider contentProvider = new ConstraintContentProvider();
 			tableViewer.setContentProvider(contentProvider);
 			tableViewer.setInput(tableModel);
-//			tableViewer.addFilter(new ViewerFilter() {
-//				
-//				@Override
-//				public boolean select(Viewer viewer, Object parentElement, Object element) {
-//					return element instanceof LocalKeyConstraintModel;
-//				}
-//				
-//			});
 			
 			final EventBroker eventBroker = tableModel.getEventBroker();
 			eventBroker.addListener(contentProvider);
@@ -328,6 +406,12 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			
 			lstKeyColumns = new org.eclipse.swt.widgets.List(cmpNames, SWT.BORDER | SWT.MULTI);
 			lstKeyColumns.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			
+			label = new Label(cmpNames, SWT.NULL);
+			label.setText("対象カラム(&R)"); // RESOURCE
+			
+			lstTargetColumn = new org.eclipse.swt.widgets.List(cmpNames, SWT.BORDER | SWT.SINGLE);
+			lstTargetColumn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		}
 		
 		@Override
@@ -341,7 +425,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			colName.setWidth(COL_WIDTH_NAME);
 			
 			TableColumn colData = new TableColumn(table, SWT.LEFT);
-			colData.setText("構成カラム/チェック制約式"); // RESOURCE
+			colData.setText("構成カラム/対象カラム/チェック制約式"); // RESOURCE
 			colData.setWidth(COL_WIDTH_DATA);
 		}
 		
@@ -350,10 +434,12 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			txtConstraintName.setEnabled(false);
 			txtCheckExpression.setEnabled(false);
 			lstKeyColumns.setEnabled(false);
+			lstTargetColumn.setEnabled(false);
 			
 			txtConstraintName.setText(StringUtils.EMPTY);
 			txtCheckExpression.setText(StringUtils.EMPTY);
 			lstKeyColumns.removeAll();
+			lstTargetColumn.removeAll();
 		}
 		
 		@Override
@@ -361,17 +447,32 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			ConstraintModel constraintModel = (ConstraintModel) getTableViewer().getElementAt(index);
 			
 			txtConstraintName.setEnabled(true);
+			txtConstraintName.setText(StringUtils.EMPTY);
 			txtCheckExpression.setEnabled(true);
+			txtCheckExpression.setText(StringUtils.EMPTY);
 			lstKeyColumns.setEnabled(true);
 			lstKeyColumns.removeAll();
+			lstTargetColumn.setEnabled(true);
+			lstTargetColumn.removeAll();
+			
+			if (constraintModel instanceof CheckConstraintModel == false) {
+				txtCheckExpression.setEnabled(false);
+			}
+			
+			if (constraintModel instanceof KeyConstraintModel == false) {
+				lstKeyColumns.setEnabled(false);
+			}
+			
+			if (constraintModel instanceof NotNullConstraintModel == false) {
+				lstTargetColumn.setEnabled(false);
+			}
 			
 			// 現在値の設定
 			txtConstraintName.setText(StringUtils.defaultString(constraintModel.getName()));
 			if (constraintModel instanceof CheckConstraintModel) {
 				CheckConstraintModel check = (CheckConstraintModel) constraintModel;
 				txtCheckExpression.setText(StringUtils.defaultString(check.getExpression()));
-			}
-			if (constraintModel instanceof KeyConstraintModel) {
+			} else if (constraintModel instanceof KeyConstraintModel) {
 				KeyConstraintModel key = (KeyConstraintModel) constraintModel;
 				List<EntityRef<? extends ColumnModel>> keyColumns = key.getKeyColumns();
 				List<ColumnModel> columns = tableModel.getColumns();
@@ -390,91 +491,37 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 						lstKeyColumns.setSelection(newIndices);
 					}
 				}
+			} else if (constraintModel instanceof NotNullConstraintModel) {
+				NotNullConstraintModel nn = (NotNullConstraintModel) constraintModel;
+				EntityRef<? extends ColumnModel> columnRef = nn.getColumnRef();
+				List<ColumnModel> columns = tableModel.getColumns();
+				for (int i = 0; i < columns.size(); i++) {
+					ColumnModel columnModel = columns.get(i);
+					lstTargetColumn.add(columnModel.getName());
+					if (columnRef != null && columnRef.isReferenceOf(columnModel)) {
+						lstTargetColumn.setSelection(i);
+					}
+				}
 			}
 		}
 		
 		@Override
 		protected ConstraintModel performAddItem() {
-			Table table = getTableViewer().getTable();
-			
-			CheckConstraintModel constraintModel = new DefaultCheckConstraintModel(UUID.randomUUID());
-			// ore
-//			UniqueKeyConstraintModel constraintModel = new DefaultUniqueKeyConstraintModel(UUID.randomUUID());
-			
-			tableModel.store(constraintModel);
-			
-			int addedIndex = ArrayUtils.indexOf(getTableViewer().getTable().getItems(), constraintModel);
-			table.setSelection(addedIndex);
-			enableEditControls(addedIndex);
-			txtConstraintName.setFocus();
-			
-			return constraintModel;
-		}
-		
-		@Override
-		protected ConstraintModel performInsertItem() {
-//			Table table = getTableViewer().getTable();
-//			int index = table.getSelectionIndex();
-//			
-//			UniqueKeyConstraintModel constraintModel = new DefaultUniqueKeyConstraintModel(UUID.randomUUID());
-//			DefaultCheckConstraintModel constraintModel = new DefaultCheckConstraintModel(UUID.randomUUID());
-//			
-//			if (index < 0 || index > table.getItemCount()) {
-//				tableModel.store(constraintModel);
-//			} else {
-//				ConstraintModel attributeModel =
-//						(ConstraintModel) getTableViewer().getElementAt(index);
-//				int subjectIndex = attributes.indexOf(attributeModel);
-//				tableModel.store(constraintModel);
-//			}
-//			
-//			int addedIndex = tableModel.getConstraints().indexOf(constraintModel);
-//			table.setSelection(addedIndex);
-//			enableEditControls(addedIndex);
-//			txtConstraintName.setFocus();
-//			
-//			return constraintModel;
+			if (addMenu.isVisible() == false) {
+				Button button = getBtnAdd();
+				Rectangle bounds = button.getBounds();
+				Point menuLoc = button.getParent().toDisplay(bounds.x, bounds.y + bounds.height);
+				
+				if (tableModel.getPrimaryKey() == null) {
+					addMenu.getItem(0).setEnabled(true);
+				} else {
+					addMenu.getItem(0).setEnabled(false);
+				}
+				
+				addMenu.setLocation(menuLoc.x, menuLoc.y);
+				addMenu.setVisible(true);
+			}
 			return null;
-		}
-		
-		@Override
-		protected void performMoveDownItem() {
-//			Table table = getTableViewer().getTable();
-//			int index = table.getSelectionIndex();
-//			if (index < 0 || index >= table.getItemCount()) {
-//				return;
-//			}
-//			
-//			Object subject = getTableViewer().getElementAt(index);
-//			Object object = getTableViewer().getElementAt(index + 1);
-//			
-//			int subjectIndex = tableModel.getConstraints().indexOf(subject);
-//			int objectIndex = tableModel.getConstraints().indexOf(object);
-//			
-//			jiemamyFacade.swapListElement(tableModel, tableModel.getConstraints(), subjectIndex, objectIndex);
-//			
-//			table.setSelection(index + 1);
-//			enableEditControls(index + 1);
-		}
-		
-		@Override
-		protected void performMoveUpItem() {
-//			Table table = getTableViewer().getTable();
-//			int index = table.getSelectionIndex();
-//			if (index <= 0 || index > table.getItemCount()) {
-//				return;
-//			}
-//			
-//			Object subject = getTableViewer().getElementAt(index);
-//			Object object = getTableViewer().getElementAt(index - 1);
-//			
-//			int subjectIndex = tableModel.getConstraints().indexOf(subject);
-//			int objectIndex = tableModel.getConstraints().indexOf(object);
-//			
-//			jiemamyFacade.swapListElement(tableModel, tableModel.getConstraints(), subjectIndex, objectIndex);
-//			
-//			table.setSelection(index - 1);
-//			enableEditControls(index - 1);
 		}
 		
 		@Override
@@ -517,21 +564,25 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			
 			if (constraintModel instanceof DefaultCheckConstraintModel) {
 				DefaultCheckConstraintModel checkConstraintModel = (DefaultCheckConstraintModel) constraintModel;
-				
 				String expression = StringUtils.defaultString(txtCheckExpression.getText());
 				checkConstraintModel.setExpression(expression);
-			} else
-
-			if (constraintModel instanceof DefaultUniqueKeyConstraintModel) {
-				DefaultUniqueKeyConstraintModel uniqueConstraint = (DefaultUniqueKeyConstraintModel) constraintModel;
-				
-				List<EntityRef<? extends ColumnModel>> keyColumns = uniqueConstraint.getKeyColumns();
-				keyColumns.clear();
+			} else if (constraintModel instanceof AbstractLocalKeyConstraintModel) {
+				AbstractLocalKeyConstraintModel localKeyConstraint = (AbstractLocalKeyConstraintModel) constraintModel;
+				localKeyConstraint.clearKeyColumns();
 				for (int selectionIndex : lstKeyColumns.getSelectionIndices()) {
 					ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);
-					keyColumns.add(columnModel.toReference());
+					localKeyConstraint.addKeyColumn(columnModel.toReference());
+				}
+			} else if (constraintModel instanceof DefaultNotNullConstraintModel) {
+				DefaultNotNullConstraintModel nn = (DefaultNotNullConstraintModel) constraintModel;
+				int selectionIndex = lstTargetColumn.getSelectionIndex();
+				if (selectionIndex >= 0) {
+					ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);
+					nn.setColumn(columnModel.toReference());
 				}
 			}
+			
+			tableModel.store(constraintModel);
 		}
 		
 
@@ -541,6 +592,32 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			protected void process(TypedEvent e) {
 				updateModel();
 			}
+		}
+		
+		private abstract class SelectionAdapterExtension extends SelectionAdapter {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Table table = getTableViewer().getTable();
+				
+				ConstraintModel constraintModel = getModel();
+				tableModel.store(constraintModel);
+				
+				int addedIndex = Lists.transform(Arrays.asList(table.getItems()), new Function<TableItem, Object>() {
+					
+					public Object apply(TableItem item) {
+						return item.getData();
+					}
+				}).indexOf(constraintModel);
+				if (addedIndex < 0) {
+					return;
+				}
+				table.setSelection(addedIndex);
+				enableEditControls(addedIndex);
+				txtConstraintName.setFocus();
+			}
+			
+			abstract ConstraintModel getModel();
 		}
 	}
 }

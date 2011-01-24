@@ -18,6 +18,8 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.dialog;
 
+import org.apache.commons.lang.Validate;
+
 /**
  * {@link TableEditorConfig}のデフォルト実装。
  * 
@@ -34,6 +36,7 @@ public class DefaultTableEditorConfig implements TableEditorConfig {
 	 * @param editorTitle エディタのタイトル
 	 */
 	public DefaultTableEditorConfig(String editorTitle) {
+		Validate.notNull(editorTitle);
 		this.editorTitle = editorTitle;
 		
 	}
@@ -52,6 +55,10 @@ public class DefaultTableEditorConfig implements TableEditorConfig {
 	
 	public String getRemoveLabel() {
 		return "削除(&R)"; // RESOURCE
+	}
+	
+	public boolean isFreeOrder() {
+		return false;
 	}
 	
 }

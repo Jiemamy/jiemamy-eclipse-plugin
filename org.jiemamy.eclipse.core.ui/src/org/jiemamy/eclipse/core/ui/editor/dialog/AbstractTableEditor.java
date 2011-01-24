@@ -100,8 +100,10 @@ public abstract class AbstractTableEditor extends Composite {
 		// hookメソッドのコール
 		createOptionalEditButtons(cmpButtons);
 		
-		btnMoveUp = new Button(cmpButtons, SWT.ARROW | SWT.UP);
-		btnMoveDown = new Button(cmpButtons, SWT.ARROW | SWT.DOWN);
+		if (config.isFreeOrder()) {
+			btnMoveUp = new Button(cmpButtons, SWT.ARROW | SWT.UP);
+			btnMoveDown = new Button(cmpButtons, SWT.ARROW | SWT.DOWN);
+		}
 		
 		// 子エリア３ - 詳細エディタ
 		Group grpEditor = new Group(this, SWT.NULL);
@@ -313,12 +315,18 @@ public abstract class AbstractTableEditor extends Composite {
 		if (btnRemove != null) {
 			btnRemove.setEnabled(false);
 		}
-		btnMoveUp.setEnabled(false);
-		btnMoveDown.setEnabled(false);
+		if (btnMoveUp != null) {
+			btnMoveUp.setEnabled(false);
+		}
+		if (btnMoveDown != null) {
+			btnMoveDown.setEnabled(false);
+		}
 	}
 	
 	/**
 	 * 詳細編集コントロールを無効化する。
+	 * 
+	 * <p>必要に応じて、適宜オーバーライドすること。</p>
 	 */
 	protected void disableEditorControls() {
 		// nothing to do
@@ -336,21 +344,27 @@ public abstract class AbstractTableEditor extends Composite {
 		if (btnRemove != null) {
 			btnRemove.setEnabled(true);
 		}
-		btnMoveUp.setEnabled(true);
-		btnMoveDown.setEnabled(true);
+		if (btnMoveUp != null) {
+			btnMoveUp.setEnabled(true);
+		}
+		if (btnMoveDown != null) {
+			btnMoveDown.setEnabled(true);
+		}
 		
 		// 選択が一番上だった場合
-		if (index <= 0) {
+		if (btnMoveUp != null && index <= 0) {
 			btnMoveUp.setEnabled(false);
 		}
 		// 選択が一番下だった場合
-		if (index >= tableViewer.getTable().getItemCount() - 1) {
+		if (btnMoveDown != null && index >= tableViewer.getTable().getItemCount() - 1) {
 			btnMoveDown.setEnabled(false);
 		}
 	}
 	
 	/**
 	 * 詳細編集コントロールを有効化する。
+	 * 
+	 * <p>必要に応じて、適宜オーバーライドすること。</p>
 	 * 
 	 * @param index 選択された要素のテーブル内での位置インデックス
 	 */
@@ -368,19 +382,29 @@ public abstract class AbstractTableEditor extends Composite {
 	/**
 	 * 挿入ボタンが押された時の処理を行う。
 	 * 
+	 * <p>必要に応じて、適宜オーバーライドすること。</p>
+	 * 
 	 * @return 追加されたモデル
 	 */
-	protected abstract Object performInsertItem();
+	protected Object performInsertItem() {
+		return null;
+	}
 	
 	/**
 	 * 下ボタンが押された時の処理を行う。
+	 * 
+	 * <p>必要に応じて、適宜オーバーライドすること。</p>
 	 */
-	protected abstract void performMoveDownItem();
+	protected void performMoveDownItem() {
+	}
 	
 	/**
 	 * 上ボタンが押された時の処理を行う。
+	 * 
+	 * <p>必要に応じて、適宜オーバーライドすること。</p>
 	 */
-	protected abstract void performMoveUpItem();
+	protected void performMoveUpItem() {
+	}
 	
 	/**
 	 * 削除ボタンが押された時の処理を行う。

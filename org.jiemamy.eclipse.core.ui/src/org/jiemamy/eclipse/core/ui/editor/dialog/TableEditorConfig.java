@@ -55,4 +55,5 @@ public interface TableEditorConfig {
 	 */
 	String getRemoveLabel();
 	
+	boolean isFreeOrder();
 }

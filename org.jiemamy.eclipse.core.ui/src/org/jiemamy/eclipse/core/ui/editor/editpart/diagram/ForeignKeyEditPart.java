@@ -24,8 +24,10 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.draw2d.PolylineDecoration;
 import org.eclipse.draw2d.PositionConstants;
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
+import org.eclipse.gef.commands.Command;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -34,13 +36,13 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
+import org.jiemamy.eclipse.core.ui.editor.command.EditForeignKeyCommand;
 import org.jiemamy.eclipse.core.ui.editor.dialog.foreignkey.ForeignKeyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.model.ConnectionModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -78,13 +80,9 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 				new ForeignKeyEditDialog(getViewer().getControl().getShell(), context, foreignKey);
 		
 		if (dialog.open() == Dialog.OK) {
-			DefaultTableModel tableModel =
-					(DefaultTableModel) DefaultTableModel.findDeclaringTable(context.getTables(), foreignKey);
-			tableModel.store(foreignKey);
-			context.store(tableModel);
-//			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
-//			GraphicalViewer viewer = (GraphicalViewer) getViewer();
-//			viewer.getEditDomain().getCommandStack().execute(command);
+			Command command = new EditForeignKeyCommand(context, foreignKey);
+			GraphicalViewer viewer = (GraphicalViewer) getViewer();
+			viewer.getEditDomain().getCommandStack().execute(command);
 		}
 	}
 	

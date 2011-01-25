@@ -25,6 +25,8 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.commands.Command;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
+import org.jiemamy.eclipse.core.ui.editor.command.EditDatabaseObjectCommand;
 import org.jiemamy.eclipse.core.ui.editor.dialog.view.ViewEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.ViewFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
@@ -74,21 +77,13 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		DatabaseObjectNodeModel node = getModel();
 		DefaultViewModel viewModel = (DefaultViewModel) context.resolve(node.getCoreModelRef());
 		
-//		// 編集前のスナップショットを保存
-//		JiemamyViewFacade facade = context.getJiemamy().getFactory().newFacade(JiemamyViewFacade.class);
-//		SavePoint beforeEditSavePoint = facade.save();
-		
 		Shell shell = getViewer().getControl().getShell();
 		ViewEditDialog dialog = new ViewEditDialog(shell, context, viewModel, TODO.DIAGRAM_INDEX);
 		
 		if (dialog.open() == Dialog.OK) {
-			// 編集後のスナップショットを保存
-//			SavePoint afterEditSavePoint = facade.save();
-			
-//			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
-//			GraphicalViewer viewer = (GraphicalViewer) getViewer();
-//			viewer.getEditDomain().getCommandStack().execute(command);
-			context.store(viewModel);
+			Command command = new EditDatabaseObjectCommand(context, viewModel);
+			GraphicalViewer viewer = (GraphicalViewer) getViewer();
+			viewer.getEditDomain().getCommandStack().execute(command);
 		}
 	}
 	

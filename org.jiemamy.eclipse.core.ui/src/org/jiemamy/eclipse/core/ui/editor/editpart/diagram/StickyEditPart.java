@@ -23,6 +23,7 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Panel;
 import org.eclipse.draw2d.StackLayout;
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
+import org.jiemamy.eclipse.core.ui.editor.command.EditStickyCommand;
 import org.jiemamy.eclipse.core.ui.editor.dialog.sticky.StickyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.figure.StickyFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
@@ -75,11 +77,9 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		StickyEditDialog dialog = new StickyEditDialog(shell, context, stickyModel, diagramModel);
 		
 		if (dialog.open() == Dialog.OK) {
-//			Command command = new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
-//			GraphicalViewer viewer = (GraphicalViewer) getViewer();
-//			viewer.getEditDomain().getCommandStack().execute(command);
-			diagramModel.store(stickyModel);
-			facet.store(diagramModel);
+			org.eclipse.gef.commands.Command command = new EditStickyCommand(context, diagramModel, stickyModel);
+			GraphicalViewer viewer = (GraphicalViewer) getViewer();
+			viewer.getEditDomain().getCommandStack().execute(command);
 		}
 	}
 	

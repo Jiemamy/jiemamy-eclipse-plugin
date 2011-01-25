@@ -84,7 +84,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	public void activate() {
 		super.activate();
 		getJiemamyContext().getEventBroker().addListener(this);
-		logger.trace("activated");
+		logger.trace(LogMarker.LIFECYCLE, "activated");
 	}
 	
 	public void commandExecuted(StoredEvent<?> event) {
@@ -96,7 +96,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	public void deactivate() {
 		getJiemamyContext().getEventBroker().removeListener(this);
 		super.deactivate();
-		logger.trace("deactivated");
+		logger.trace(LogMarker.LIFECYCLE, "deactivated");
 	}
 	
 //	@Override

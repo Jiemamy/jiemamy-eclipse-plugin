@@ -78,6 +78,10 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	/** 説明文入力欄 */
 	private TextEditTab tabDescription;
 	
+	private DefaultContextMetadata metadata;
+	
+	private DefaultAroundScriptModel universalAroundScript;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -93,6 +97,14 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 		dialects = JiemamyCorePlugin.getDialectResolver().getAllInstance();
+	}
+	
+	public DefaultContextMetadata getMetadata() {
+		return metadata;
+	}
+	
+	public DefaultAroundScriptModel getUniversalAroundScript() {
+		return universalAroundScript;
 	}
 	
 	@Override
@@ -185,36 +197,34 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	
 	@Override
 	protected boolean performOk() {
-		JiemamyContext context = getTargetCoreModel();
-		
-		DefaultContextMetadata meta = new DefaultContextMetadata();
+		metadata = new DefaultContextMetadata();
 		
 		int selectionIndex = cmbDialect.getSelectionIndex();
 		String dialectClassName = dialects.get(selectionIndex).getClass().getName();
-		meta.setDialectClassName(dialectClassName);
+		metadata.setDialectClassName(dialectClassName);
 		
 		String schemaName = StringUtils.defaultString(txtSchema.getText());
-		meta.setSchemaName(schemaName);
+		metadata.setSchemaName(schemaName);
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
-		meta.setDescription(description);
-		
-		context.setMetadata(meta);
-		
-		SqlFacet facet = context.getFacet(SqlFacet.class);
+		metadata.setDescription(description);
+//		
+//		context.setMetadata(meta);
+//		
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
 		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
-			DefaultAroundScriptModel aroundScript = (DefaultAroundScriptModel) facet.getUniversalAroundScript();
-			if (aroundScript == null) {
-				aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+			SqlFacet facet = getContext().getFacet(SqlFacet.class);
+			universalAroundScript = (DefaultAroundScriptModel) facet.getUniversalAroundScript();
+			if (universalAroundScript == null) {
+				universalAroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
 			}
-			aroundScript.setScript(Position.BEGIN, beginScript);
-			aroundScript.setScript(Position.END, endScript);
-			facet.setUniversalAroundScript(aroundScript);
+			universalAroundScript.setScript(Position.BEGIN, beginScript);
+			universalAroundScript.setScript(Position.END, endScript);
+//			facet.setUniversalAroundScript(aroundScript);
 		} else {
-			facet.setUniversalAroundScript(null);
+//			facet.setUniversalAroundScript(null);
 		}
 		
 		return true;

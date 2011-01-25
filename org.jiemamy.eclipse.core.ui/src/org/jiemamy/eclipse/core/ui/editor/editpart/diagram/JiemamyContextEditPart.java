@@ -31,6 +31,7 @@ import org.eclipse.draw2d.Layer;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
@@ -45,6 +46,7 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.TODO;
+import org.jiemamy.eclipse.core.ui.editor.command.EditJiemamyContextCommand;
 import org.jiemamy.eclipse.core.ui.editor.dialog.context.JiemamyContextEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmXYLayoutEditPolicy;
@@ -119,24 +121,14 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		JiemamyContext context = getModel();
 		
-//		// 編集前のスナップショットを保存
-//		JiemamyFacade facade = context.newFacade(JiemamyViewFacade.class);
-//		SavePoint beforeEditSavePoint = facade.save();
-//		
 		Shell shell = getViewer().getControl().getShell();
 		JiemamyContextEditDialog dialog = new JiemamyContextEditDialog(shell, context);
-//		
+		
 		if (dialog.open() == Dialog.OK) {
-//			// 編集後のスナップショットを保存
-//			SavePoint afterEditSavePoint = facade.save();
-//			
-//			org.eclipse.gef.commands.Command command =
-//					new DialogEditCommand(facade, beforeEditSavePoint, afterEditSavePoint);
-//			GraphicalViewer viewer = (GraphicalViewer) getViewer();
-//			viewer.getEditDomain().getCommandStack().execute(command);
-		} else {
-//			// 編集前にロールバック
-//			facade.rollback(beforeEditSavePoint);
+			org.eclipse.gef.commands.Command command =
+					new EditJiemamyContextCommand(context, dialog.getMetadata(), dialog.getUniversalAroundScript());
+			GraphicalViewer viewer = (GraphicalViewer) getViewer();
+			viewer.getEditDomain().getCommandStack().execute(command);
 		}
 	}
 	

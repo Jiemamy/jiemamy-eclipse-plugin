@@ -236,9 +236,8 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		try {
-			aroundScript = (DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
-		} catch (EntityNotFoundException e) {
+		aroundScript = (DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+		if (aroundScript == null) {
 			aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
 			aroundScript.setCoreModelRef(viewModel.toReference());
 		}
@@ -270,14 +269,12 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 		
 		String beginScript = "";
 		String endScript = "";
-		try {
-			SqlFacet facet = getContext().getFacet(SqlFacet.class);
-			DefaultAroundScriptModel aroundScript =
-					(DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		DefaultAroundScriptModel aroundScript =
+				(DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
-		} catch (EntityNotFoundException e) {
-			// ignore
 		}
 		
 		// ---- B-2. BeginScript

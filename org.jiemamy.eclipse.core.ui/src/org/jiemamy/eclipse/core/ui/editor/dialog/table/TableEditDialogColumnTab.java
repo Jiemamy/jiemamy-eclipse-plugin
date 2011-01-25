@@ -173,7 +173,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 */
 	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent command) {
+		public void commandExecuted(StoredEvent<?> command) {
 			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
 			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
@@ -362,7 +362,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			ExtensionResolver<Dialect> dialectResolver = JiemamyCorePlugin.getDialectResolver();
 			IConfigurationElement dialectElement =
-					dialectResolver.getExtensionConfigurationElements().get(context.getDialectClassName());
+					dialectResolver.getExtensionConfigurationElements()
+						.get(context.getMetadata().getDialectClassName());
 			if (dialectElement != null) {
 				IConfigurationElement[] children = dialectElement.getChildren("typeOptionHandler");
 				if (ArrayUtils.isEmpty(children) == false) {

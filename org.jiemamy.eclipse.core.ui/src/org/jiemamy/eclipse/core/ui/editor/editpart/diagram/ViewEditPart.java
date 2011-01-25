@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.dialog.view.ViewEditDialog;
@@ -130,10 +129,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		ViewModel viewModel = (ViewModel) context.resolve(node.getCoreModelRef());
 		ViewFigure viewFigure = (ViewFigure) figure;
 		
-		String labelString = viewModel.getName();
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		
-		viewFigure.setDatabaseObjectName(labelString);
+		viewFigure.setDatabaseObjectName(viewModel.getName());
 		
 		JmColor color = node.getColor();
 		viewFigure.setBgColor(ConvertUtil.convert(color));

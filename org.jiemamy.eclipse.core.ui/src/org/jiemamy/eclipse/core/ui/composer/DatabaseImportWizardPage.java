@@ -212,7 +212,8 @@ class DatabaseImportWizardPage extends WizardPage {
 		txtSchema.setLayoutData(gd);
 		txtSchema.setText(StringUtils.defaultIfEmpty(settings.get("txtSchema"), ""));
 		
-		new Label(composite, SWT.NONE); // dummy
+		@SuppressWarnings("unused")
+		Object dummy = new Label(composite, SWT.NONE); // dummy
 		
 		btnImportDataSet = new Button(composite, SWT.CHECK);
 		btnImportDataSet.setText("DataSetをインポートする"); // RESOURCE

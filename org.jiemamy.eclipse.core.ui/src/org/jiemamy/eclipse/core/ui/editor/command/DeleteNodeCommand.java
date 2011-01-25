@@ -59,8 +59,8 @@ public class DeleteNodeCommand extends Command {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param diagramFacet facet
-	 * @param diagramModel ダイアグラム
+	 * @param context {@link JiemamyContext}
+	 * @param diagramIndex ダイアグラムindex
 	 * @param nodeModel 削除されるノード
 	 */
 	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, NodeModel nodeModel) {

@@ -199,7 +199,7 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 		ExtensionResolver<Dialect> dialectResolver = JiemamyCorePlugin.getDialectResolver();
 		
 		IConfigurationElement dialectElement =
-				dialectResolver.getExtensionConfigurationElements().get(context.getDialectClassName());
+				dialectResolver.getExtensionConfigurationElements().get(context.getMetadata().getDialectClassName());
 		
 		if (dialectElement != null) {
 			for (IConfigurationElement additionalTabElement : dialectElement.getChildren("additionalTab")) {
@@ -314,9 +314,6 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	 * @author daisuke
 	 */
 	public class EditListenerImpl extends AbstractEditListener {
-		
-		public EditListenerImpl() {
-		}
 		
 		@Override
 		protected void process(TypedEvent e) {

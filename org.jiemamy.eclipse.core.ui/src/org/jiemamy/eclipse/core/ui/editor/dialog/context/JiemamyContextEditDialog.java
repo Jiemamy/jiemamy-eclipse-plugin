@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.DefaultContextMetadata;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
@@ -115,7 +116,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		
 		txtSchema = new Text(composite, SWT.BORDER);
 		txtSchema.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		txtSchema.setText(StringUtils.defaultString(context.getSchemaName()));
+		txtSchema.setText(StringUtils.defaultString(context.getMetadata().getSchemaName()));
 		txtSchema.addFocusListener(new TextSelectionAdapter(txtSchema));
 		
 		// ---- A-2. RDBMS
@@ -168,7 +169,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		addTab(tabEndScript);
 		
 		// ---- B-5. Description
-		String description = StringUtils.defaultString(context.getDescription());
+		String description = StringUtils.defaultString(context.getMetadata().getDescription());
 		tabDescription = new TextEditTab(tabFolder, Messages.Tab_Description, description);
 		addTab(tabDescription);
 		
@@ -186,14 +187,21 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	protected boolean performOk() {
 		JiemamyContext context = getTargetCoreModel();
 		
+		DefaultContextMetadata meta = new DefaultContextMetadata();
+		
 		int selectionIndex = cmbDialect.getSelectionIndex();
 		String dialectClassName = dialects.get(selectionIndex).getClass().getName();
-		context.setDialectClassName(dialectClassName);
+		meta.setDialectClassName(dialectClassName);
 		
 		String schemaName = StringUtils.defaultString(txtSchema.getText());
-		context.setSchemaName(schemaName);
+		meta.setSchemaName(schemaName);
 		
-		SqlFacet facet = getContext().getFacet(SqlFacet.class);
+		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
+		meta.setDescription(description);
+		
+		context.setMetadata(meta);
+		
+		SqlFacet facet = context.getFacet(SqlFacet.class);
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
@@ -208,9 +216,6 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		} else {
 			facet.setUniversalAroundScript(null);
 		}
-		
-		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
-		context.setDescription(description);
 		
 		return true;
 	}

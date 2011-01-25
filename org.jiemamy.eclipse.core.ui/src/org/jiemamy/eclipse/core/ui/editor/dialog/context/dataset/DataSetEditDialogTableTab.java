@@ -74,7 +74,6 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	 * @param style SWTスタイル値
 	 * @param dataSetModel 編集対象{@link DataSetModel}
 	 * @param tableModel {@link DataSetModel}内での対象テーブル
-	 * @param jiemamyFacade モデル操作を実行するファサード
 	 */
 	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, DataSetModel dataSetModel,
 			TableModel tableModel) {

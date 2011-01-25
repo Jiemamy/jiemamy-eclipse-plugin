@@ -90,7 +90,7 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		logger.trace(LogMarker.LIFECYCLE, "activated");
 	}
 	
-	public void commandExecuted(StoredEvent command) {
+	public void commandExecuted(StoredEvent<?> command) {
 		refresh();
 //		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}

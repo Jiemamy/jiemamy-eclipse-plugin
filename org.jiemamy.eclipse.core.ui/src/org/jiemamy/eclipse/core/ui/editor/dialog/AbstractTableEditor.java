@@ -403,8 +403,6 @@ public abstract class AbstractTableEditor extends Composite {
 	
 	/**
 	 * 削除ボタンが押された時の処理を行う。
-	 * 
-	 * @return 削除されたモデル
 	 */
 	protected abstract void performRemoveItem();
 	

@@ -29,8 +29,22 @@ import org.jiemamy.model.DefaultDiagramModel;
  */
 public interface Creation {
 	
+	/**
+	 * TODO for daisuke
+	 * 
+	 * @param context
+	 * @param diagramModel
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
+	 */
 	void execute(JiemamyContext context, DefaultDiagramModel diagramModel);
 	
+	/**
+	 * TODO for daisuke
+	 * 
+	 * @param context
+	 * @param diagramModel
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
+	 */
 	void undo(JiemamyContext context, DefaultDiagramModel diagramModel);
 	
 }

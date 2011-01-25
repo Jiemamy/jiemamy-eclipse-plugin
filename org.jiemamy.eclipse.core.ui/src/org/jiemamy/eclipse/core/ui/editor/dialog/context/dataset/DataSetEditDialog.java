@@ -97,6 +97,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 	 * インスタンスを生成する。
 	 * 
 	 * @param shell 親シェルオブジェクト
+	 * @param context {@link JiemamyContext}
 	 * @param dataSetModel 編集対象{@link JiemamyContext}
 	 * @throws IllegalArgumentException 引数rootModel, jiemamyFacadeに{@code null}を与えた場合
 	 */

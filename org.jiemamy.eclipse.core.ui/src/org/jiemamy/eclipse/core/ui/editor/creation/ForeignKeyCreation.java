@@ -20,6 +20,8 @@ package org.jiemamy.eclipse.core.ui.editor.creation;
 
 import java.util.UUID;
 
+import org.apache.commons.lang.Validate;
+
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
@@ -56,6 +58,9 @@ public class ForeignKeyCreation implements Creation {
 	}
 	
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		Validate.notNull(context);
+		Validate.notNull(diagramModel);
+		
 		ForeignKeyFactory.setup(foreignKey, context, sourceTable, targetTable);
 		
 		sourceTable.store(foreignKey);
@@ -69,8 +74,10 @@ public class ForeignKeyCreation implements Creation {
 	 * TODO for daisuke
 	 * 
 	 * @param sourceRef 起点ノードの参照
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setSource(EntityRef<? extends NodeModel> sourceRef) {
+		Validate.notNull(sourceRef);
 		connection.setSource(sourceRef);
 	}
 	
@@ -78,8 +85,10 @@ public class ForeignKeyCreation implements Creation {
 	 * TODO for daisuke
 	 * 
 	 * @param sourceTable
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setSourceTable(DefaultTableModel sourceTable) {
+		Validate.notNull(sourceTable);
 		this.sourceTable = sourceTable;
 	}
 	
@@ -87,8 +96,10 @@ public class ForeignKeyCreation implements Creation {
 	 * TODO for daisuke
 	 * 
 	 * @param targetRef 終点ノードの参照
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setTarget(EntityRef<? extends NodeModel> targetRef) {
+		Validate.notNull(targetRef);
 		connection.setTarget(targetRef);
 	}
 	
@@ -96,12 +107,16 @@ public class ForeignKeyCreation implements Creation {
 	 * TODO for daisuke
 	 * 
 	 * @param targetTable
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setTargetTable(DefaultTableModel targetTable) {
+		Validate.notNull(targetTable);
 		this.targetTable = targetTable;
 	}
 	
 	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		Validate.notNull(context);
+		Validate.notNull(diagramModel);
 		diagramModel.deleteConnection(connection.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 		

@@ -24,7 +24,7 @@ package org.jiemamy.eclipse.core.ui;
  * @version $Id$
  * @author daisuke
  */
-@Deprecated
+//@Deprecated
 public final class TODO {
 	
 	public static final int DIAGRAM_INDEX = 0;

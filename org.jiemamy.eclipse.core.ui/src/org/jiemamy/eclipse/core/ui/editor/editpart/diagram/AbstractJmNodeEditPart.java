@@ -87,7 +87,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		logger.trace("activated");
 	}
 	
-	public void commandExecuted(StoredEvent event) {
+	public void commandExecuted(StoredEvent<?> event) {
 		// THINK どのメソッドを呼ばなければならないのか精査
 		refresh();
 	}

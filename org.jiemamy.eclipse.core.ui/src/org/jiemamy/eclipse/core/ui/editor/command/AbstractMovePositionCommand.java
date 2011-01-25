@@ -78,6 +78,7 @@ public abstract class AbstractMovePositionCommand extends Command {
 	 * ダイアグラムを全体的に移動させる。
 	 * 
 	 * @param negative 正方向に移動させる場合は{@code true}、負方向の場合は{@code false}
+	 * @param diagramModel 
 	 */
 	protected void shiftPosition(boolean negative, DefaultDiagramModel diagramModel) {
 		for (NodeModel node : diagramModel.getNodes()) {

@@ -149,7 +149,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	 */
 	private class ConstraintContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent command) {
+		public void commandExecuted(StoredEvent<?> command) {
 			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
 			constraintTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}

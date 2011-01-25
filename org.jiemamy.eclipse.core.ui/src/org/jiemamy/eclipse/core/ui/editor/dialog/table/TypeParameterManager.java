@@ -44,13 +44,11 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.EditListener;
 import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.column.DefaultColumnModel;
 import org.jiemamy.model.datatype.DefaultTypeVariant;
 import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeVariant;
 import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
-import org.jiemamy.model.domain.DomainModel;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -96,8 +94,7 @@ class TypeParameterManager {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param dialect 
-	 * @param columnModel データ型を設定されるモデル（{@link ColumnModel}または{@link DomainModel}）
+	 * @param dialect {@link Dialect}
 	 * @param composite オプションコントロール描画対象の親
 	 * @param editListener コントロールの操作を検知するリスナ
 	 * @param handler may be null
@@ -129,6 +126,7 @@ class TypeParameterManager {
 	 * 
 	 * <p>元から存在したコントロールはすべて破棄される。</p>
 	 * 
+	 * @param columnModel 
 	 * @param keys データ型パラメータキー集合
 	 */
 	public void createTypeOptionControl(DefaultColumnModel columnModel, Collection<TypeParameterKey<?>> keys) {
@@ -237,6 +235,8 @@ class TypeParameterManager {
 	
 	/**
 	 * アダプタからコントロールに値を格納する。
+	 * 
+	 * @param columnModel 
 	 */
 	public void setValue(DefaultColumnModel columnModel) {
 		TypeVariant dataType = columnModel.getDataType();

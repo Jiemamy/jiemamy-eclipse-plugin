@@ -114,14 +114,12 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 	 */
 	private class DataSetContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		private Viewer viewer;
-		
-
-		public void commandExecuted(StoredEvent command) {
+		public void commandExecuted(StoredEvent<?> command) {
 			dataSetTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
 		public void dispose() {
+			// nothing to do
 		}
 		
 		public Object[] getElements(Object inputElement) {
@@ -137,10 +135,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 			logger.debug(LogMarker.LIFECYCLE, "DataSetContentProvider: input changed");
 			logger.trace(LogMarker.LIFECYCLE, "oldInput: " + oldInput);
 			logger.trace(LogMarker.LIFECYCLE, "newInput: " + newInput);
-			
-			this.viewer = viewer;
 		}
-		
 	}
 	
 	/**

@@ -1,90 +1,90 @@
 <?xml version="1.0"?>
 <project
-		name="retrieve.plugin.dependencies"
-		basedir="."
-		default="build"
-		xmlns:antcontrib="antlib:net.sf.antcontrib"
-		xmlns:ivy="antlib:org.apache.ivy.ant"
-		xmlns:ant4eclipse="antlib:org.ant4eclipse">
-	
-	<!-- SETTINGS START -->
-	<property name="ws.dir" value="${basedir}/.." />
-	<property name="dest.dir" value="${basedir}/destination" />
-	<property name="eclipse-headless-builder.dir" value="${ws.dir}/eclipse-headless-builder" />
-	<property name="target.dir.pattern" value="org.jiemamy.eclipse.*" />
-	<property name="target.projects" value="org.jiemamy.eclipse.core,org.jiemamy.eclipse.core.ui" />
-	<!-- SETTINGS END -->
-	
-	<available 
-	            file="${eclipse-headless-builder.dir}"
-	            type="dir"
-	            property="eclipse-headless-builder-is-not-exists" />
-	
-	<fail unless="eclipse-headless-builder-is-not-exists">eclipse-headless-builder is not exists.</fail>
-	<fail unless="fromShell">This ant script requires executing from build.sh</fail>
-	
-	<import file="${eclipse-headless-builder.dir}/build.xml" />
-	
+        name="retrieve.plugin.dependencies"
+        basedir="."
+        default="build"
+        xmlns:antcontrib="antlib:net.sf.antcontrib"
+        xmlns:ivy="antlib:org.apache.ivy.ant"
+        xmlns:ant4eclipse="antlib:org.ant4eclipse">
+    
+    <!-- SETTINGS START -->
+    <property name="ws.dir" value="${basedir}/.." />
+    <property name="dest.dir" value="${basedir}/destination" />
+    <property name="eclipse-headless-builder.dir" value="${ws.dir}/eclipse-headless-builder" />
+    <property name="target.dir.pattern" value="org.jiemamy.eclipse.*" />
+    <property name="target.projects" value="org.jiemamy.eclipse.core,org.jiemamy.eclipse.core.ui" />
+    <!-- SETTINGS END -->
+    
+    <available 
+            file="${eclipse-headless-builder.dir}"
+            type="dir"
+            property="eclipse-headless-builder-is-not-exists" />
+    
+    <fail unless="eclipse-headless-builder-is-not-exists">eclipse-headless-builder is not exists.</fail>
+    <fail unless="fromShell">This ant script requires executing from build.sh</fail>
+    
+    <import file="${eclipse-headless-builder.dir}/build.xml" />
+
 
     <!-- =================================
           target: prepare-lib
          ================================= -->
-	<target name="prepare-libs" description="--> preapare dependencies">
-		<setup-ivy/>
-		<echo message="detecting subprojects..."/>
-		<ivy:buildlist reference="build-path">
-	      <fileset dir="${ws.dir}" includes="${target.dir.pattern}/build.xml"/>
-	    </ivy:buildlist>
-		<echo message="retrieving denendencies..."/>
-		<subant target="prepare-lib" buildpathref="build-path" />
-	</target>
-	<target name="prepare-lib" description="--> preapare dependencies">
-		<!-- dummy -->
-	</target>
-	
+    <target name="prepare-libs" description="--> preapare dependencies">
+        <setup-ivy/>
+        <echo message="detecting subprojects..."/>
+        <ivy:buildlist reference="build-path">
+            <fileset dir="${ws.dir}" includes="${target.dir.pattern}/build.xml"/>
+        </ivy:buildlist>
+        <echo message="retrieving denendencies..."/>
+        <subant target="prepare-lib" buildpathref="build-path" />
+    </target>
+    <target name="prepare-lib" description="--> preapare dependencies">
+        <!-- dummy -->
+    </target>
+    
 
-	<!-- =================================
+    <!-- =================================
           target: build
          ================================= -->
-	<target name="build" depends="prepare-libs">
-		<setup-a4e/>
-		<echo message="building plugins..."/>
-		<ant4eclipse:installedJREs>
-			<jre id="jdk" location="${java.home}" />
-		</ant4eclipse:installedJREs>
-		
-		<ant4eclipse:executeProjectSet workspaceDirectory="${ws.dir}"
-		                               allWorkspaceProjects="false"
-			                           projectNames="${target.projects}">
+    <target name="build" depends="prepare-libs">
+        <setup-a4e/>
+        <echo message="building plugins..."/>
+        <ant4eclipse:installedJREs>
+            <jre id="jdk" location="${java.home}" />
+        </ant4eclipse:installedJREs>
+        
+        <ant4eclipse:executeProjectSet workspaceDirectory="${ws.dir}"
+                                       allWorkspaceProjects="false"
+                                       projectNames="${target.projects}">
 
-			<ant4eclipse:forEachProject filter="(executeProjectSet.org.eclipse.pde.PluginNature=*)">
-				<echo>building plugin ${executeProjectSet.project.name}...</echo>
-				<buildPlugin workspaceDirectory="${ws.dir}"
-				             projectname="${executeProjectSet.project.name}"
-				             targetplatformid="carbon.target.platform"
-				             destination="${dest.dir}" />
+            <ant4eclipse:forEachProject filter="(executeProjectSet.org.eclipse.pde.PluginNature=*)">
+                <echo>building plugin ${executeProjectSet.project.name}...</echo>
+                <buildPlugin workspaceDirectory="${ws.dir}"
+                             projectname="${executeProjectSet.project.name}"
+                             targetplatformid="carbon.target.platform"
+                             destination="${dest.dir}" />
  
-			</ant4eclipse:forEachProject>
-			
-			<!--
-			<ant4eclipse:forEachProject filter="(executeProjectSet.org.eclipse.pde.FeatureNature=*)">
-				<echo>building feature ${executeProjectSet.project.name}...</echo>
-				<buildFeature workspaceDirectory="${ws.dir}"
-				             projectname="${executeProjectSet.project.name}"
-				             targetplatformid="carbon.target.platform"
-				             destination="${dest.dir}" />
+            </ant4eclipse:forEachProject>
+            
+            <!--
+            <ant4eclipse:forEachProject filter="(executeProjectSet.org.eclipse.pde.FeatureNature=*)">
+                <echo>building feature ${executeProjectSet.project.name}...</echo>
+                <buildFeature workspaceDirectory="${ws.dir}"
+                             projectname="${executeProjectSet.project.name}"
+                             targetplatformid="carbon.target.platform"
+                             destination="${dest.dir}" />
  
-			</ant4eclipse:forEachProject>
-			-->
+            </ant4eclipse:forEachProject>
+            -->
  
-		</ant4eclipse:executeProjectSet>
-	</target>
+        </ant4eclipse:executeProjectSet>
+    </target>
 
     <!-- =================================
           target: clean-dest
          ================================= -->
     <target name="clean-dest" description="--> clean destination">
-		<echo message="clean destination..."/>
+        <echo message="clean destination..."/>
         <delete includeemptydirs="true" quiet="true">
             <fileset dir="${dest.dir}" />
         </delete>
@@ -94,7 +94,7 @@
           target: clean-lib
          ================================= -->
     <target name="clean-lib" description="--> clean dependencies">
-		<echo message="clean dependencies..."/>
+        <echo message="clean dependencies..."/>
         <delete includeemptydirs="true" quiet="true">
             <fileset dir="${lib.dir}" />
         </delete>
@@ -104,8 +104,8 @@
           target: clean-all
          ================================= -->
     <target name="clean-all" depends="clean-lib,clean-dest" description="--> clean the project">
-    	<clean-ivy/>
-    	<clean-cache/>
+        <clean-ivy/>
+        <clean-cache/>
     </target>
 
   </project>

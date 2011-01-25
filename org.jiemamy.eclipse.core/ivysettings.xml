@@ -1,11 +1,11 @@
 <ivysettings>
-  <property name="ivy.checksums" value=""/>
-  <settings defaultResolver="chain-jiemamy"/>
-  <resolvers>
-    <chain name="chain-jiemamy">
-      <ibiblio name="central" m2compatible="true" root="http://repo1.maven.org/maven2/" />
-      <ibiblio name="org.jiemamy.maven.release" m2compatible="true" root="http://maven.jiemamy.org/release/" />
-      <ibiblio name="org.jiemamy.maven.snapshot" m2compatible="true" root="http://maven.jiemamy.org/snapshot/" />
-    </chain>
-  </resolvers>
+    <property name="ivy.checksums" value=""/>
+    <settings defaultResolver="chain-jiemamy"/>
+    <resolvers>
+        <chain name="chain-jiemamy">
+            <ibiblio name="central" m2compatible="true" root="http://repo1.maven.org/maven2/" />
+            <ibiblio name="org.jiemamy.maven.release" m2compatible="true" root="http://maven.jiemamy.org/release/" />
+            <ibiblio name="org.jiemamy.maven.snapshot" m2compatible="true" root="http://maven.jiemamy.org/snapshot/" />
+        </chain>
+    </resolvers>
 </ivysettings>

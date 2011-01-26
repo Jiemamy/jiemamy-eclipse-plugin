@@ -21,6 +21,7 @@ package org.jiemamy.eclipse.core.ui.editor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.EventObject;
 import java.util.List;
 import java.util.UUID;
@@ -93,6 +94,8 @@ import org.jiemamy.transaction.EventBrokerImpl;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
+import org.jiemamy.utils.UUIDUtil;
+import org.jiemamy.validator.AbstractProblem;
 import org.jiemamy.validator.AllValidator;
 import org.jiemamy.validator.Problem;
 import org.jiemamy.validator.Problem.Severity;
@@ -185,7 +188,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <p>こも実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
+	 * <p>この実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
 	 */
 	public void commandExecuted(StoredEvent<?> command) {
 		Validator validator;
@@ -193,15 +196,15 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 			Dialect dialect = context.findDialect();
 			validator = dialect.getValidator();
 		} catch (ClassNotFoundException e) {
-//			dialect = JiemamyCorePlugin.getDialectResolver().getAllInstance().get(0);
-//			validator = dialect.getValidator();
 			validator = new AllValidator();
 		}
 		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
 		MarkerUtil.deleteAllMarkers();
 		for (Problem problem : validator.validate(context)) {
 			Severity severity = problem.getSeverity();
-			String message = problem.getMessage();
+			String message =
+					MessageFormat.format("{0}:{1} - {2}", problem.getErrorCode(), problem.getMessage(),
+							UUIDUtil.toShortString(((AbstractProblem) problem).getTargetId()));
 			MarkerUtil.createMarker(resource, IMarker.PRIORITY_NORMAL, findSeverity(severity), message);
 		}
 	}

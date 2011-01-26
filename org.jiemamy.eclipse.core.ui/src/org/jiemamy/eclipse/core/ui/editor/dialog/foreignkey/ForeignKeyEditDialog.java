@@ -46,6 +46,7 @@ import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
+import org.jiemamy.model.ModelConsistencyException;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.DefaultDeferrabilityModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
@@ -122,6 +123,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 	 * @param context コンテキスト
 	 * @param foreignKey 編集対象外部キー
 	 * @throws IllegalArgumentException 引数foreignKey, jiemamyFacadeに{@code null}を与えた場合
+	 * @throws ModelConsistencyException
 	 */
 	public ForeignKeyEditDialog(Shell shell, JiemamyContext context, DefaultForeignKeyConstraintModel foreignKey) {
 		super(shell, context, foreignKey, DefaultForeignKeyConstraintModel.class);
@@ -130,9 +132,16 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 		TableModel sourceTableModel = foreignKey.findDeclaringTable(context.getTables());
+		if (sourceTableModel == null) {
+			throw new ModelConsistencyException("source table not found");
+		}
 		
 		TableModel targetTableModel =
 				(TableModel) DefaultTableModel.findReferencedDatabaseObject(context.getTables(), foreignKey);
+		if (targetTableModel == null) {
+			throw new ModelConsistencyException("target table not found");
+		}
+		
 		sourceColumns = sourceTableModel.getColumns();
 		referenceKeys = Lists.newArrayList(targetTableModel.getConstraints(LocalKeyConstraintModel.class));
 		

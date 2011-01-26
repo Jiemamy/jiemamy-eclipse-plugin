@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -221,7 +222,14 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 					} else if (constraintModel instanceof NotNullConstraintModel) {
 						EntityRef<? extends ColumnModel> ref =
 								((NotNullConstraintModel) constraintModel).getColumnRef();
-						return ref == null ? StringUtils.EMPTY : tableModel.resolve(ref).getName();
+						if (ref != null) {
+							try {
+								ColumnModel targetColumn = tableModel.resolve(ref);
+								return targetColumn.getName();
+							} catch (EntityNotFoundException e) {
+								// ignore
+							}
+						}
 					}
 					return StringUtils.EMPTY;
 					

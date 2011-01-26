@@ -29,17 +29,21 @@ import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.command.EditForeignKeyCommand;
 import org.jiemamy.eclipse.core.ui.editor.dialog.foreignkey.ForeignKeyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
 import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.ModelConsistencyException;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
@@ -76,13 +80,17 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", foreignKey);
 		
-		ForeignKeyEditDialog dialog =
-				new ForeignKeyEditDialog(getViewer().getControl().getShell(), context, foreignKey);
-		
-		if (dialog.open() == Dialog.OK) {
-			Command command = new EditForeignKeyCommand(context, foreignKey);
-			GraphicalViewer viewer = (GraphicalViewer) getViewer();
-			viewer.getEditDomain().getCommandStack().execute(command);
+		Shell shell = getViewer().getControl().getShell();
+		try {
+			ForeignKeyEditDialog dialog = new ForeignKeyEditDialog(shell, context, foreignKey);
+			
+			if (dialog.open() == Dialog.OK) {
+				Command command = new EditForeignKeyCommand(context, foreignKey);
+				GraphicalViewer viewer = (GraphicalViewer) getViewer();
+				viewer.getEditDomain().getCommandStack().execute(command);
+			}
+		} catch (ModelConsistencyException e) {
+			MessageDialog.openError(shell, "ModelConsistencyException", e.getMessage());
 		}
 	}
 	
@@ -131,16 +139,24 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 			}
 			if (foreignKey.getKeyColumns().size() > i) {
 				EntityRef<? extends ColumnModel> keyColumnRef = foreignKey.getKeyColumns().get(i);
-				ColumnModel keyColumn = context.resolve(keyColumnRef);
-				sb.append(keyColumn.getName());
+				try {
+					ColumnModel keyColumn = context.resolve(keyColumnRef);
+					sb.append(keyColumn.getName());
+				} catch (EntityNotFoundException e) {
+					sb.append("UNKNOWN");
+				}
 			} else {
 				sb.append("UNKNOWN");
 			}
 			sb.append(" -> ");
 			if (foreignKey.getReferenceColumns().size() > i) {
 				EntityRef<? extends ColumnModel> referenceColumnRef = foreignKey.getReferenceColumns().get(i);
-				ColumnModel referenceColumn = context.resolve(referenceColumnRef);
-				sb.append(referenceColumn.getName());
+				try {
+					ColumnModel referenceColumn = context.resolve(referenceColumnRef);
+					sb.append(referenceColumn.getName());
+				} catch (EntityNotFoundException e) {
+					sb.append("UNKNOWN");
+				}
 			} else {
 				sb.append("UNKNOWN");
 			}

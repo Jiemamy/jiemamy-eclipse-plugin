@@ -40,10 +40,6 @@ public final class MarkerUtil {
 	public static final String MARKER_ID = JiemamyUIPlugin.PLUGIN_ID + ".problem";
 	
 
-//	public static final String MARKER_ATTR_TARGET = "targetModel";
-//	
-//	public static final String MARKER_ATTR_CATEGORY = "category";
-	
 	/**
 	 * 指定したリソースに対して、指定した（エラー）マーカーを作成する。
 	 * 

@@ -79,10 +79,13 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.ContextMetadata;
+import org.jiemamy.DefaultContextMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
+import org.jiemamy.dialect.GenericDialect;
 import org.jiemamy.eclipse.core.ui.editor.editpart.DiagramEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
@@ -95,7 +98,6 @@ import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 import org.jiemamy.utils.UUIDUtil;
-import org.jiemamy.validator.AbstractProblem;
 import org.jiemamy.validator.AllValidator;
 import org.jiemamy.validator.Problem;
 import org.jiemamy.validator.Problem.Severity;
@@ -195,7 +197,11 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		try {
 			Dialect dialect = context.findDialect();
 			validator = dialect.getValidator();
+		} catch (IllegalStateException e) {
+			configureDefaultDialect();
+			validator = new AllValidator();
 		} catch (ClassNotFoundException e) {
+			configureDefaultDialect();
 			validator = new AllValidator();
 		}
 		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
@@ -204,7 +210,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 			Severity severity = problem.getSeverity();
 			String message =
 					MessageFormat.format("{0}:{1} - {2}", problem.getErrorCode(), problem.getMessage(),
-							UUIDUtil.toShortString(((AbstractProblem) problem).getTargetId()));
+							UUIDUtil.toShortString(problem.getTargetId()));
 			MarkerUtil.createMarker(resource, IMarker.PRIORITY_NORMAL, findSeverity(severity), message);
 		}
 	}
@@ -562,9 +568,9 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		} finally {
 			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
 			if (diagramPresentations.getDiagrams().size() < 1) {
-				DefaultDiagramModel presentationModel = new DefaultDiagramModel(UUID.randomUUID());
-				presentationModel.setName("default");
-				diagramPresentations.store(presentationModel);
+				DefaultDiagramModel diagramModel = new DefaultDiagramModel(UUID.randomUUID());
+				diagramModel.setName("default");
+				diagramPresentations.store(diagramModel);
 			}
 		}
 		
@@ -588,6 +594,14 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		
 		// タブにファイル名をセット
 		setPartName(input.getName());
+	}
+	
+	private void configureDefaultDialect() {
+		ContextMetadata metadata = context.getMetadata();
+		if (metadata instanceof DefaultContextMetadata) {
+			((DefaultContextMetadata) metadata).setDialectClassName(GenericDialect.class.getName());
+		}
+		context.setMetadata(metadata);
 	}
 	
 //	/**

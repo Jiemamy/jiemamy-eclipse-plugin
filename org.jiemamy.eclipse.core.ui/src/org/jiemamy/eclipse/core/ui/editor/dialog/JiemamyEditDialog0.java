@@ -179,6 +179,8 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	protected AbstractTab createAdditionalTab(TabFolder tabFolder, String tabClassName) {
 		AbstractTab tab = null;
 		try {
+			// ここでロードするクラスが入っているバンドルは、Eclipse-RegisterBuddy に
+			// org.jiemamy.eclipse.core.ui を指定しなければならない。さもなければClassNotFoundException
 			Class<?> tabClass = Class.forName(tabClassName);
 			Constructor<?> constructor = tabClass.getConstructor(TabFolder.class, int.class, type);
 			tab = (AbstractTab) constructor.newInstance(tabFolder, SWT.NULL, targetCoreModel);

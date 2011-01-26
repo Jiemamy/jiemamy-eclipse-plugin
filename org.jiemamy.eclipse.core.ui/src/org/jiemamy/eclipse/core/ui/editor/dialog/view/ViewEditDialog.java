@@ -39,7 +39,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Text;
 
-import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dddbase.EntityNotFoundException;
@@ -49,7 +48,7 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.dialog.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.model.script.Position;
@@ -89,11 +88,12 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
 	 * @param viewModel 編集対象モデル
-	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
+	 * @param nodeModel 
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditDialog(Shell parentShell, JiemamyContext context, DefaultViewModel viewModel, int diagramIndex) {
-		super(parentShell, context, viewModel, DefaultViewModel.class, diagramIndex);
+	public ViewEditDialog(Shell parentShell, JiemamyContext context, DefaultViewModel viewModel,
+			DefaultDatabaseObjectNodeModel nodeModel) {
+		super(parentShell, context, viewModel, DefaultViewModel.class, nodeModel);
 		
 		Validate.notNull(viewModel);
 		
@@ -149,10 +149,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
 					DefaultNodeModel nodeModel = getNodeModel();
-					DefaultDiagramModel diagramModel = getDiagramModel();
 					nodeModel.setColor(ConvertUtil.convert(rgb));
-					diagramModel.store(nodeModel);
-					getContext().getFacet(DiagramFacet.class).store(diagramModel);
 				}
 			}
 		});
@@ -164,10 +161,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
 				DefaultNodeModel nodeModel = getNodeModel();
-				DefaultDiagramModel diagramModel = getDiagramModel();
 				nodeModel.setColor(null);
-				diagramModel.store(nodeModel);
-				getContext().getFacet(DiagramFacet.class).store(diagramModel);
 			}
 		});
 		

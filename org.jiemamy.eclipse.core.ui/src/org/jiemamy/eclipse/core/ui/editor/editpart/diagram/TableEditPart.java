@@ -80,25 +80,24 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 //	}
 	
 	@Override
-	public DatabaseObjectNodeModel getModel() {
-		return (DatabaseObjectNodeModel) super.getModel();
+	public DefaultDatabaseObjectNodeModel getModel() {
+		return (DefaultDatabaseObjectNodeModel) super.getModel();
 	}
 	
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		DatabaseObjectNodeModel node = getModel();
-		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(node.getCoreModelRef());
+		DefaultDatabaseObjectNodeModel nodeModel = getModel();
+		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(nodeModel.getCoreModelRef());
 		
 		Shell shell = getViewer().getControl().getShell();
-		TableEditDialog dialog = new TableEditDialog(shell, context, tableModel, TODO.DIAGRAM_INDEX);
+		TableEditDialog dialog = new TableEditDialog(shell, context, tableModel, nodeModel);
 		
 		if (dialog.open() == Dialog.OK) {
-			Command command = new EditDatabaseObjectCommand(context, tableModel);
+			Command command = new EditDatabaseObjectCommand(context, tableModel, nodeModel, TODO.DIAGRAM_INDEX);
 			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 			viewer.getEditDomain().getCommandStack().execute(command);
-//			context.store(tableModel);
 		}
 	}
 	

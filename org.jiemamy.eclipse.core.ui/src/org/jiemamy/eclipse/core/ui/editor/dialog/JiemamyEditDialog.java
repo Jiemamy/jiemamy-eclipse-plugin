@@ -20,11 +20,9 @@ package org.jiemamy.eclipse.core.ui.editor.dialog;
 
 import org.eclipse.swt.widgets.Shell;
 
-import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 
 /**
  * Jiemamyのモデル編集ダイアログ抽象クラス。
@@ -34,9 +32,7 @@ import org.jiemamy.model.DefaultNodeModel;
  */
 public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends JiemamyEditDialog0<T> {
 	
-	private DefaultNodeModel nodeModel;
-	
-	private DefaultDiagramModel diagramModel;
+	private DefaultDatabaseObjectNodeModel nodeModel;
 	
 
 	/**
@@ -46,23 +42,17 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	 * @param context コンテキスト
 	 * @param targetCoreModel 編集対象モデルの型
 	 * @param type 編集対象モデルの型
-	 * @param diagramIndex 
+	 * @param nodeModel  
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
 	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetCoreModel, Class<?> type,
-			int diagramIndex) {
+			DefaultDatabaseObjectNodeModel nodeModel) {
 		super(parentShell, context, targetCoreModel, type);
 		
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
-		nodeModel = (DefaultNodeModel) diagramModel.getNodeFor(targetCoreModel.toReference());
+		this.nodeModel = nodeModel;
 	}
 	
-	protected DefaultDiagramModel getDiagramModel() {
-		return diagramModel;
-	}
-	
-	protected DefaultNodeModel getNodeModel() {
+	public DefaultDatabaseObjectNodeModel getNodeModel() {
 		return nodeModel;
 	}
 }

@@ -66,22 +66,22 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	}
 	
 	@Override
-	public DatabaseObjectNodeModel getModel() {
-		return (DatabaseObjectNodeModel) super.getModel();
+	public DefaultDatabaseObjectNodeModel getModel() {
+		return (DefaultDatabaseObjectNodeModel) super.getModel();
 	}
 	
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		DatabaseObjectNodeModel node = getModel();
-		DefaultViewModel viewModel = (DefaultViewModel) context.resolve(node.getCoreModelRef());
+		DefaultDatabaseObjectNodeModel nodeModel = getModel();
+		DefaultViewModel viewModel = (DefaultViewModel) context.resolve(nodeModel.getCoreModelRef());
 		
 		Shell shell = getViewer().getControl().getShell();
-		ViewEditDialog dialog = new ViewEditDialog(shell, context, viewModel, TODO.DIAGRAM_INDEX);
+		ViewEditDialog dialog = new ViewEditDialog(shell, context, viewModel, nodeModel);
 		
 		if (dialog.open() == Dialog.OK) {
-			Command command = new EditDatabaseObjectCommand(context, viewModel);
+			Command command = new EditDatabaseObjectCommand(context, viewModel, nodeModel, TODO.DIAGRAM_INDEX);
 			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 			viewer.getEditDomain().getCommandStack().execute(command);
 		}

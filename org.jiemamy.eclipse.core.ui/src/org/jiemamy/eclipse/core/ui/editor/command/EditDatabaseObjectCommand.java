@@ -21,8 +21,11 @@ package org.jiemamy.eclipse.core.ui.editor.command;
 import org.apache.commons.lang.Validate;
 import org.eclipse.gef.commands.Command;
 
+import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.NodeModel;
 
 /**
  * TODO for daisuke
@@ -36,31 +39,46 @@ public class EditDatabaseObjectCommand extends Command {
 	
 	private final DatabaseObjectModel dom;
 	
-	private final DatabaseObjectModel old;
+	private final DatabaseObjectModel oldDom;
+	
+	private final NodeModel nodeModel;
+	
+	private final NodeModel oldNodeModel;
+	
+	private final int diagramIndex;
 	
 
-	/**
-	 * インスタンスを生成する。
-	 * 
-	 * @param context
-	 * @param dom
-	 */
-	public EditDatabaseObjectCommand(JiemamyContext context, DatabaseObjectModel dom) {
+	public EditDatabaseObjectCommand(JiemamyContext context, DatabaseObjectModel dom, NodeModel nodeModel,
+			int diagramIndex) {
 		Validate.notNull(context);
 		Validate.notNull(dom);
+		Validate.notNull(nodeModel);
 		
 		this.context = context;
 		this.dom = dom;
-		old = context.resolve(dom.toReference());
+		this.nodeModel = nodeModel;
+		this.diagramIndex = diagramIndex;
+		oldNodeModel = context.resolve(nodeModel.toReference());
+		oldDom = context.resolve(dom.toReference());
 	}
 	
 	@Override
 	public void execute() {
 		context.store(dom);
+		
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		diagramModel.store(nodeModel);
+		facet.store(diagramModel);
 	}
 	
 	@Override
 	public void undo() {
-		context.store(old);
+		context.store(oldDom);
+		
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		diagramModel.store(oldNodeModel);
+		facet.store(diagramModel);
 	}
 }

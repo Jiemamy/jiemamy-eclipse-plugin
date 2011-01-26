@@ -18,13 +18,13 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.dialog.table;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.collect.Sets;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
@@ -54,12 +54,14 @@ import org.jiemamy.eclipse.core.ui.editor.dialog.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.model.script.Position;
 import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.table.TableModel;
 
 /**
  * {@link DefaultTableModel}の詳細編集ダイアログクラス。
@@ -93,13 +95,12 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
 	 * @param tableModel 編集対象モデル
-	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
+	 * @param nodeModel {@link DefaultDiagramModel}
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TableEditDialog(Shell parentShell, JiemamyContext context, DefaultTableModel tableModel, int diagramIndex) {
-		super(parentShell, context, tableModel, DefaultTableModel.class, diagramIndex);
-		
-		Validate.notNull(tableModel);
+	public TableEditDialog(Shell parentShell, JiemamyContext context, DefaultTableModel tableModel,
+			DefaultDatabaseObjectNodeModel nodeModel) {
+		super(parentShell, context, tableModel, DefaultTableModel.class, nodeModel);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -152,9 +153,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
 					DefaultNodeModel nodeModel = getNodeModel();
-					DefaultDiagramModel diagramModel = getDiagramModel();
 					nodeModel.setColor(ConvertUtil.convert(rgb));
-					diagramModel.store(nodeModel);
 				}
 			}
 		});
@@ -166,9 +165,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
 				DefaultNodeModel nodeModel = getNodeModel();
-				DefaultDiagramModel diagramModel = getDiagramModel();
 				nodeModel.setColor(null);
-				diagramModel.store(nodeModel);
 			}
 		});
 		
@@ -210,39 +207,10 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	
 	@Override
 	protected boolean performOk() {
-		if (StringUtils.isEmpty(txtName.getText())) {
-			return false;
-		}
-		
 		DefaultTableModel tableModel = getTargetCoreModel();
-		Set<DatabaseObjectModel> entities = getContext().getDatabaseObjects();
-		Set<String> entityNames = new HashSet<String>(entities.size());
-		for (DatabaseObjectModel entityModel : entities) {
-			if (entityModel.equals(tableModel) == false) {
-				entityNames.add(entityModel.getName());
-			}
-		}
 		
-		List<ColumnModel> columns = tableModel.getColumns();
-		Set<String> columnNames = new HashSet<String>(columns.size());
-		for (ColumnModel columnModel : columns) {
-			columnNames.add(columnModel.getName());
-		}
-		
-		if (entityNames.contains(txtName.getText())) {
-			// RESOURCE
-			boolean entityCheckOk = MessageDialog.openQuestion(getParentShell(), "Confirm", "エンティティ名が重複しますが、よろしいですか？");
-			if (entityCheckOk == false) {
-				return false;
-			}
-		}
-		
-		if (columnNames.size() != columns.size()) {
-			// RESOURCE
-			boolean columnCheckOk = MessageDialog.openQuestion(getParentShell(), "Confirm", "カラム名が重複しますが、よろしいですか？");
-			if (columnCheckOk == false) {
-				return false;
-			}
+		if (confirmConsistency(tableModel) == false) {
+			return false;
 		}
 		
 		String name = txtName.getText();
@@ -278,6 +246,47 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		tableModel.setDescription(description);
 		
 		return true;
+	}
+	
+	/**
+	 * 整合性をチェックし、ダイアログでユーザに確認する。
+	 * 
+	 * @param tableModel テーブル
+	 * @return 警告を無視する場合は{@code true}、そうでない場合は{@code false}
+	 */
+	private boolean confirmConsistency(TableModel tableModel) {
+		boolean result = true;
+		
+		Set<DatabaseObjectModel> doms = getContext().getDatabaseObjects();
+		Set<String> domNames = Sets.newHashSetWithExpectedSize(doms.size());
+		for (DatabaseObjectModel dom : doms) {
+			if (dom.equals(tableModel) == false) {
+				domNames.add(dom.getName());
+			}
+		}
+		
+		if (domNames.contains(txtName.getText())) {
+			// RESOURCE
+			boolean entityCheckOk = MessageDialog.openQuestion(getParentShell(), "Confirm", "エンティティ名が重複しますが、よろしいですか？");
+			if (entityCheckOk == false) {
+				result = false;
+			}
+		}
+		
+		List<ColumnModel> columns = tableModel.getColumns();
+		Set<String> columnNames = Sets.newHashSetWithExpectedSize(columns.size());
+		for (ColumnModel column : columns) {
+			columnNames.add(column.getName());
+		}
+		
+		if (columnNames.size() != columns.size()) {
+			// RESOURCE
+			boolean columnCheckOk = MessageDialog.openQuestion(getParentShell(), "Confirm", "カラム名が重複しますが、よろしいですか？");
+			if (columnCheckOk == false) {
+				result = false;
+			}
+		}
+		return result;
 	}
 	
 	private void createTabs(final DefaultTableModel tableModel, TabFolder tabFolder) {

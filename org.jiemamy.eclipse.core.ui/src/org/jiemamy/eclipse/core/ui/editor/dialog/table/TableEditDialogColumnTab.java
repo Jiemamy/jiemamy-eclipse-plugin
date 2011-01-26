@@ -713,10 +713,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			} else {
 				if (primaryKey == null) {
 					primaryKey = DefaultPrimaryKeyConstraintModel.of(columnModel);
-				} else {
+					tableModel.store(primaryKey);
+				} else if (primaryKey.getKeyColumns().contains(columnModel.toReference()) == false) {
 					primaryKey.addKeyColumn(columnModel.toReference());
+					tableModel.store(primaryKey);
 				}
-				tableModel.store(primaryKey);
 			}
 			if (primaryKey != null && primaryKey.getKeyColumns().size() <= 0) {
 				tableModel.deleteConstraint(primaryKey.toReference());

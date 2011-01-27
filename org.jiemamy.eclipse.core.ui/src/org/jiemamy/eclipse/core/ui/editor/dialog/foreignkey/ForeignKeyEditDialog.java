@@ -197,7 +197,8 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		if (referenceKeyConstraint == null) {
 			cmbReferenceKey.setText(cmbReferenceKey.getItem(0));
 		} else {
-			cmbReferenceKey.setText(KeyConstraintUtil.toStringKeyColumns(context, referenceKeyConstraint));
+			
+			cmbReferenceKey.setText(toReferenceKeyLabel(referenceKeyConstraint));
 		}
 		
 		assert dialogArea != null;
@@ -242,13 +243,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		cmbReferenceKey = new Combo(dialogArea, SWT.READ_ONLY); // TODO CComboにしてPKラベルを表示
 		cmbReferenceKey.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		for (LocalKeyConstraintModel referenceKey : referenceKeys) {
-			StringBuilder sb = new StringBuilder();
-			if (referenceKey.getName() != null) {
-				sb.append(referenceKey.getName());
-				sb.append(" ");
-			}
-			sb.append(KeyConstraintUtil.toStringKeyColumns(getContext(), referenceKey));
-			cmbReferenceKey.add(sb.toString());
+			cmbReferenceKey.add(toReferenceKeyLabel(referenceKey));
 		}
 		
 		cmbReferenceKey.addSelectionListener(new SelectionAdapter() {
@@ -473,5 +468,15 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		for (ReferentialAction referentialAction : ReferentialAction.values()) {
 			cmbOnUpdate.add(referentialAction.name());
 		}
+	}
+	
+	private String toReferenceKeyLabel(KeyConstraintModel referenceKey) {
+		StringBuilder sb = new StringBuilder();
+		if (StringUtils.isEmpty(referenceKey.getName()) == false) {
+			sb.append(referenceKey.getName());
+			sb.append(" ");
+		}
+		sb.append(KeyConstraintUtil.toStringKeyColumns(getContext(), referenceKey));
+		return sb.toString();
 	}
 }

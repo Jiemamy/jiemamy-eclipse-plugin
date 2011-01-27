@@ -21,6 +21,7 @@ package org.jiemamy.eclipse.core.ui.editor.dialog.table;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.collect.Collections2;
@@ -79,7 +80,9 @@ import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
 import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.column.ColumnParameterKey;
 import org.jiemamy.model.column.DefaultColumnModel;
+import org.jiemamy.model.constraint.AbstractKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.NotNullConstraintModel;
@@ -627,6 +630,24 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			
 			ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
+			
+			// 削除対象カラムに対するNNは削除
+			Set<NotNullConstraintModel> nns = tableModel.getConstraints(NotNullConstraintModel.class);
+			for (NotNullConstraintModel nn : nns) {
+				if (nn.getColumnRef().isReferenceOf(subject)) {
+					tableModel.deleteConstraint(nn.toReference());
+				}
+			}
+			
+			// 削除対象カラムがキーの一部になっていたら、そのキーセットからカラムを削除
+			Set<AbstractKeyConstraintModel> keys = tableModel.getConstraints(AbstractKeyConstraintModel.class);
+			for (AbstractKeyConstraintModel key : keys) {
+				if (key.getKeyColumns().contains(subject.toReference())) {
+					key.removeKeyColumn(subject.toReference());
+					tableModel.store(key);
+				}
+			}
+			
 			tableModel.delete(subject.toReference());
 			
 			tableViewer.remove(subject);
@@ -719,20 +740,20 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					tableModel.store(primaryKey);
 				}
 			}
-			if (primaryKey != null && primaryKey.getKeyColumns().size() <= 0) {
-				tableModel.deleteConstraint(primaryKey.toReference());
-			}
-			
-//			if (chkIsDisabled.getSelection() == false) {
-//				if (columnModel.hasAdapter(Disablable.class)) {
-//					columnModel.unregisterAdapter(Disablable.class);
-//				}
-//			} else {
-//				if (columnModel.hasAdapter(Disablable.class) == false) {
-//					columnModel.registerAdapter(factory.newAdapter(Disablable.class));
-//				}
-//				columnModel.getAdapter(Disablable.class).setDisabled(true);
+//			if (primaryKey != null && primaryKey.getKeyColumns().size() <= 0) {
+//				tableModel.deleteConstraint(primaryKey.toReference());
 //			}
+			
+			Boolean disabled = columnModel.getParam(ColumnParameterKey.DISABLED);
+			if (chkIsDisabled.getSelection() == false) {
+				if (disabled != null && disabled) {
+					columnModel.removeParam(ColumnParameterKey.DISABLED);
+				}
+			} else {
+				if (disabled == null || disabled == false) {
+					columnModel.putParam(ColumnParameterKey.DISABLED, true);
+				}
+			}
 			
 			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
 			manager.writeBackToAdapter(columnModel);

@@ -92,7 +92,6 @@ import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.serializer.JiemamySerializer;
 import org.jiemamy.serializer.SerializationException;
-import org.jiemamy.transaction.DispatchStrategy;
 import org.jiemamy.transaction.EventBrokerImpl;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
@@ -249,7 +248,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		ByteArrayInputStream in = null;
 		try {
 			out = new ByteArrayOutputStream();
-			context.findSerializer().serialize(context, out);
+			JiemamyContext.findSerializer().serialize(context, out);
 			
 			in = new ByteArrayInputStream(out.toByteArray());
 			IFile file = ((IFileEditorInput) getEditorInput()).getFile();
@@ -288,7 +287,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 							ByteArrayInputStream in = null;
 							try {
 								out = new ByteArrayOutputStream();
-								context.findSerializer().serialize(context, out);
+								JiemamyContext.findSerializer().serialize(context, out);
 								
 								in = new ByteArrayInputStream(out.toByteArray());
 								file.create(in, true, monitor);
@@ -311,8 +310,8 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	}
 	
 	@Override
-	// Java1.4対応APIのため、Classに型パラメータをつけることができない
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
+		// ↑Java1.4対応APIのため、Classに型パラメータをつけることができない
 		if (adapter == ZoomManager.class) {
 			return ((ScalableRootEditPart) getGraphicalViewer().getRootEditPart()).getZoomManager();
 //		} else if (adapter == IContentOutlinePage.class) {
@@ -339,25 +338,21 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		return tabIndex;
 	}
 	
-	public JiemamyContext getTargetModel() {
-		return context;
-	}
-	
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);
 		
-		context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
-		
-		// FIXME 無差別ディスパッチになってる。
-		context.getEventBroker().setDefaultStrategy(new DispatchStrategy() {
-			
-			public boolean needToDispatch(StoredEventListener listener, StoredEvent<?> command) {
-				return true;
-			}
-			
-		});
-		context.getEventBroker().addListener(this);
+//		context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
+//		
+//		// FIXME 無差別ディスパッチになってる。
+//		context.getEventBroker().setDefaultStrategy(new DispatchStrategy() {
+//			
+//			public boolean needToDispatch(StoredEventListener listener, StoredEvent<?> command) {
+//				return true;
+//			}
+//			
+//		});
+//		context.getEventBroker().addListener(this);
 		
 		logger.debug(LogMarker.LIFECYCLE, "initialized");
 	}
@@ -454,6 +449,8 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// configure the context menu provider
 		viewer.setContextMenu(new DiagramEditorContextMenuProvider(viewer, this, actionRegistry));
 		getSite().setSelectionProvider(viewer);
+		
+		logger.debug(LogMarker.LIFECYCLE, "GraphicalViewer configured");
 	}
 	
 	@Override
@@ -535,12 +532,15 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		action = new AlignmentAction((IWorkbenchPart) this, PositionConstants.MIDDLE);
 		actionRegistry.registerAction(action);
 		selectionActions.add(action.getId());
+		
+		logger.debug(LogMarker.LIFECYCLE, "action created");
 	}
 	
 	@Override
 	protected PaletteRoot getPaletteRoot() {
 		if (paletteModel == null) {
 			paletteModel = DiagramEditorPaletteFactory.createPalette();
+			logger.debug(LogMarker.LIFECYCLE, "palette created");
 		}
 		
 		return paletteModel;
@@ -555,7 +555,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// 最上位モデルの設定
 		IFile file = ((IFileEditorInput) getEditorInput()).getFile();
 		try {
-			JiemamySerializer serializer = context.findSerializer();
+			JiemamySerializer serializer = JiemamyContext.findSerializer();
 			context = serializer.deserialize(file.getContents(), DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 			context.getEventBroker().addListener(this); // THINK require?
 		} catch (SerializationException e) {
@@ -577,15 +577,9 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// 初回のバリデータ起動
 		commandExecuted(null);
 		
-//		Set<DatabaseObjectModel> entities = context.getDatabaseObjects();
-//		for (DatabaseObjectModel entityModel : entities) {
-//			entityModel.registerAdapter(new EntityPropertySource(entityModel));
-////			if (entityModel instanceof TableModel) {
-////				entityModel.registerAdapter(new RepresentationAdapter());
-////			}
-//		}
-		
 		viewer.setContents(context);
+		
+		logger.debug(LogMarker.LIFECYCLE, "GraphicalViewer initialized");
 	}
 	
 	@Override

@@ -117,16 +117,17 @@ public class ImportAction extends AbstractJiemamyAction {
 				return;
 			}
 			ImportConfig config = wizard.getConfig();
-			
-			// 実行
-			boolean success = importer.importModel(rootModel, config);
-			
-			if (success) {
-				rootEditPart.refresh();
-				new AutoLayoutAction(viewer).run();
-				MessageDialog.openInformation(shell, "import succeeded", "インポートが正常に完了しました。"); // RESOURCE
-			} else {
-				MessageDialog.openWarning(shell, "import aborted", "インポートは行われませんでした。"); // RESOURCE
+			if (config != null) {
+				// 実行
+				boolean success = importer.importModel(rootModel, config);
+				
+				if (success) {
+					rootEditPart.refresh();
+					new AutoLayoutAction(viewer).run();
+					MessageDialog.openInformation(shell, "import succeeded", "インポートが正常に完了しました。"); // RESOURCE
+				} else {
+					MessageDialog.openWarning(shell, "import aborted", "インポートは行われませんでした。"); // RESOURCE
+				}
 			}
 		} catch (ImportException e) {
 			ExceptionHandler.handleException(e.getCause());

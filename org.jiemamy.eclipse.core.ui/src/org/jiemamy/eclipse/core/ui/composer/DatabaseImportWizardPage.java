@@ -50,6 +50,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -128,7 +129,7 @@ class DatabaseImportWizardPage extends WizardPage {
 		gd.horizontalSpan = 2;
 		cmbDialect.setLayoutData(gd);
 		for (Dialect dialect : dialectResolver.getAllInstance()) {
-			cmbDialect.add(dialect.toString());
+			cmbDialect.add(dialect.getClass().getName());
 		}
 		cmbDialect.select(0);
 		cmbDialect.addSelectionListener(new SelectionAdapter() {
@@ -212,8 +213,8 @@ class DatabaseImportWizardPage extends WizardPage {
 		txtSchema.setLayoutData(gd);
 		txtSchema.setText(StringUtils.defaultIfEmpty(settings.get("txtSchema"), ""));
 		
-		@SuppressWarnings("unused")
 		Object dummy = new Label(composite, SWT.NONE); // dummy
+		dummy.toString(); // dummy
 		
 		btnImportDataSet = new Button(composite, SWT.CHECK);
 		btnImportDataSet.setText("DataSetをインポートする"); // RESOURCE
@@ -450,35 +451,74 @@ class DatabaseImportWizardPage extends WizardPage {
 	
 	/**
 	 * 接続のテストを行う。
+	 * 
+	 * TODO ネスト深くてむちゃくちゃなので、ちょっとリファクタリングすべし。
 	 */
 	private void testConnection() {
-		Connection connection = null;
 		try {
-			Driver driver = DriverUtil.getDriverInstance(getDriverJarPaths(), getDriverClassName());
-			Properties info = new Properties();
+			final Driver driver = DriverUtil.getDriverInstance(getDriverJarPaths(), getDriverClassName());
+			final Properties info = new Properties();
 			info.setProperty("user", getUsername());
 			info.setProperty("password", getPassword());
-			connection = driver.connect(getUri(), info);
-			if (connection != null) {
-				MessageDialog.openInformation(getShell(), "接続成功", "データベースに接続できました。"); // RESOURCE
-				connectionSucceeded();
-			} else {
-				MessageDialog.openError(getShell(), "接続失敗0", "null connection"); // RESOURCE
-			}
+			final String uri = getUri();
+			
+			final Display display = getShell().getDisplay();
+			new Thread() {
+				
+				@Override
+				public void run() {
+					Connection connection = null;
+					try {
+						connection = driver.connect(uri, info);
+						if (connection != null) {
+							display.asyncExec(new Runnable() {
+								
+								public void run() {
+									MessageDialog.openInformation(getShell(), "接続成功", "データベースに接続できました。"); // RESOURCE
+									connectionSucceeded();
+								}
+							});
+						} else {
+							display.asyncExec(new Runnable() {
+								
+								public void run() {
+									MessageDialog.openError(getShell(), "接続失敗0", "null connection"); // RESOURCE
+								}
+							});
+						}
+					} catch (SQLException ex) {
+						final String msg = ex.getClass().getName() + " " + ex.getMessage();
+						display.asyncExec(new Runnable() {
+							
+							public void run() {
+								MessageDialog.openError(getShell(), "接続失敗1", msg); // RESOURCE
+							}
+						});
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						final String msg = ex.getClass().getName() + " " + ex.getMessage();
+						display.asyncExec(new Runnable() {
+							
+							public void run() {
+								MessageDialog.openError(getShell(), "接続失敗2", msg); // RESOURCE
+							}
+						});
+					} finally {
+						DbUtils.closeQuietly(connection);
+					}
+				}
+			}.start();
+			
 		} catch (DriverNotFoundException ex) {
-			MessageDialog.openError(getShell(), "接続失敗1", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
-		} catch (InstantiationException ex) {
-			MessageDialog.openError(getShell(), "接続失敗2", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
-		} catch (IllegalAccessException ex) {
 			MessageDialog.openError(getShell(), "接続失敗3", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
-		} catch (IOException ex) {
+		} catch (InstantiationException ex) {
 			MessageDialog.openError(getShell(), "接続失敗4", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
-		} catch (SQLException ex) {
+		} catch (IllegalAccessException ex) {
 			MessageDialog.openError(getShell(), "接続失敗5", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
-		} catch (Exception ex) {
+		} catch (IOException ex) {
 			MessageDialog.openError(getShell(), "接続失敗6", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
-		} finally {
-			DbUtils.closeQuietly(connection);
+		} catch (Exception ex) {
+			MessageDialog.openError(getShell(), "接続失敗7", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
 		}
 	}
 }

@@ -58,6 +58,8 @@ import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.column.ColumnParameterKey;
+import org.jiemamy.model.constraint.KeyConstraintModel;
 import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.model.script.Position;
 import org.jiemamy.model.table.DefaultTableModel;
@@ -175,19 +177,23 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				// TODO disable-model
-//				if (tableModel.hasAdapter(Disablable.class) == false) {
-//					JiemamyFactory factory = tableModel.getJiemamy().getFactory();
-//					tableModel.registerAdapter(factory.newAdapter(Disablable.class));
-//				}
-//				tableModel.getAdapter(Disablable.class).setDisabled(btnDisable.getSelection());
+				Boolean disabled = tableModel.getParam(ColumnParameterKey.DISABLED);
+				if (btnDisable.getSelection() == false) {
+					if (disabled != null && disabled) {
+						tableModel.removeParam(ColumnParameterKey.DISABLED);
+					}
+				} else {
+					if (disabled == null || disabled == false) {
+						tableModel.putParam(ColumnParameterKey.DISABLED, true);
+					}
+				}
 			}
 			
 		});
-//		if (tableModel.hasAdapter(Disablable.class)
-//				&& Boolean.TRUE.equals(tableModel.getAdapter(Disablable.class).isDisabled())) {
-//			btnDisable.setSelection(true);
-//		}
+		Boolean disabled = tableModel.getParam(ColumnParameterKey.DISABLED);
+		if (disabled != null && disabled) {
+			btnDisable.setSelection(true);
+		}
 		
 		// ---- B. タブ
 		TabFolder tabFolder = new TabFolder(composite, SWT.NONE);
@@ -244,6 +250,13 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
 		tableModel.setDescription(description);
+		
+		Set<KeyConstraintModel> constraints = tableModel.getConstraints(KeyConstraintModel.class);
+		for (KeyConstraintModel keyConstraintModel : constraints) {
+			if (keyConstraintModel.getKeyColumns().isEmpty()) {
+				tableModel.deleteConstraint(keyConstraintModel.toReference());
+			}
+		}
 		
 		return true;
 	}

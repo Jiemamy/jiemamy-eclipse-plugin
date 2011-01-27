@@ -23,8 +23,15 @@ import com.google.common.base.Function;
 import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.model.datatype.TypeParameterKey;
 
+/**
+ * TODO for daisuke
+ * 
+ * @version $Id$
+ * @author daisuke
+ */
 public class SpecsToKeys implements Function<TypeParameterSpec, TypeParameterKey<?>> {
 	
+	/** singleton instance */
 	public static final SpecsToKeys INSTANCE = new SpecsToKeys();
 	
 

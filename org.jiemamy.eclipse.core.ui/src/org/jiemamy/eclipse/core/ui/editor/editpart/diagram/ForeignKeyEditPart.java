@@ -18,6 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.editpart.diagram;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.draw2d.ConnectionLocator;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -128,7 +129,7 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 	private String toString(JiemamyContext context, ForeignKeyConstraintModel foreignKey) {
 		StringBuilder sb = new StringBuilder();
 		
-		if (foreignKey.getName() != null) {
+		if (StringUtils.isEmpty(foreignKey.getName()) == false) {
 			sb.append(foreignKey.getName()).append("\n");
 		}
 		

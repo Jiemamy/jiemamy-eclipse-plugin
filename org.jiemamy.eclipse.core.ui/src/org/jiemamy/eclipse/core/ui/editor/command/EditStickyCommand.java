@@ -29,7 +29,7 @@ import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.StickyNodeModel;
 
 /**
- * TODO for daisuke
+ * {@link StickyNodeModel}を編集するコマンド。
  * 
  * @version $Id$
  * @author daisuke
@@ -50,9 +50,10 @@ public class EditStickyCommand extends Command {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param context
-	 * @param diagramModel 
-	 * @param stickyModel
+	 * @param context コンテキスト
+	 * @param diagramModel ダイアグラム
+	 * @param stickyModel メモ
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public EditStickyCommand(JiemamyContext context, DefaultDiagramModel diagramModel, StickyNodeModel stickyModel) {
 		Validate.notNull(context);

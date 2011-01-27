@@ -55,5 +55,10 @@ public interface TableEditorConfig {
 	 */
 	String getRemoveLabel();
 	
+	/**
+	 * 要素の順序をコントロールできるエディタかどうかを返す。
+	 * 
+	 * @return 要素の順序をコントロールできるエディタの場合は{@code true}、そうでない場合は{@code false}
+	 */
 	boolean isFreeOrder();
 }

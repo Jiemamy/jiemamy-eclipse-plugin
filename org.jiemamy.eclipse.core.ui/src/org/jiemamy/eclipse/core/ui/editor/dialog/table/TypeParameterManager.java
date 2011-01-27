@@ -126,10 +126,14 @@ class TypeParameterManager {
 	 * 
 	 * <p>元から存在したコントロールはすべて破棄される。</p>
 	 * 
-	 * @param columnModel 
+	 * @param columnModel カラム
 	 * @param keys データ型パラメータキー集合
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void createTypeOptionControl(DefaultColumnModel columnModel, Collection<TypeParameterKey<?>> keys) {
+		Validate.notNull(columnModel);
+		Validate.noNullElements(keys);
+		
 		clearTypeOptionControl();
 		
 		TypeVariant dataType = columnModel.getDataType();
@@ -236,9 +240,11 @@ class TypeParameterManager {
 	/**
 	 * アダプタからコントロールに値を格納する。
 	 * 
-	 * @param columnModel 
+	 * @param columnModel カラム
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setValue(DefaultColumnModel columnModel) {
+		Validate.notNull(columnModel);
 		TypeVariant dataType = columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;
@@ -273,8 +279,12 @@ class TypeParameterManager {
 	
 	/**
 	 * コントロールからアダプタにデータを書き戻す。
+	 * 
+	 * @param columnModel カラム
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void writeBackToAdapter(DefaultColumnModel columnModel) {
+		Validate.notNull(columnModel);
 		DefaultTypeVariant dataType = (DefaultTypeVariant) columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;

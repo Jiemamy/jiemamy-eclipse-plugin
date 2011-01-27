@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
@@ -74,10 +75,15 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	 * @param nodeModel 操作対象ノード
 	 * @param boundary 新しい位置サイズ
 	 * @param viewer ビューア
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, DefaultNodeModel nodeModel,
 			JmRectangle boundary, EditPartViewer viewer) {
-		super(diagramIndex);
+		Validate.notNull(context);
+		Validate.notNull(nodeModel);
+		Validate.notNull(boundary);
+		Validate.notNull(viewer);
+		
 		this.context = context;
 		this.diagramIndex = diagramIndex;
 		this.nodeModel = nodeModel;
@@ -99,6 +105,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	 * @param nodeModel 操作対象ノード
 	 * @param rectangle 新しい位置サイズ
 	 * @param viewer ビューア
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, DefaultNodeModel nodeModel,
 			Rectangle rectangle, EditPartViewer viewer) {

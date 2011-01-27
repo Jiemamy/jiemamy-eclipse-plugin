@@ -28,7 +28,7 @@ import org.jiemamy.model.DefaultDiagramModel;
 import org.jiemamy.model.NodeModel;
 
 /**
- * TODO for daisuke
+ * {@link DatabaseObjectModel}を編集するコマンド。
  * 
  * @version $Id$
  * @author daisuke
@@ -48,6 +48,15 @@ public class EditDatabaseObjectCommand extends Command {
 	private final int diagramIndex;
 	
 
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param context コンテキスト
+	 * @param dom 編集対象{@link DatabaseObjectModel}
+	 * @param nodeModel ノード
+	 * @param diagramIndex
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
+	 */
 	public EditDatabaseObjectCommand(JiemamyContext context, DatabaseObjectModel dom, NodeModel nodeModel,
 			int diagramIndex) {
 		Validate.notNull(context);

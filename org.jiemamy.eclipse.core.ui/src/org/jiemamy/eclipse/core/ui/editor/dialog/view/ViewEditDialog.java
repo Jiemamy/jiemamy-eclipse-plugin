@@ -21,7 +21,6 @@ package org.jiemamy.eclipse.core.ui.editor.dialog.view;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -50,6 +49,7 @@ import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
 import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.column.ColumnParameterKey;
 import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.model.script.Position;
 import org.jiemamy.model.view.DefaultViewModel;
@@ -88,14 +88,12 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
 	 * @param viewModel 編集対象モデル
-	 * @param nodeModel 
+	 * @param nodeModel ノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public ViewEditDialog(Shell parentShell, JiemamyContext context, DefaultViewModel viewModel,
 			DefaultDatabaseObjectNodeModel nodeModel) {
 		super(parentShell, context, viewModel, DefaultViewModel.class, nodeModel);
-		
-		Validate.notNull(viewModel);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -171,19 +169,23 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				// TODO disable-model
-//				if (viewModel.hasAdapter(Disablable.class) == false) {
-//					JiemamyFactory factory = viewModel.getJiemamy().getFactory();
-//					viewModel.registerAdapter(factory.newAdapter(Disablable.class));
-//				}
-//				viewModel.getAdapter(Disablable.class).setDisabled(btnDisable.getSelection());
+				Boolean disabled = viewModel.getParam(ColumnParameterKey.DISABLED);
+				if (btnDisable.getSelection() == false) {
+					if (disabled != null && disabled) {
+						viewModel.removeParam(ColumnParameterKey.DISABLED);
+					}
+				} else {
+					if (disabled == null || disabled == false) {
+						viewModel.putParam(ColumnParameterKey.DISABLED, true);
+					}
+				}
 			}
 			
 		});
-//		if (viewModel.hasAdapter(Disablable.class)
-//				&& Boolean.TRUE.equals(viewModel.getAdapter(Disablable.class).isDisabled())) {
-//			btnDisable.setSelection(true);
-//		}
+		Boolean disabled = viewModel.getParam(ColumnParameterKey.DISABLED);
+		if (disabled != null && disabled) {
+			btnDisable.setSelection(true);
+		}
 		
 		// ---- A-4. ラベル
 		label = new Label(composite, SWT.NULL);

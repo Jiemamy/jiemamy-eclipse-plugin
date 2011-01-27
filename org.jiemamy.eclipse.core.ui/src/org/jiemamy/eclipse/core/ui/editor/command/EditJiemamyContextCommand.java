@@ -29,7 +29,7 @@ import org.jiemamy.SqlFacet;
 import org.jiemamy.model.script.AroundScriptModel;
 
 /**
- * TODO for daisuke
+ * {@link JiemamyContext}を編集するコマンド。
  * 
  * @version $Id$
  * @author daisuke
@@ -52,9 +52,10 @@ public class EditJiemamyContextCommand extends Command {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param context 
-	 * @param metadata
-	 * @param universalAroundScript
+	 * @param context コンテキスト
+	 * @param metadata new metdata.  May be {@code null}
+	 * @param universalAroundScript new around script.  May be {@code null}
+	 * @throws IllegalArgumentException 引数{@code context}に{@code null}を与えた場合
 	 */
 	public EditJiemamyContextCommand(JiemamyContext context, ContextMetadata metadata,
 			AroundScriptModel universalAroundScript) {

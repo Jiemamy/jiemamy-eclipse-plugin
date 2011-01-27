@@ -41,19 +41,7 @@ public abstract class AbstractMovePositionCommand extends Command {
 	
 	private JmPoint shift;
 	
-	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
-	private int diagramIndex;
-	
 
-	/**
-	 * インスタンスを生成する。
-	 * 
-	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 */
-	public AbstractMovePositionCommand(int diagramIndex) {
-		this.diagramIndex = diagramIndex;
-	}
-	
 	/**
 	 * shiftを取得する。
 	 * 
@@ -78,9 +66,11 @@ public abstract class AbstractMovePositionCommand extends Command {
 	 * ダイアグラムを全体的に移動させる。
 	 * 
 	 * @param negative 正方向に移動させる場合は{@code true}、負方向の場合は{@code false}
-	 * @param diagramModel 
+	 * @param diagramModel 操作対象ダイアグラム
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	protected void shiftPosition(boolean negative, DefaultDiagramModel diagramModel) {
+		Validate.notNull(diagramModel);
 		for (NodeModel node : diagramModel.getNodes()) {
 			if (node instanceof DefaultNodeModel == false) {
 				continue;

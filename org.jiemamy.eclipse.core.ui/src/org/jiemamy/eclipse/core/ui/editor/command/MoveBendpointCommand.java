@@ -18,6 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.command;
 
+import org.apache.commons.lang.Validate;
 import org.eclipse.draw2d.geometry.Point;
 
 import org.jiemamy.DiagramFacet;
@@ -47,6 +48,8 @@ public class MoveBendpointCommand extends AbstractMovePositionCommand {
 	
 	private final JiemamyContext context;
 	
+	private final JmPoint oldLocation;
+	
 
 	/**
 	 * インスタンスを生成する。
@@ -56,15 +59,20 @@ public class MoveBendpointCommand extends AbstractMovePositionCommand {
 	 * @param connectionModel 操作対象のコネクション
 	 * @param newLocation 新しい座標
 	 * @param bendpointIndex source側からtarget側に向かって数えたベンドポイントのインデックス
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public MoveBendpointCommand(JiemamyContext context, int diagramIndex, DefaultConnectionModel connectionModel,
 			int bendpointIndex, Point newLocation) {
-		super(diagramIndex);
+		Validate.notNull(context);
+		Validate.notNull(connectionModel);
+		Validate.notNull(newLocation);
+		
 		this.context = context;
 		this.diagramIndex = diagramIndex;
 		this.connectionModel = connectionModel;
 		this.bendpointIndex = bendpointIndex;
 		this.newLocation = newLocation;
+		oldLocation = connectionModel.getBendpoints().get(bendpointIndex);
 		
 		int shiftX = newLocation.x < 0 ? Math.abs(newLocation.x) : 0;
 		int shiftY = newLocation.y < 0 ? Math.abs(newLocation.y) : 0;
@@ -84,6 +92,12 @@ public class MoveBendpointCommand extends AbstractMovePositionCommand {
 	
 	@Override
 	public void undo() {
-//		jiemamyFacade.rollback(savePoint);
+		connectionModel.breachEncapsulationOfBendpoints().set(bendpointIndex, oldLocation);
+		
+		DiagramFacet facet = context.getFacet(DiagramFacet.class);
+		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		diagramModel.store(connectionModel);
+		shiftPosition(true, diagramModel);
+		facet.store(diagramModel);
 	}
 }

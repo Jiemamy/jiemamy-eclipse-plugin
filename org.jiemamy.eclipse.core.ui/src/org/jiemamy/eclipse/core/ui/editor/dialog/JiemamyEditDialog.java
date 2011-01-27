@@ -32,7 +32,7 @@ import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
  */
 public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends JiemamyEditDialog0<T> {
 	
-	private DefaultDatabaseObjectNodeModel nodeModel;
+	private final DefaultDatabaseObjectNodeModel nodeModel;
 	
 
 	/**
@@ -42,7 +42,7 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	 * @param context コンテキスト
 	 * @param targetCoreModel 編集対象モデルの型
 	 * @param type 編集対象モデルの型
-	 * @param nodeModel  
+	 * @param nodeModel ノード
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
 	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetCoreModel, Class<?> type,
@@ -52,6 +52,11 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 		this.nodeModel = nodeModel;
 	}
 	
+	/**
+	 * ノードを取得する。
+	 * 
+	 * @return ノード
+	 */
 	public DefaultDatabaseObjectNodeModel getNodeModel() {
 		return nodeModel;
 	}

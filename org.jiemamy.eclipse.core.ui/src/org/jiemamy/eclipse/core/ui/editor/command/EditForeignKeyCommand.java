@@ -35,8 +35,6 @@ public class EditForeignKeyCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final ForeignKeyConstraintModel foreignKey;
-	
 	private final DefaultTableModel tableModel;
 	
 	private final DefaultTableModel oldTableModel;
@@ -45,14 +43,14 @@ public class EditForeignKeyCommand extends Command {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param context
-	 * @param foreignKey
+	 * @param context コンテキスト
+	 * @param foreignKey 新しい外部キーモデル
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public EditForeignKeyCommand(JiemamyContext context, ForeignKeyConstraintModel foreignKey) {
 		Validate.notNull(context);
 		Validate.notNull(foreignKey);
 		this.context = context;
-		this.foreignKey = foreignKey;
 		tableModel = (DefaultTableModel) DefaultTableModel.findDeclaringTable(context.getTables(), foreignKey);
 		oldTableModel = context.resolve(tableModel.toReference());
 		

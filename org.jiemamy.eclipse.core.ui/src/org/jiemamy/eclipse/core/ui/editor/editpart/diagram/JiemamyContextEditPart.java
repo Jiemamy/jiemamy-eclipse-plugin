@@ -34,6 +34,7 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.Request;
+import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -42,6 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jiemamy.DefaultContextMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -53,6 +55,7 @@ import org.jiemamy.eclipse.core.ui.editor.editpolicy.JmXYLayoutEditPolicy;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
 import org.jiemamy.model.DiagramModel;
 import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
@@ -125,10 +128,15 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		JiemamyContextEditDialog dialog = new JiemamyContextEditDialog(shell, context);
 		
 		if (dialog.open() == Dialog.OK) {
-			org.eclipse.gef.commands.Command command =
-					new EditJiemamyContextCommand(context, dialog.getMetadata(), dialog.getUniversalAroundScript());
-			GraphicalViewer viewer = (GraphicalViewer) getViewer();
-			viewer.getEditDomain().getCommandStack().execute(command);
+			DefaultContextMetadata metadata = dialog.getMetadata();
+			DefaultAroundScriptModel universalAroundScript = dialog.getUniversalAroundScript();
+			if (metadata != null) {
+				Command command = new EditJiemamyContextCommand(context, metadata, universalAroundScript);
+				GraphicalViewer viewer = (GraphicalViewer) getViewer();
+				viewer.getEditDomain().getCommandStack().execute(command);
+			} else {
+				logger.warn("metadata is null");
+			}
 		}
 	}
 	

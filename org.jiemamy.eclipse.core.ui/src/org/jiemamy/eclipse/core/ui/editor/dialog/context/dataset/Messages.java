@@ -75,6 +75,9 @@ class Messages extends NLS {
 	/** データセット編集ダイアログ CSVインポート 完了 */
 	public static String DataSetEditDialog_import_success;
 	
+	/** データセット編集ダイアログ 説明 */
+	public static String DataSetEditDialog_description;
+	
 	// CHECKSTYLE:ON
 	
 	private static final String BUNDLE_NAME = Messages.class.getName().toLowerCase(Locale.US);

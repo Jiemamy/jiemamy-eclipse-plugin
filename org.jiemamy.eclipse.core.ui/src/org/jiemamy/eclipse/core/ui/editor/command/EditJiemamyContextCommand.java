@@ -53,13 +53,14 @@ public class EditJiemamyContextCommand extends Command {
 	 * インスタンスを生成する。
 	 * 
 	 * @param context コンテキスト
-	 * @param metadata new metdata.  May be {@code null}
+	 * @param metadata new metdata
 	 * @param universalAroundScript new around script.  May be {@code null}
-	 * @throws IllegalArgumentException 引数{@code context}に{@code null}を与えた場合
+	 * @throws IllegalArgumentException 引数{@code context}または{@code metadata}に{@code null}を与えた場合
 	 */
 	public EditJiemamyContextCommand(JiemamyContext context, ContextMetadata metadata,
 			AroundScriptModel universalAroundScript) {
 		Validate.notNull(context);
+		Validate.notNull(metadata);
 		this.context = context;
 		this.metadata = metadata;
 		this.universalAroundScript = universalAroundScript;

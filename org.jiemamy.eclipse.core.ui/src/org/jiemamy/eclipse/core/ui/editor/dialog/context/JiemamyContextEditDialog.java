@@ -208,9 +208,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
 		metadata.setDescription(description);
-//		
-//		context.setMetadata(meta);
-//		
+		
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
@@ -222,9 +220,6 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 			}
 			universalAroundScript.setScript(Position.BEGIN, beginScript);
 			universalAroundScript.setScript(Position.END, endScript);
-//			facet.setUniversalAroundScript(aroundScript);
-		} else {
-//			facet.setUniversalAroundScript(null);
 		}
 		
 		return true;

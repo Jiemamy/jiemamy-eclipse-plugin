@@ -60,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.CommonMessages;
 import org.jiemamy.eclipse.core.ui.editor.dialog.JiemamyEditDialog0;
@@ -121,18 +122,23 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		tabFolder = new TabFolder(composite, SWT.NONE);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		tabFolder.setLayoutData(gd);
+		
+		addTab(new DescriptionTab(tabFolder, SWT.NONE, "Description"));
+		
 		final Menu menu = new Menu(tabFolder);
 		tabFolder.setMenu(menu);
 		menu.addMenuListener(new TabMenuListener(dataSetModel, menu));
 		
+		JiemamyContext context = getContext();
 		Set<EntityRef<? extends TableModel>> tableRefs = dataSetModel.getRecords().keySet();
 		for (EntityRef<? extends TableModel> tableRef : tableRefs) {
-			TableModel tableModel = getContext().resolve(tableRef);
-			if (tableModel == null) {
-				logger.warn("");
+			try {
+				TableModel tableModel = context.resolve(tableRef);
+				addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
+			} catch (EntityNotFoundException e) {
+				logger.warn("table unresolvable");
 				continue;
 			}
-			addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
 		}
 		
 		Composite cmpButtons = new Composite(composite, SWT.NULL);
@@ -327,8 +333,10 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 					TableSelectDialog dialog = new TableSelectDialog(getShell(), list);
 					dialog.open();
 					TableModel tableModel = dialog.getResult();
-					dataSetModel.putRecord(tableModel.toReference(), new ArrayList<RecordModel>());
-					addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
+					if (tableModel != null) {
+						dataSetModel.putRecord(tableModel.toReference(), new ArrayList<RecordModel>());
+						addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
+					}
 				}
 			});
 			
@@ -340,9 +348,11 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 				public void widgetSelected(SelectionEvent evt) {
 					TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex());
 					TableModel tableModel = (TableModel) item.getData();
-					boolean result =
-							MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_title,
-									NLS.bind(Messages.DataSetEditDialog_deleteTable_confirm, tableModel.getName()));
+					if (tableModel == null) {
+						return;
+					}
+					String message = NLS.bind(Messages.DataSetEditDialog_deleteTable_confirm, tableModel.getName());
+					boolean result = MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_title, message);
 					if (result == false) {
 						return;
 					}

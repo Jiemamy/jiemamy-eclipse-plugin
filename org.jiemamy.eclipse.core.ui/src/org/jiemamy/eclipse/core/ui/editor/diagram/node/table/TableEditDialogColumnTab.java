@@ -537,12 +537,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			chkIsPK.setSelection(tableModel.isPrimaryKeyColumn(columnModel.toReference()));
 			
-//			if (columnModel.hasAdapter(Disablable.class)
-//					&& Boolean.TRUE.equals(columnModel.getAdapter(Disablable.class).isDisabled())) {
-//				chkIsDisabled.setSelection(true);
-//			} else {
-//				chkIsDisabled.setSelection(false);
-//			}
+			Boolean disabled = columnModel.getParam(ColumnParameterKey.DISABLED);
+			if (disabled != null && disabled) {
+				chkIsDisabled.setSelection(true);
+			} else {
+				chkIsDisabled.setSelection(false);
+			}
 		}
 		
 		@Override

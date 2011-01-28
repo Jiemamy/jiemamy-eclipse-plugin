@@ -24,7 +24,7 @@ import org.eclipse.gef.commands.CommandStack;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
-import org.jiemamy.eclipse.core.ui.editor.command.ChangeNodeConstraintCommand;
+import org.jiemamy.eclipse.core.ui.editor.diagram.node.ChangeNodeConstraintCommand;
 import org.jiemamy.model.DefaultNodeModel;
 import org.jiemamy.model.geometory.JmRectangle;
 

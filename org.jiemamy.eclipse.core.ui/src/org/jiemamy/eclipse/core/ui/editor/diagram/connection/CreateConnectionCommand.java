@@ -1,0 +1,215 @@
+/*
+ * Copyright 2007-2011 Jiemamy Project and the Others.
+ * Created on 2008/08/03
+ *
+ * This file is part of Jiemamy.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+package org.jiemamy.eclipse.core.ui.editor.diagram.connection;
+
+import java.util.Collection;
+
+import com.google.common.collect.Iterables;
+
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.gef.commands.Command;
+import org.seasar.eclipse.common.util.LogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.jiemamy.DiagramFacet;
+import org.jiemamy.JiemamyContext;
+import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
+import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
+import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.constraint.LocalKeyConstraintModel;
+import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.view.ViewModel;
+import org.jiemamy.utils.LogMarker;
+
+/**
+ * コネクション作成GEFコマンド。
+ * 
+ * @author daisuke
+ */
+public class CreateConnectionCommand extends Command {
+	
+	private static Logger logger = LoggerFactory.getLogger(CreateConnectionCommand.class);
+	
+	/** 接続元ノード */
+	private NodeModel source;
+	
+	/** 接続先ノード */
+	private NodeModel target;
+	
+	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
+	private int diagramIndex;
+	
+	/** Figureサイズ */
+	@SuppressWarnings("unused")
+	private Dimension figureSize;
+	
+	private final JiemamyContext context;
+	
+	private DatabaseObjectModel sourceCore;
+	
+	private DatabaseObjectModel targetCore;
+	
+	private final ForeignKeyCreation creation;
+	
+
+	/**
+	 * インスタンスを生成する。
+	 * 
+	 * @param context ルートモデル
+	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
+	 * @param creation 作成するコネクションモデル
+	 */
+	public CreateConnectionCommand(JiemamyContext context, int diagramIndex, ForeignKeyCreation creation) {
+		this.context = context;
+		this.diagramIndex = diagramIndex;
+		this.creation = creation;
+		
+		logger.trace(LogMarker.LIFECYCLE, "construct");
+	}
+	
+	@Override
+	public boolean canExecute() {
+		logger.trace(LogMarker.LIFECYCLE, "canExecute");
+		
+		if (source == null || target == null) {
+			logger.trace("source or target is null: " + source + " " + target);
+			return false;
+		}
+		
+		// Viewとはコネクションが貼れない
+		if (sourceCore instanceof ViewModel || targetCore instanceof ViewModel) {
+			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_01);
+			return false;
+		}
+		
+		// 現状、付箋とはコネクションが貼れない
+		if (source instanceof StickyNodeModel || target instanceof StickyNodeModel) {
+			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_02);
+			return false;
+		}
+		
+		// カラムが1つもないテーブルからは外部キーが貼れない
+		if (((TableModel) sourceCore).getColumns().size() < 1) {
+			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_03);
+			return false;
+		}
+		
+		// ローカルキーが1つもないテーブルへは外部キーが貼れない
+		if (getKey((TableModel) targetCore) == null) {
+			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_04);
+			return false;
+		}
+		
+		// THINK 違うキー同士で参照してる可能性は？
+//		if (connection.unwrap() != null) {
+//			// 循環参照の禁止（ターゲットの親に自分がいたら、参照不可）
+//			
+//			Collection<DatabaseObjectModel> refs = EntityUtil.getReferenceEntities(target.unwrap(), true);
+//			if (refs.contains(source.unwrap())) {
+//				LogUtil.log(JiemamyPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_05);
+//				return false;
+//			}
+//		}
+		
+		return true;
+	}
+	
+	@Override
+	public void execute() {
+		logger.debug(LogMarker.LIFECYCLE, "execute");
+		DefaultDiagramModel diagramModel =
+				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		creation.setSourceTable((DefaultTableModel) sourceCore);
+		creation.setTargetTable((DefaultTableModel) targetCore);
+		creation.execute(context, diagramModel);
+		
+//		jiemamyFacade.resetBendpoint(diagramIndex, connection);
+	}
+	
+	/**
+	 * Figureサイズを設定する。
+	 * 
+	 * @param figureSize Figureサイズ
+	 */
+	public void setFigureSize(Dimension figureSize) {
+		this.figureSize = figureSize;
+	}
+	
+	/**
+	 * 接続元ノードを設定する。
+	 * 
+	 * @param source 接続元ノード
+	 */
+	public void setSource(NodeModel source) {
+		logger.trace(LogMarker.LIFECYCLE, "setSource");
+		logger.trace(LogMarker.DETAIL, "source = " + source);
+		this.source = source;
+		if (source instanceof DefaultDatabaseObjectNodeModel) {
+			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) source;
+			sourceCore = context.resolve(dboNodeModel.getCoreModelRef());
+		}
+		creation.setSource(source.toReference());
+	}
+	
+	/**
+	 * 接続先ノードを設定する。
+	 * 
+	 * @param target 接続先ノード
+	 */
+	public void setTarget(NodeModel target) {
+		logger.trace(LogMarker.LIFECYCLE, "setTarget");
+		logger.trace(LogMarker.DETAIL, "target = " + target);
+		this.target = target;
+		if (target instanceof DefaultDatabaseObjectNodeModel) {
+			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) target;
+			targetCore = context.resolve(dboNodeModel.getCoreModelRef());
+		}
+		creation.setTarget(target.toReference());
+	}
+	
+	@Override
+	public void undo() {
+		logger.debug(LogMarker.LIFECYCLE, "undo");
+		DefaultDiagramModel diagramModel =
+				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		creation.undo(context, diagramModel);
+	}
+	
+	/**
+	 * 主キーがあれば主キー、なければ何らかのLocalKeyConstraintを取得する。
+	 * 
+	 * @param tableModel 検索するテーブル
+	 * @return キー. 見つからなかった場合は{@code null}
+	 */
+	private LocalKeyConstraintModel getKey(TableModel tableModel) {
+		LocalKeyConstraintModel key = tableModel.getPrimaryKey();
+		if (key == null) {
+			Collection<LocalKeyConstraintModel> localKeys = tableModel.getConstraints(LocalKeyConstraintModel.class);
+			if (localKeys.size() > 0) {
+				key = Iterables.get(localKeys, 0);
+			}
+		}
+		return key;
+	}
+}

@@ -44,7 +44,7 @@ import org.jiemamy.composer.ImportException;
 import org.jiemamy.composer.Importer;
 import org.jiemamy.eclipse.core.ui.composer.ImporterWizard;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
-import org.jiemamy.eclipse.core.ui.editor.editpart.diagram.JiemamyContextEditPart;
+import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyContextEditPart;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.utils.LogMarker;
 

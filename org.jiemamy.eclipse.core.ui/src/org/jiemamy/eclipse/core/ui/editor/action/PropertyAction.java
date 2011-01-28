@@ -21,7 +21,7 @@ package org.jiemamy.eclipse.core.ui.editor.action;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.GraphicalViewer;
 
-import org.jiemamy.eclipse.core.ui.editor.editpart.EditDialogSupport;
+import org.jiemamy.eclipse.core.ui.editor.diagram.EditDialogSupport;
 
 /**
  * Propertiesアクション。

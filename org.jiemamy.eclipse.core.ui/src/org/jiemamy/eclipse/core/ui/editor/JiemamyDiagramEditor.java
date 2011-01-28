@@ -86,7 +86,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.dialect.GenericDialect;
-import org.jiemamy.eclipse.core.ui.editor.editpart.DiagramEditPartFactory;
+import org.jiemamy.eclipse.core.ui.editor.diagram.DiagramEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
 import org.jiemamy.model.DefaultDiagramModel;

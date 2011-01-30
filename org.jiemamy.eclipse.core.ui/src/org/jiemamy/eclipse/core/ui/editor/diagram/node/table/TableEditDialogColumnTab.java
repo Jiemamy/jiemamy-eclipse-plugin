@@ -740,6 +740,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					tableModel.store(primaryKey);
 				}
 			}
+			
+			// THINK
 //			if (primaryKey != null && primaryKey.getKeyColumns().size() <= 0) {
 //				tableModel.deleteConstraint(primaryKey.toReference());
 //			}

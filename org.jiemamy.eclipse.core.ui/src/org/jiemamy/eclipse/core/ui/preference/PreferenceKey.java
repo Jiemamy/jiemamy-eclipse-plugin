@@ -138,7 +138,6 @@ public enum PreferenceKey {
 	 * @return デフォルト値
 	 */
 	@SuppressWarnings("unchecked")
-	// TODO キャスト安全性の根拠提示
 	private <T>T getDefault() {
 		return (T) defaultValue;
 	}

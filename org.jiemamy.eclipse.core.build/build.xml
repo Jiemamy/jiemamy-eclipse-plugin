@@ -33,7 +33,7 @@
         <setup-ivy/>
         <echo message="detecting subprojects..."/>
         <ivy:buildlist reference="build-path">
-            <fileset dir="${ws.dir}" includes="${target.dir.pattern}/build.xml"/>
+            <fileset dir="${ws.dir}" includes="${target.dir.pattern}/build2.xml"/>
         </ivy:buildlist>
         <echo message="retrieving denendencies..."/>
         <subant target="prepare-lib" buildpathref="build-path" />

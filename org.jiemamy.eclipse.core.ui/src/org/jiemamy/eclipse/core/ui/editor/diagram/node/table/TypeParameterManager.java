@@ -45,9 +45,9 @@ import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.DefaultColumnModel;
+import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.datatype.DefaultDataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
-import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
 import org.jiemamy.utils.LogMarker;
 
@@ -295,48 +295,67 @@ class TypeParameterManager {
 		
 		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SIZE)) {
 			String text = txtSize.getText();
-			Integer value = 0;
-			try {
-				value = Integer.valueOf(text);
+			if (StringUtils.isEmpty(text) == false) {
+				Integer value = 0;
+				try {
+					value = Integer.valueOf(text);
+					txtSize.setBackground(null);
+				} catch (NumberFormatException e) {
+					txtSize.setBackground(COLOR_ERROR);
+				}
+				dataType.putParam(TypeParameterKey.SIZE, value);
+			} else {
 				txtSize.setBackground(null);
-			} catch (NumberFormatException e) {
-				txtSize.setBackground(COLOR_ERROR);
+				dataType.removeParam(TypeParameterKey.SIZE);
 			}
-			dataType.putParam(TypeParameterKey.SIZE, value);
 		}
 		if (SwtUtil.isAlive(txtPrecision) && keys.contains(TypeParameterKey.PRECISION)) {
 			String text = txtPrecision.getText();
-			Integer value = 0;
-			try {
-				value = Integer.valueOf(text);
+			if (StringUtils.isEmpty(text) == false) {
+				Integer value = 0;
+				try {
+					value = Integer.valueOf(text);
+					txtPrecision.setBackground(null);
+				} catch (NumberFormatException e) {
+					txtPrecision.setBackground(COLOR_ERROR);
+				}
+				dataType.putParam(TypeParameterKey.PRECISION, value);
+			} else {
 				txtPrecision.setBackground(null);
-			} catch (NumberFormatException e) {
-				txtPrecision.setBackground(COLOR_ERROR);
+				dataType.removeParam(TypeParameterKey.PRECISION);
 			}
-			dataType.putParam(TypeParameterKey.PRECISION, value);
 		}
 		if (SwtUtil.isAlive(txtScale) && keys.contains(TypeParameterKey.SCALE)) {
 			String text = txtScale.getText();
-			Integer value = 0;
-			if (StringUtils.isEmpty(text)) {
-				txtScale.setBackground(null);
-			} else {
+			if (StringUtils.isEmpty(text) == false) {
+				Integer value = 0;
 				try {
 					value = Integer.valueOf(text);
 					txtScale.setBackground(null);
 				} catch (NumberFormatException e) {
 					txtScale.setBackground(COLOR_ERROR);
 				}
+				dataType.putParam(TypeParameterKey.SCALE, value);
+			} else {
+				txtScale.setBackground(null);
+				dataType.removeParam(TypeParameterKey.SCALE);
 			}
-			dataType.putParam(TypeParameterKey.SCALE, value);
 		}
 		if (SwtUtil.isAlive(chkWithTimezone) && keys.contains(TypeParameterKey.WITH_TIMEZONE)) {
 			boolean value = chkWithTimezone.getSelection();
-			dataType.putParam(TypeParameterKey.WITH_TIMEZONE, value);
+			if (value) {
+				dataType.putParam(TypeParameterKey.WITH_TIMEZONE, value);
+			} else {
+				dataType.removeParam(TypeParameterKey.WITH_TIMEZONE);
+			}
 		}
 		if (SwtUtil.isAlive(chkSerial) && keys.contains(TypeParameterKey.SERIAL)) {
 			boolean value = chkSerial.getSelection();
-			dataType.putParam(TypeParameterKey.SERIAL, value);
+			if (value) {
+				dataType.putParam(TypeParameterKey.SERIAL, value);
+			} else {
+				dataType.removeParam(TypeParameterKey.SERIAL);
+			}
 		}
 		if (handler != null) {
 			handler.writeBackToAdapter();

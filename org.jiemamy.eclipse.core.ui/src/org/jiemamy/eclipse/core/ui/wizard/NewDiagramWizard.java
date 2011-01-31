@@ -135,6 +135,7 @@ public final class NewDiagramWizard extends Wizard implements INewWizard {
 			JiemamyContext context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
 			DefaultContextMetadata metadata = new DefaultContextMetadata();
 			metadata.setDialectClassName(GenericDialect.class.getName());
+			context.setMetadata(metadata);
 			
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			try {

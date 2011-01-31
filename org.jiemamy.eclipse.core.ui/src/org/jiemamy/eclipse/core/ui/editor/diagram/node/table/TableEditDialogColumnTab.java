@@ -68,7 +68,6 @@ import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractEditListener;
 import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractTab;
 import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractTableEditor;
@@ -86,10 +85,10 @@ import org.jiemamy.model.constraint.AbstractKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.NotNullConstraintModel;
+import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.datatype.DefaultDataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeReference;
-import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
 import org.jiemamy.model.domain.DomainModel;
 import org.jiemamy.model.table.DefaultTableModel;
@@ -241,7 +240,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					return columnModel.getName();
 					
 				case 2:
-					return LabelStringUtil.toString(dialect, columnModel.getDataType(), DisplayPlace.TABLE);
+					return LabelStringUtil.toString(dialect, columnModel.getDataType());
 					
 				case 3:
 					return columnModel.getDefaultValue();

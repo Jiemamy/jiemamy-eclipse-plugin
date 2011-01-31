@@ -20,12 +20,13 @@ package org.jiemamy.eclipse.core.ui.utils;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.Validate;
+
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.dialect.TypeParameterSpec.Necessity;
-import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
-import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.DataType;
+import org.jiemamy.model.datatype.TypeParameterKey;
 
 /**
  * UI表示用文字列を生成するユーティリティクラス。
@@ -39,10 +40,12 @@ public class LabelStringUtil {
 	 * 
 	 * @param dialect {@link Dialect}
 	 * @param dataType 表示対象DataType
-	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public static String toString(Dialect dialect, DataType dataType, DisplayPlace place) {
+	public static String toString(Dialect dialect, DataType dataType) {
+		Validate.notNull(dialect);
+		Validate.notNull(dataType);
 		StringBuilder typeName = new StringBuilder(dataType.getTypeReference().getTypeName());
 		String suffix = "";
 		
@@ -69,8 +72,7 @@ public class LabelStringUtil {
 		
 		if (size != null) {
 			typeName.append("(").append(size).append(")");
-		}
-		if (precision != null && scale != null) {
+		} else if (precision != null && scale != null) {
 			typeName.append("(").append(precision).append(", ").append(scale).append(")");
 		}
 		

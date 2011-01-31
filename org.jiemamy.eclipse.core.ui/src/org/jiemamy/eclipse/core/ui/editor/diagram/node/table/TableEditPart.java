@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
-import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.EditDatabaseObjectCommand;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.ColumnFigure;
@@ -167,8 +166,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		
 		nameLabel.setText(columnModel.getName());
 		try {
-			typeLabel.setText(LabelStringUtil.toString(context.findDialect(), columnModel.getDataType(),
-					DisplayPlace.FIGURE));
+			typeLabel.setText(LabelStringUtil.toString(context.findDialect(), columnModel.getDataType()));
 		} catch (ClassNotFoundException e) {
 			logger.error("lost dialect", e);
 			typeLabel.setText(columnModel.getDataType().getTypeReference().getTypeName());

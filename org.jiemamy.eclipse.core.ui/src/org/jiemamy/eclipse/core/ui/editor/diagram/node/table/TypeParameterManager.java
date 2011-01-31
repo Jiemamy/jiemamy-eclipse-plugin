@@ -45,9 +45,9 @@ import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.DefaultColumnModel;
-import org.jiemamy.model.datatype.DefaultTypeVariant;
+import org.jiemamy.model.datatype.DefaultDataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
-import org.jiemamy.model.datatype.TypeVariant;
+import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
 import org.jiemamy.utils.LogMarker;
 
@@ -136,7 +136,7 @@ class TypeParameterManager {
 		
 		clearTypeOptionControl();
 		
-		TypeVariant dataType = columnModel.getDataType();
+		DataType dataType = columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;
 		}
@@ -245,7 +245,7 @@ class TypeParameterManager {
 	 */
 	public void setValue(DefaultColumnModel columnModel) {
 		Validate.notNull(columnModel);
-		TypeVariant dataType = columnModel.getDataType();
+		DataType dataType = columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;
 		}
@@ -285,7 +285,7 @@ class TypeParameterManager {
 	 */
 	public void writeBackToAdapter(DefaultColumnModel columnModel) {
 		Validate.notNull(columnModel);
-		DefaultTypeVariant dataType = (DefaultTypeVariant) columnModel.getDataType();
+		DefaultDataType dataType = (DefaultDataType) columnModel.getDataType();
 		if (dataType.getTypeReference() instanceof DomainType) {
 			return;
 		}

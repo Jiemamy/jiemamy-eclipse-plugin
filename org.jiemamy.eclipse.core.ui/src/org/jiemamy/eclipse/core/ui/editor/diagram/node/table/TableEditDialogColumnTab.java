@@ -86,10 +86,10 @@ import org.jiemamy.model.constraint.AbstractKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.NotNullConstraintModel;
-import org.jiemamy.model.datatype.DefaultTypeVariant;
+import org.jiemamy.model.datatype.DefaultDataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
 import org.jiemamy.model.datatype.TypeReference;
-import org.jiemamy.model.datatype.TypeVariant;
+import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
 import org.jiemamy.model.domain.DomainModel;
 import org.jiemamy.model.table.DefaultTableModel;
@@ -512,7 +512,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsNotNull.setEnabled(true);
 			chkIsDisabled.setEnabled(true);
 			
-			TypeVariant dataType = columnModel.getDataType();
+			DataType dataType = columnModel.getDataType();
 			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
 			Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
 			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
@@ -553,7 +553,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			columnModel.setName(newName); // TODO autoname
 			
-			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0));
+			DefaultDataType type = new DefaultDataType(allTypes.get(0));
 			columnModel.setDataType(type);
 			tableModel.store(columnModel);
 			
@@ -577,7 +577,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			columnModel.setName(newName); // TODO autoname
 			
-			DefaultTypeVariant type = new DefaultTypeVariant(allTypes.get(0));
+			DefaultDataType type = new DefaultDataType(allTypes.get(0));
 			columnModel.setDataType(type);
 			columnModel.setIndex(index);
 			tableModel.store(columnModel);
@@ -706,7 +706,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			int selectionInedx = cmbDataType.getSelectionIndex();
 			if (selectionInedx != -1) {
-				DefaultTypeVariant dataType = new DefaultTypeVariant(allTypes.get(selectionInedx));
+				DefaultDataType dataType = new DefaultDataType(allTypes.get(selectionInedx));
 				columnModel.setDataType(dataType);
 			}
 			

@@ -25,7 +25,7 @@ import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.dialect.TypeParameterSpec.Necessity;
 import org.jiemamy.eclipse.core.ui.editor.DisplayPlace;
 import org.jiemamy.model.datatype.TypeParameterKey;
-import org.jiemamy.model.datatype.TypeVariant;
+import org.jiemamy.model.datatype.DataType;
 
 /**
  * UI表示用文字列を生成するユーティリティクラス。
@@ -42,7 +42,7 @@ public class LabelStringUtil {
 	 * @param place 表示しようと考えている場所
 	 * @return 表示用文字列
 	 */
-	public static String toString(Dialect dialect, TypeVariant dataType, DisplayPlace place) {
+	public static String toString(Dialect dialect, DataType dataType, DisplayPlace place) {
 		StringBuilder typeName = new StringBuilder(dataType.getTypeReference().getTypeName());
 		String suffix = "";
 		

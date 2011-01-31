@@ -310,8 +310,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				return;
 			}
 			
-			// FIXME swapColumnメソッド追加
-//			context.swapDataSet(index, index + 1);
+			context.swapDataSet(index, index + 1);
 			
 			table.setSelection(index + 1);
 			enableEditControls(index + 1);
@@ -325,8 +324,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				return;
 			}
 			
-			// FIXME swapColumnメソッド追加
-//			context.swapColumn(index - 1, index);
+			context.swapDataSet(index - 1, index);
 			
 			table.setSelection(index - 1);
 			enableEditControls(index - 1);

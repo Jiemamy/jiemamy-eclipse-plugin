@@ -332,7 +332,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			MenuItem menuItemAddFk = new MenuItem(addMenu, SWT.PUSH);
 			menuItemAddFk.setText("Foreign Key Constraint"); // RESOURCE
 			menuItemAddFk.setEnabled(false);
-			// TODO
+			// 今は常に無効だが、いつかmenuからFKを追加できるようにするといいかも。
 			
 			MenuItem menuItemAddCc = new MenuItem(addMenu, SWT.PUSH);
 			menuItemAddCc.setText("Check Constraint"); // RESOURCE

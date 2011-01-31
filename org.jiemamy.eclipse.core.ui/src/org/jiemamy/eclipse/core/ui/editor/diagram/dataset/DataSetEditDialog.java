@@ -210,7 +210,13 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		}
 		
 		DataSetModel dataSetModel = getTargetCoreModel();
-		TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex()); // FIXME タブが1つもないこともあるよ
+		int tabIndex = tabFolder.getSelectionIndex();
+		if (tabIndex <= 0) {
+			MessageDialog.openInformation(getShell(), "テーブル未選択", "エクスポートするテーブルのタブを選択してください。"); // RESOURCE
+			return;
+		}
+		
+		TabItem item = tabFolder.getItem(tabIndex);
 		TableModel tableModel = (TableModel) item.getData();
 		
 		OutputStream out = null;
@@ -271,9 +277,15 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 			return;
 		}
 		
-		DataSetModel dataSetModel = getTargetCoreModel();
-		TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex()); // FIXME タブが1つもないこともあるよ
+		int tabIndex = tabFolder.getSelectionIndex();
+		if (tabIndex <= 0) {
+			MessageDialog.openInformation(getShell(), "テーブル未選択", "エクスポートするテーブルのタブを選択してください。"); // RESOURCE
+			return;
+		}
+		TabItem item = tabFolder.getItem(tabIndex);
 		TableModel tableModel = (TableModel) item.getData();
+		
+		DataSetModel dataSetModel = getTargetCoreModel();
 		
 		try {
 			DataSetUtil.importFromCsv(dataSetModel, tableModel, new FileInputStream(csv));

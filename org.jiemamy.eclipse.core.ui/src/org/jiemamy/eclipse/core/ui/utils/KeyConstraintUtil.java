@@ -58,8 +58,9 @@ public final class KeyConstraintUtil {
 				ColumnModel col = context.resolve(columnRef);
 				columnNames.add(col.getName());
 			} catch (EntityNotFoundException e) {
-				// FIXME
-				columnNames.add("UNKNOWN COLUMN NAME");
+				// FIXME tableにaddしたが、そのtableをstoreしていない状態では、
+				// contextから該当columnresolveできないので、カラム名が分からない
+				columnNames.add("<NewColumn>");
 			}
 		}
 		return StringUtils.join(columnNames, ", ");

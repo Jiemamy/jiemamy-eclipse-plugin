@@ -18,6 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.sticky;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -93,7 +94,7 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 		StickyFigure figure = new StickyFigure();
 		String contents = getModel().getContents();
 		
-		if (contents.length() > 0) {
+		if (StringUtils.isEmpty(contents) == false) {
 			Panel tooltip = new Panel();
 			tooltip.setLayoutManager(new StackLayout());
 			tooltip.setBackgroundColor(ColorConstants.tooltipBackground);

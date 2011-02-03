@@ -121,16 +121,14 @@ public class CreateConnectionCommand extends Command {
 			return false;
 		}
 		
+		// 循環参照の禁止（ターゲットの親に自分がいたら、参照不可）
 		// THINK 違うキー同士で参照してる可能性は？
-//		if (connection.unwrap() != null) {
-//			// 循環参照の禁止（ターゲットの親に自分がいたら、参照不可）
-//			
-//			Collection<DatabaseObjectModel> refs = EntityUtil.getReferenceEntities(target.unwrap(), true);
-//			if (refs.contains(source.unwrap())) {
-//				LogUtil.log(JiemamyPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_05);
-//				return false;
-//			}
-//		}
+		Collection<DatabaseObjectModel> superDatabaseObjectsRecursive =
+				context.findSuperDatabaseObjectsRecursive(targetCore);
+		if (superDatabaseObjectsRecursive.contains(sourceCore)) {
+			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_05);
+			return false;
+		}
 		
 		return true;
 	}

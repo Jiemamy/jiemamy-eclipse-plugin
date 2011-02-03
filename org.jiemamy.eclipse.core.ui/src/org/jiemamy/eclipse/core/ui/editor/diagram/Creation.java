@@ -22,7 +22,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DefaultDiagramModel;
 
 /**
- * TODO for daisuke
+ * 一連のモデルの生成を表すインターフェイス。
  * 
  * @version $Id$
  * @author daisuke

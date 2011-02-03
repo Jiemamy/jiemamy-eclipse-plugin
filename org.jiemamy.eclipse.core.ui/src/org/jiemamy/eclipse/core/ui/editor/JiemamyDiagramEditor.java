@@ -235,10 +235,12 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		super.dispose();
 		logger.debug(LogMarker.LIFECYCLE, "disposed");
 		
-		// FIXME 以下debugコード
-		List<StoredEventListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
-		for (StoredEventListener listener : listeners) {
-			logger.warn(listener + " is not removed from EventBroker.");
+		// 以下debugコード
+		if (JiemamyContext.isDebug()) {
+			List<StoredEventListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
+			for (StoredEventListener listener : listeners) {
+				logger.warn(listener + " is not removed from EventBroker.");
+			}
 		}
 	}
 	

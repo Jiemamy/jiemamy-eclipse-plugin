@@ -20,6 +20,8 @@ package org.jiemamy.eclipse.core.ui.editor.diagram.node.sticky;
 
 import java.util.UUID;
 
+import org.apache.commons.lang.Validate;
+
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.NodeCreation;
@@ -50,15 +52,22 @@ public class StickyCreation implements NodeCreation {
 	}
 	
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		Validate.notNull(context);
+		Validate.notNull(diagramModel);
+		
 		diagramModel.store(stickyNodeModel);
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
 	
 	public void setBoundary(JmRectangle boundary) {
+		Validate.notNull(boundary);
 		stickyNodeModel.setBoundary(boundary);
 	}
 	
 	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		Validate.notNull(context);
+		Validate.notNull(diagramModel);
+		
 		diagramModel.deleteNode(stickyNodeModel.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}

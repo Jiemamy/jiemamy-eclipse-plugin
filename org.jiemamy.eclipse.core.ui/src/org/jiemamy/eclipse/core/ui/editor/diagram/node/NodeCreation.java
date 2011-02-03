@@ -22,13 +22,19 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.Creation;
 import org.jiemamy.model.geometory.JmRectangle;
 
 /**
- * TODO for daisuke
+ * ノードとその関連モデルの生成を表すインターフェイス。
  * 
  * @version $Id$
  * @author daisuke
  */
 public interface NodeCreation extends Creation {
 	
+	/**
+	 * ノードの位置サイズを設定する。
+	 * 
+	 * @param boundary ノードの位置サイズ
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
+	 */
 	void setBoundary(JmRectangle boundary);
 	
 }

@@ -96,10 +96,20 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		dialects = JiemamyCorePlugin.getDialectResolver().getAllInstance();
 	}
 	
+	/**
+	 * 編集済みの{@link DefaultContextMetadata}を取得する。
+	 * 
+	 * @return 編集済みの{@link DefaultContextMetadata}
+	 */
 	public DefaultContextMetadata getMetadata() {
 		return metadata;
 	}
 	
+	/**
+	 * 編集済みの UniversalAroundScript を取得する。
+	 * 
+	 * @return 編集済みの DefaultContextMetadata
+	 */
 	public DefaultAroundScriptModel getUniversalAroundScript() {
 		return universalAroundScript;
 	}

@@ -20,6 +20,8 @@ package org.jiemamy.eclipse.core.ui.editor.diagram.node.view;
 
 import java.util.UUID;
 
+import org.apache.commons.lang.Validate;
+
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.NodeCreation;
@@ -52,6 +54,9 @@ public class ViewCreation implements NodeCreation {
 	}
 	
 	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		Validate.notNull(context);
+		Validate.notNull(diagramModel);
+		
 		NamingUtil.autoName(view, context);
 		context.store(view);
 		diagramModel.store(node);
@@ -59,10 +64,14 @@ public class ViewCreation implements NodeCreation {
 	}
 	
 	public void setBoundary(JmRectangle boundary) {
+		Validate.notNull(boundary);
 		node.setBoundary(boundary);
 	}
 	
 	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+		Validate.notNull(context);
+		Validate.notNull(diagramModel);
+		
 		diagramModel.deleteNode(node.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 		context.deleteDatabaseObject(view.toReference());

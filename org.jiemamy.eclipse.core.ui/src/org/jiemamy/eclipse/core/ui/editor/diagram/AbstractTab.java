@@ -18,6 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram;
 
+import org.apache.commons.lang.Validate;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
@@ -41,9 +42,11 @@ public abstract class AbstractTab extends Composite {
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
 	 * @param tabTitle タブのタイトル文字列
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public AbstractTab(TabFolder parentTabFolder, int style, String tabTitle) {
 		super(parentTabFolder, style);
+		Validate.notNull(tabTitle);
 		
 		tabItem = new TabItem(parentTabFolder, SWT.NONE);
 		tabItem.setText(tabTitle);

@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractTab;
 
 /**
- * TODO for daisuke
+ * 説明文を表示するタブの実装クラス。
  * 
  * @version $Id$
  * @author daisuke
@@ -38,9 +38,10 @@ public class DescriptionTab extends AbstractTab {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param parentTabFolder
-	 * @param style
-	 * @param tabTitle
+	 * @param parentTabFolder タブの親となる{@link TabFolder}
+	 * @param style SWTスタイル値
+	 * @param tabTitle タブのタイトル文字列
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public DescriptionTab(TabFolder parentTabFolder, int style, String tabTitle) {
 		super(parentTabFolder, style, tabTitle);

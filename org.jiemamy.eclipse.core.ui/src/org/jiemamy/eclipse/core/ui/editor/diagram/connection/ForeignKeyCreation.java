@@ -34,7 +34,7 @@ import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.utils.ForeignKeyFactory;
 
 /**
- * TODO for daisuke
+ * 外部キーとそのコネクションの生成を表すクラス。
  * 
  * @version $Id$
  * @author daisuke
@@ -72,7 +72,7 @@ public class ForeignKeyCreation implements Creation {
 	}
 	
 	/**
-	 * TODO for daisuke
+	 * 起点ノードを設定する。
 	 * 
 	 * @param sourceRef 起点ノードの参照
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
@@ -83,9 +83,9 @@ public class ForeignKeyCreation implements Creation {
 	}
 	
 	/**
-	 * TODO for daisuke
+	 * 外部キーを作成する対象のテーブルを設定する。
 	 * 
-	 * @param sourceTable
+	 * @param sourceTable 外部キーを作成する対象のテーブル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setSourceTable(DefaultTableModel sourceTable) {
@@ -94,7 +94,7 @@ public class ForeignKeyCreation implements Creation {
 	}
 	
 	/**
-	 * TODO for daisuke
+	 * 終点ノードを設定する。
 	 * 
 	 * @param targetRef 終点ノードの参照
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
@@ -105,9 +105,9 @@ public class ForeignKeyCreation implements Creation {
 	}
 	
 	/**
-	 * TODO for daisuke
+	 * 外部キーが参照するテーブルを設定する。
 	 * 
-	 * @param targetTable
+	 * @param targetTable 外部キーが参照するテーブル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public void setTargetTable(DefaultTableModel targetTable) {
@@ -118,6 +118,7 @@ public class ForeignKeyCreation implements Creation {
 	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
+		
 		diagramModel.deleteConnection(connection.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 		

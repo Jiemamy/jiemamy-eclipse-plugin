@@ -30,7 +30,7 @@ import org.jiemamy.model.StickyNodeModel;
 import org.jiemamy.model.geometory.JmRectangle;
 
 /**
- * TODO for daisuke
+ * {@link StickyNodeModel}の生成を表す実装クラス。
  * 
  * @version $Id$
  * @author daisuke

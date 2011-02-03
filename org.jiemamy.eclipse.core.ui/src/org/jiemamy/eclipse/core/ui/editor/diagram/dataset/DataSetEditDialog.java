@@ -306,8 +306,6 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 	/**
 	 * タブを追加・削除するメニューを表示するリスナ。
 	 * 
-	 * TODO 同じテーブルに対するタブを複数作られてしまう心配は？
-	 *  
 	 * @author daisuke
 	 */
 	private final class TabMenuListener extends MenuAdapter {
@@ -340,6 +338,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 				
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
+					// TODO 同じテーブルに対するタブを複数作られてしまう心配は？
 					Collection<TableModel> tables = getContext().getTables();
 					List<TableModel> list = Lists.newArrayList(tables);
 					TableSelectDialog dialog = new TableSelectDialog(getShell(), list);

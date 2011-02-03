@@ -33,7 +33,7 @@ import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.utils.NamingUtil;
 
 /**
- * TODO for daisuke
+ * {@link DefaultTableModel}とその{@link DefaultNodeModel}の生成を表す実装クラス。
  * 
  * @version $Id$
  * @author daisuke

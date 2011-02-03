@@ -81,7 +81,7 @@ import org.jiemamy.eclipse.extension.ExtensionResolver;
 import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.column.ColumnParameterKey;
 import org.jiemamy.model.column.DefaultColumnModel;
-import org.jiemamy.model.constraint.AbstractKeyConstraintModel;
+import org.jiemamy.model.constraint.DefaultKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.NotNullConstraintModel;
@@ -639,15 +639,15 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			
 			// 削除対象カラムがキーの一部になっていたら、そのキーセットからカラムを削除
-			Set<AbstractKeyConstraintModel> keys = tableModel.getConstraints(AbstractKeyConstraintModel.class);
-			for (AbstractKeyConstraintModel key : keys) {
+			Set<DefaultKeyConstraintModel> keys = tableModel.getConstraints(DefaultKeyConstraintModel.class);
+			for (DefaultKeyConstraintModel key : keys) {
 				if (key.getKeyColumns().contains(subject.toReference())) {
 					key.removeKeyColumn(subject.toReference());
 					tableModel.store(key);
 				}
 			}
 			
-			tableModel.delete(subject.toReference());
+			tableModel.deleteColumn(subject.toReference());
 			
 			tableViewer.remove(subject);
 			int nextSelection = table.getItemCount() > index ? index : index - 1;

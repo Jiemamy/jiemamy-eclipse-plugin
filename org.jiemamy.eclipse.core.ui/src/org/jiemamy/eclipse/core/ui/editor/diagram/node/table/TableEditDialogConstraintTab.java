@@ -73,11 +73,11 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
 import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.constraint.AbstractConstraintModel;
-import org.jiemamy.model.constraint.AbstractLocalKeyConstraintModel;
 import org.jiemamy.model.constraint.CheckConstraintModel;
 import org.jiemamy.model.constraint.ConstraintModel;
 import org.jiemamy.model.constraint.DefaultCheckConstraintModel;
+import org.jiemamy.model.constraint.DefaultConstraintModel;
+import org.jiemamy.model.constraint.DefaultLocalKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
 import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
 import org.jiemamy.model.constraint.DefaultUniqueKeyConstraintModel;
@@ -580,8 +580,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				return;
 			}
 			
-			AbstractConstraintModel constraintModel =
-					(AbstractConstraintModel) getTableViewer().getElementAt(editIndex);
+			DefaultConstraintModel constraintModel = (DefaultConstraintModel) getTableViewer().getElementAt(editIndex);
 			
 			String constraintName = StringUtils.defaultString(txtConstraintName.getText());
 			constraintModel.setName(constraintName);
@@ -590,8 +589,8 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				DefaultCheckConstraintModel checkConstraintModel = (DefaultCheckConstraintModel) constraintModel;
 				String expression = StringUtils.defaultString(txtCheckExpression.getText());
 				checkConstraintModel.setExpression(expression);
-			} else if (constraintModel instanceof AbstractLocalKeyConstraintModel) {
-				AbstractLocalKeyConstraintModel localKeyConstraint = (AbstractLocalKeyConstraintModel) constraintModel;
+			} else if (constraintModel instanceof DefaultLocalKeyConstraintModel) {
+				DefaultLocalKeyConstraintModel localKeyConstraint = (DefaultLocalKeyConstraintModel) constraintModel;
 				localKeyConstraint.clearKeyColumns();
 				for (int selectionIndex : lstKeyColumns.getSelectionIndices()) {
 					ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);

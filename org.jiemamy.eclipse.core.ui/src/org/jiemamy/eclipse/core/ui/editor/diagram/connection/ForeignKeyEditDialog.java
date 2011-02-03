@@ -57,7 +57,6 @@ import org.jiemamy.model.constraint.ForeignKeyConstraintModel.MatchType;
 import org.jiemamy.model.constraint.ForeignKeyConstraintModel.ReferentialAction;
 import org.jiemamy.model.constraint.KeyConstraintModel;
 import org.jiemamy.model.constraint.LocalKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
 import org.jiemamy.model.table.TableModel;
 import org.jiemamy.utils.LogMarker;
 
@@ -136,8 +135,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 			throw new ModelConsistencyException("source table not found");
 		}
 		
-		TableModel targetTableModel =
-				(TableModel) DefaultTableModel.findReferencedDatabaseObject(context.getTables(), foreignKey);
+		TableModel targetTableModel = foreignKey.findReferenceTable(context.getTables());
 		if (targetTableModel == null) {
 			throw new ModelConsistencyException("target table not found");
 		}
@@ -192,8 +190,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		}
 		
 		JiemamyContext context = getContext();
-		KeyConstraintModel referenceKeyConstraint =
-				DefaultTableModel.findReferencedKeyConstraint(context.getTables(), foreignKey);
+		KeyConstraintModel referenceKeyConstraint = foreignKey.findReferencedKeyConstraint(context.getTables());
 		if (referenceKeyConstraint == null) {
 			cmbReferenceKey.setText(cmbReferenceKey.getItem(0));
 		} else {

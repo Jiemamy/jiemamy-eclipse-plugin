@@ -24,8 +24,8 @@ import org.eclipse.gef.commands.Command;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.model.DbObject;
-import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.JmNode;
+import org.jiemamy.model.SimpleJmDiagram;
 
 /**
  * {@link DbObject}を編集するコマンド。
@@ -54,11 +54,10 @@ public class EditDbObjectCommand extends Command {
 	 * @param context コンテキスト
 	 * @param dbObject 編集対象{@link DbObject}
 	 * @param node ノード
-	 * @param diagramIndex
+	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public EditDbObjectCommand(JiemamyContext context, DbObject dbObject, JmNode node,
-			int diagramIndex) {
+	public EditDbObjectCommand(JiemamyContext context, DbObject dbObject, JmNode node, int diagramIndex) {
 		Validate.notNull(context);
 		Validate.notNull(dbObject);
 		Validate.notNull(node);

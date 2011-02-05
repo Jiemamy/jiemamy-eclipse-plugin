@@ -24,7 +24,7 @@ import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.model.datatype.TypeParameterKey;
 
 /**
- * TODO for daisuke
+ * {@link TypeParameterSpec}を{@link TypeParameterKey}に変換する関数オブジェクト。
  * 
  * @version $Id$
  * @author daisuke

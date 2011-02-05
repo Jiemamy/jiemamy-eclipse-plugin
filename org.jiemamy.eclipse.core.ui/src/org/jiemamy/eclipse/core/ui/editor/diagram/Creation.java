@@ -30,7 +30,7 @@ import org.jiemamy.model.SimpleJmDiagram;
 public interface Creation {
 	
 	/**
-	 * TODO for daisuke
+	 * 一連のモデルを{@link JiemamyContext}に追加する。
 	 * 
 	 * @param context コンテキスト
 	 * @param diagram ダイアグラム
@@ -39,7 +39,7 @@ public interface Creation {
 	void execute(JiemamyContext context, SimpleJmDiagram diagram);
 	
 	/**
-	 * TODO for daisuke
+	 * {@link #execute(JiemamyContext, SimpleJmDiagram)}をundoする。
 	 * 
 	 * @param context コンテキスト
 	 * @param diagram ダイアグラム

@@ -20,9 +20,9 @@ package org.jiemamy.eclipse.core.ui.utils;
 
 import java.util.List;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.JiemamyContext;
@@ -32,7 +32,7 @@ import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.constraint.JmKeyConstraint;
 
 /**
- * TODO for daisuke
+ * {@link JmKeyConstraint}に関するユーティリティクラス。
  * 
  * @version $Id$
  * @author daisuke
@@ -63,7 +63,7 @@ public final class KeyConstraintUtil {
 				columnNames.add("<NewColumn>");
 			}
 		}
-		return StringUtils.join(columnNames, ", ");
+		return Joiner.on(", ").join(columnNames);
 	}
 	
 	private KeyConstraintUtil() {

@@ -122,7 +122,8 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<SimpleJmForeignKeyC
 	 * @param context コンテキスト
 	 * @param foreignKey 編集対象外部キー
 	 * @throws IllegalArgumentException 引数foreignKey, jiemamyFacadeに{@code null}を与えた場合
-	 * @throws ModelConsistencyException
+	 * @throws ModelConsistencyException 指定した外部キーが{@code context}配下のテーブルのメンバーでない場合
+	 * @throws ModelConsistencyException 指定した外部キーが参照するテーブルを見つけられない場合
 	 */
 	public ForeignKeyEditDialog(Shell shell, JiemamyContext context, SimpleJmForeignKeyConstraint foreignKey) {
 		super(shell, context, foreignKey, SimpleJmForeignKeyConstraint.class);

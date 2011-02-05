@@ -201,7 +201,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			if ((element instanceof JmCheckConstraint) == false) {
+			if ((element instanceof JmConstraint) == false) {
 				logger.error("unknown element: " + element.getClass().getName());
 				return StringUtils.EMPTY;
 			}
@@ -304,7 +304,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			addMenu = new Menu(getBtnAdd());
 			
 			MenuItem menuItemAddPk = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddPk.setText("Primary Key JmConstraint"); // RESOURCE
+			menuItemAddPk.setText("Primary Key Constraint"); // RESOURCE
 			menuItemAddPk.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
@@ -316,7 +316,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			});
 			
 			MenuItem menuItemAddUk = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddUk.setText("Unique Key JmConstraint"); // RESOURCE
+			menuItemAddUk.setText("Unique Key Constraint"); // RESOURCE
 			menuItemAddUk.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
@@ -328,12 +328,12 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			});
 			
 			MenuItem menuItemAddFk = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddFk.setText("Foreign Key JmConstraint"); // RESOURCE
+			menuItemAddFk.setText("Foreign Key Constraint"); // RESOURCE
 			menuItemAddFk.setEnabled(false);
 			// 今は常に無効だが、いつかmenuからFKを追加できるようにするといいかも。
 			
 			MenuItem menuItemAddCc = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddCc.setText("Check JmConstraint"); // RESOURCE
+			menuItemAddCc.setText("Check Constraint"); // RESOURCE
 			menuItemAddCc.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
@@ -344,7 +344,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			});
 			
 			MenuItem menuItemAddNn = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddNn.setText("Not-null JmConstraint"); // RESOURCE
+			menuItemAddNn.setText("Not-null Constraint"); // RESOURCE
 			menuItemAddNn.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
@@ -499,8 +499,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 						}
 					}
 					if (found) {
-						int[] newIndices =
-								ArrayUtils.add(lstKeyColumns.getSelectionIndices(), columns.indexOf(column));
+						int[] newIndices = ArrayUtils.add(lstKeyColumns.getSelectionIndices(), columns.indexOf(column));
 						lstKeyColumns.setSelection(newIndices);
 					}
 				}

@@ -143,7 +143,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		assert dialect != null;
 		this.dialect = dialect;
 		
-		int size = context.getDomains().size() + dialect.getAllTypeReferences().size();
+		int size = context.getDomains().size() + dialect.getAllRawTypeDescriptors().size();
 		allTypes = Lists.newArrayListWithExpectedSize(size);
 		
 		allTypes.addAll(dialect.getAllRawTypeDescriptors());

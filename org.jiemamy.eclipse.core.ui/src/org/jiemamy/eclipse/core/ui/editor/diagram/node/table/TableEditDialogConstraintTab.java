@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -309,7 +308,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public JmConstraint getModel() {
-					SimpleJmPrimaryKeyConstraint constraint = new SimpleJmPrimaryKeyConstraint(UUID.randomUUID());
+					SimpleJmPrimaryKeyConstraint constraint = new SimpleJmPrimaryKeyConstraint();
 					constraint.addKeyColumn(table.getColumns().get(0).toReference());
 					return constraint;
 				}
@@ -321,7 +320,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public JmConstraint getModel() {
-					SimpleJmUniqueKeyConstraint constraint = new SimpleJmUniqueKeyConstraint(UUID.randomUUID());
+					SimpleJmUniqueKeyConstraint constraint = new SimpleJmUniqueKeyConstraint();
 					constraint.addKeyColumn(table.getColumns().get(0).toReference());
 					return constraint;
 				}
@@ -338,7 +337,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public JmConstraint getModel() {
-					SimpleJmCheckConstraint constraint = new SimpleJmCheckConstraint(UUID.randomUUID());
+					SimpleJmCheckConstraint constraint = new SimpleJmCheckConstraint();
 					return constraint;
 				}
 			});
@@ -349,7 +348,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				
 				@Override
 				public JmConstraint getModel() {
-					SimpleJmNotNullConstraint constraint = new SimpleJmNotNullConstraint(UUID.randomUUID());
+					SimpleJmNotNullConstraint constraint = new SimpleJmNotNullConstraint();
 					constraint.setColumn(table.getColumns().get(0).toReference());
 					return constraint;
 				}

@@ -26,9 +26,9 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.diagram.Creation;
+import org.jiemamy.model.JmNode;
 import org.jiemamy.model.SimpleJmConnection;
 import org.jiemamy.model.SimpleJmDiagram;
-import org.jiemamy.model.JmNode;
 import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
 import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.utils.ForeignKeyFactory;
@@ -54,7 +54,7 @@ public class ForeignKeyCreation implements Creation {
 	 * インスタンスを生成する。
 	 */
 	public ForeignKeyCreation() {
-		foreignKey = new SimpleJmForeignKeyConstraint(UUID.randomUUID());
+		foreignKey = new SimpleJmForeignKeyConstraint();
 		connection = new SimpleJmConnection(UUID.randomUUID(), foreignKey.toReference());
 	}
 	

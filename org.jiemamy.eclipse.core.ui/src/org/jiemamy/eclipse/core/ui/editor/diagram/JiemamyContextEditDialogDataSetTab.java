@@ -18,8 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram;
 
-import java.util.UUID;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.eclipse.jface.viewers.BaseLabelProvider;
@@ -270,7 +268,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		protected void performAddItem() {
 			Table table = getTableViewer().getTable();
 			
-			SimpleJmDataSet dataSet = new SimpleJmDataSet(UUID.randomUUID());
+			SimpleJmDataSet dataSet = new SimpleJmDataSet();
 			
 			String newName = "DATASET_" + (context.getDataSets().size() + 1);
 			dataSet.setName(newName);
@@ -288,7 +286,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
-			SimpleJmDataSet dataSet = new SimpleJmDataSet(UUID.randomUUID());
+			SimpleJmDataSet dataSet = new SimpleJmDataSet();
 			
 			String newName = "DATASET_" + (context.getDataSets().size() + 1);
 			dataSet.setName(newName);

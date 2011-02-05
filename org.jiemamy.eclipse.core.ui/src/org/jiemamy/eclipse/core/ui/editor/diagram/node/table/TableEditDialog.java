@@ -20,7 +20,6 @@ package org.jiemamy.eclipse.core.ui.editor.diagram.node.table;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.collect.Sets;
 
@@ -230,7 +229,7 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		
 		SimpleJmAroundScript aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(table.toReference());
 		if (aroundScript == null) {
-			aroundScript = new SimpleJmAroundScript(UUID.randomUUID());
+			aroundScript = new SimpleJmAroundScript();
 			aroundScript.setCoreModelRef(table.toReference());
 		}
 		

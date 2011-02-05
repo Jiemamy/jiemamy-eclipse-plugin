@@ -19,7 +19,6 @@
 package org.jiemamy.eclipse.core.ui.editor.diagram;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
@@ -223,7 +222,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 			SqlFacet facet = getContext().getFacet(SqlFacet.class);
 			universalAroundScript = (SimpleJmAroundScript) facet.getUniversalAroundScript();
 			if (universalAroundScript == null) {
-				universalAroundScript = new SimpleJmAroundScript(UUID.randomUUID());
+				universalAroundScript = new SimpleJmAroundScript();
 			}
 			universalAroundScript.setScript(Position.BEGIN, beginScript);
 			universalAroundScript.setScript(Position.END, endScript);

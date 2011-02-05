@@ -18,8 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.table;
 
-import java.util.UUID;
-
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.DiagramFacet;
@@ -49,8 +47,8 @@ public class TableCreation implements NodeCreation {
 	 * インスタンスを生成する。
 	 */
 	public TableCreation() {
-		table = new SimpleJmTable(UUID.randomUUID());
-		node = new SimpleDbObjectNode(UUID.randomUUID(), table.toReference());
+		table = new SimpleJmTable();
+		node = new SimpleDbObjectNode(table.toReference());
 	}
 	
 	public void execute(JiemamyContext context, SimpleJmDiagram diagram) {

@@ -18,15 +18,13 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.sticky;
 
-import java.util.UUID;
-
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.NodeCreation;
-import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.geometory.JmRectangle;
 
 /**
@@ -47,7 +45,7 @@ public class StickyCreation implements NodeCreation {
 	 * インスタンスを生成する。
 	 */
 	public StickyCreation() {
-		stickyJmNode = new JmStickyNode(UUID.randomUUID());
+		stickyJmNode = new JmStickyNode();
 		stickyJmNode.setContents(DEFAULT_STICKY_CONTENTS);
 	}
 	

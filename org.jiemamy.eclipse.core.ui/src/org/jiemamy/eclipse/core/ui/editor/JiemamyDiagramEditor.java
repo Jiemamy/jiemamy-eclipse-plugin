@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.EventObject;
 import java.util.List;
-import java.util.UUID;
 
 import com.google.common.collect.Lists;
 
@@ -79,10 +78,10 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.JmMetadata;
-import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JmMetadata;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.dialect.GenericDialect;
@@ -570,7 +569,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		} finally {
 			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
 			if (diagramPresentations.getDiagrams().size() < 1) {
-				SimpleJmDiagram diagram = new SimpleJmDiagram(UUID.randomUUID());
+				SimpleJmDiagram diagram = new SimpleJmDiagram();
 				diagram.setName("default");
 				diagramPresentations.store(diagram);
 			}

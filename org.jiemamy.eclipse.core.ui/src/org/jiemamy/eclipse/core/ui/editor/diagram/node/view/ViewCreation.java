@@ -18,8 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.view;
 
-import java.util.UUID;
-
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.DiagramFacet;
@@ -49,8 +47,8 @@ public class ViewCreation implements NodeCreation {
 	 * インスタンスを生成する。
 	 */
 	public ViewCreation() {
-		view = new SimpleJmView(UUID.randomUUID());
-		node = new SimpleDbObjectNode(UUID.randomUUID(), view.toReference());
+		view = new SimpleJmView();
+		node = new SimpleDbObjectNode(view.toReference());
 	}
 	
 	public void execute(JiemamyContext context, SimpleJmDiagram diagram) {

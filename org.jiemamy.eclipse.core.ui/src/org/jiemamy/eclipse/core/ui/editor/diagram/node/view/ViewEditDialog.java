@@ -18,8 +18,6 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.view;
 
-import java.util.UUID;
-
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
@@ -50,8 +48,8 @@ import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.SimpleDbObjectNode;
 import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.column.ColumnParameterKey;
-import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.model.script.Position;
+import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.model.view.SimpleJmView;
 
 /**
@@ -91,8 +89,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 	 * @param node ノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditDialog(Shell parentShell, JiemamyContext context, SimpleJmView view,
-			SimpleDbObjectNode node) {
+	public ViewEditDialog(Shell parentShell, JiemamyContext context, SimpleJmView view, SimpleDbObjectNode node) {
 		super(parentShell, context, view, SimpleJmView.class, node);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -234,7 +231,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		
 		aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(view.toReference());
 		if (aroundScript == null) {
-			aroundScript = new SimpleJmAroundScript(UUID.randomUUID());
+			aroundScript = new SimpleJmAroundScript();
 			aroundScript.setCoreModelRef(view.toReference());
 		}
 		
@@ -266,8 +263,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		String beginScript = "";
 		String endScript = "";
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		SimpleJmAroundScript aroundScript =
-				(SimpleJmAroundScript) facet.getAroundScriptFor(view.toReference());
+		SimpleJmAroundScript aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(view.toReference());
 		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));

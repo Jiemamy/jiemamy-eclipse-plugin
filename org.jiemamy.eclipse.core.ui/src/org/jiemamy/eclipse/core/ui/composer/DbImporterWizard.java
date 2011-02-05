@@ -35,10 +35,10 @@ import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
  * 
  * @author daisuke
  */
-public class DbImportWizard extends Wizard implements ImporterWizard<DbImporter, DbImportConfig>,
+public class DbImporterWizard extends Wizard implements ImporterWizard<DbImporter, DbImportConfig>,
 		IWorkbenchWizard {
 	
-	private DbImportWizardPage page;
+	private DbImporterWizardPage page;
 	
 	private SimpleDbImportConfig config;
 	
@@ -48,7 +48,7 @@ public class DbImportWizard extends Wizard implements ImporterWizard<DbImporter,
 	/**
 	 * Creates a wizard for exporting SQL to the local file system.
 	 */
-	public DbImportWizard() {
+	public DbImporterWizard() {
 		IDialogSettings workbenchSettings = JiemamyUIPlugin.getDefault().getDialogSettings();
 		settings = workbenchSettings.getSection("ImportWizard");
 		if (settings == null) {
@@ -60,7 +60,7 @@ public class DbImportWizard extends Wizard implements ImporterWizard<DbImporter,
 	@Override
 	public void addPages() {
 		super.addPages();
-		page = new DbImportWizardPage(settings);
+		page = new DbImporterWizardPage(settings);
 		addPage(page);
 	}
 	

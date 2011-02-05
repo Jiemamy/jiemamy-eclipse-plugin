@@ -35,11 +35,11 @@ public interface TypeParameterHandler {
 	/**
 	 * UIを構築する。
 	 * 
-	 * @param columnModel データ型を設定されるモデル
+	 * @param column データ型を設定されるモデル
 	 * @param composite オプションコントロール描画対象の親
 	 * @param editListener コントロールの操作を検知するリスナ
 	 */
-	void createControl(JmColumn columnModel, Composite composite, EditListener editListener);
+	void createControl(JmColumn column, Composite composite, EditListener editListener);
 	
 	/**
 	 * コントロールを無効にする。

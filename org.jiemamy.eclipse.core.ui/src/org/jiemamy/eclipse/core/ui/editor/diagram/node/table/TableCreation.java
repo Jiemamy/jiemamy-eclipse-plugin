@@ -53,14 +53,14 @@ public class TableCreation implements NodeCreation {
 		node = new SimpleDbObjectNode(UUID.randomUUID(), table.toReference());
 	}
 	
-	public void execute(JiemamyContext context, SimpleJmDiagram diagramModel) {
+	public void execute(JiemamyContext context, SimpleJmDiagram diagram) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
+		Validate.notNull(diagram);
 		
 		NamingUtil.autoName(table, context);
 		context.store(table);
-		diagramModel.store(node);
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.store(node);
+		context.getFacet(DiagramFacet.class).store(diagram);
 	}
 	
 	public void setBoundary(JmRectangle boundary) {
@@ -68,12 +68,12 @@ public class TableCreation implements NodeCreation {
 		node.setBoundary(boundary);
 	}
 	
-	public void undo(JiemamyContext context, SimpleJmDiagram diagramModel) {
+	public void undo(JiemamyContext context, SimpleJmDiagram diagram) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
+		Validate.notNull(diagram);
 		
-		diagramModel.deleteNode(node.toReference());
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.deleteNode(node.toReference());
+		context.getFacet(DiagramFacet.class).store(diagram);
 		context.deleteDbObject(table.toReference());
 	}
 }

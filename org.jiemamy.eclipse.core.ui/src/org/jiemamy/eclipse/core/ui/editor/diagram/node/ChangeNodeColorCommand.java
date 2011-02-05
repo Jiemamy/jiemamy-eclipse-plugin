@@ -35,7 +35,7 @@ public class ChangeNodeColorCommand extends Command {
 	
 	private final DiagramFacet diagramFacet;
 	
-	private final SimpleJmDiagram diagramModel;
+	private final SimpleJmDiagram diagram;
 	
 	private final EntityRef<? extends SimpleJmNode> nodeRef;
 	
@@ -48,35 +48,35 @@ public class ChangeNodeColorCommand extends Command {
 	 * インスタンスを生成する。
 	 * 
 	 * @param diagramFacet ファセット
-	 * @param diagramModel ダイアグラム
-	 * @param nodeRef 変更対象のエンティティ
+	 * @param diagram ダイアグラム
+	 * @param nodeRef 変更対象のノード
 	 * @param newColor newColor
 	 */
-	public ChangeNodeColorCommand(DiagramFacet diagramFacet, SimpleJmDiagram diagramModel,
+	public ChangeNodeColorCommand(DiagramFacet diagramFacet, SimpleJmDiagram diagram,
 			EntityRef<? extends SimpleJmNode> nodeRef, JmColor newColor) {
 		this.diagramFacet = diagramFacet;
-		this.diagramModel = diagramModel;
+		this.diagram = diagram;
 		this.nodeRef = nodeRef;
 		this.newColor = newColor;
-		SimpleJmNode node = diagramModel.resolve(nodeRef);
+		SimpleJmNode node = diagram.resolve(nodeRef);
 		oldColor = node.getColor();
 	}
 	
 	@Override
 	public void execute() {
-		SimpleJmNode node = diagramModel.resolve(nodeRef);
+		SimpleJmNode node = diagram.resolve(nodeRef);
 		
 		node.setColor(newColor);
-		diagramModel.store(node);
-		diagramFacet.store(diagramModel);
+		diagram.store(node);
+		diagramFacet.store(diagram);
 	}
 	
 	@Override
 	public void undo() {
-		SimpleJmNode node = diagramModel.resolve(nodeRef);
+		SimpleJmNode node = diagram.resolve(nodeRef);
 		
 		node.setColor(oldColor);
-		diagramModel.store(node);
-		diagramFacet.store(diagramModel);
+		diagram.store(node);
+		diagramFacet.store(diagram);
 	}
 }

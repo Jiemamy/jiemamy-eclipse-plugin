@@ -85,7 +85,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	 * 
 	 * @param shell 親シェルオブジェクト
 	 * @param context 編集対象{@link JiemamyContext}
-	 * @throws IllegalArgumentException 引数rootModel, jiemamyFacadeに{@code null}を与えた場合
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public JiemamyContextEditDialog(Shell shell, JiemamyContext context) {
 		super(shell, context, context, JiemamyContext.class);

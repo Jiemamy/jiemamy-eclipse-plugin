@@ -166,11 +166,11 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void execute() {
 			DiagramFacet facet = context.getFacet(DiagramFacet.class);
-			SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+			SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 			target.setBoundary(new JmRectangle(x, y, -1, -1));
-			diagramModel.store(target);
+			diagram.store(target);
 			oldBendpoints.clear();
-			for (JmConnection conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
+			for (JmConnection conn : diagram.getSourceConnectionsFor(target.toReference())) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				oldBendpoints.put(conn, new ArrayList<JmPoint>(bendpoints));
 				bendpoints.clear();
@@ -180,8 +180,8 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void undo() {
 			DiagramFacet facet = context.getFacet(DiagramFacet.class);
-			SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-			for (JmConnection conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
+			SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+			for (JmConnection conn : diagram.getSourceConnectionsFor(target.toReference())) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				bendpoints.clear();
 				for (JmPoint bendpoint : oldBendpoints.get(conn)) {
@@ -189,7 +189,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 				}
 			}
 			target.setBoundary(new JmRectangle(oldX, oldY, -1, -1));
-			diagramModel.store(target);
+			diagram.store(target);
 		}
 	}
 	
@@ -264,28 +264,28 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		private void assembleEdges(List<Node> graphNodes, List<Edge> graphEdges) {
 			JiemamyContext context = ((JiemamyContextEditPart) viewer.getContents()).getModel();
 			DiagramFacet facet = context.getFacet(DiagramFacet.class);
-			SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+			SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 			for (Object obj : graphNodes) {
 				EntityNode node = (EntityNode) obj;
 				
-				Collection<? extends JmConnection> conns =
-						diagramModel.getSourceConnectionsFor(node.model.toReference());
-				CONN_LOOP: for (JmConnection conn : conns) {
-					if (conn.isSelfConnection()) {
+				Collection<? extends JmConnection> connections =
+						diagram.getSourceConnectionsFor(node.model.toReference());
+				CONN_LOOP: for (JmConnection connection : connections) {
+					if (connection.isSelfConnection()) {
 						continue;
 					}
 					
 					// skip if the connection already added
 					for (Object obj2 : graphEdges) {
 						ConnectionEdge edge = (ConnectionEdge) obj2;
-						if (edge.model == conn) {
+						if (edge.model == connection) {
 							continue CONN_LOOP;
 						}
 					}
-					Node source = getNode(graphNodes, conn.getSource());
-					Node target = getNode(graphNodes, conn.getTarget());
+					Node source = getNode(graphNodes, connection.getSource());
+					Node target = getNode(graphNodes, connection.getTarget());
 					if (source != null && target != null) {
-						graphEdges.add(new ConnectionEdge(source, target, conn));
+						graphEdges.add(new ConnectionEdge(source, target, connection));
 					}
 				}
 			}

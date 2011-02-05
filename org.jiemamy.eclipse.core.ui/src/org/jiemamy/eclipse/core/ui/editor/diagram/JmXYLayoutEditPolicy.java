@@ -49,10 +49,10 @@ public class JmXYLayoutEditPolicy extends XYLayoutEditPolicy {
 	@Override
 	protected Command createChangeConstraintCommand(EditPart child, Object constraint) {
 		JiemamyContext context = (JiemamyContext) getHost().getModel();
-		SimpleJmNode nodeModel = (SimpleJmNode) child.getModel();
+		SimpleJmNode node = (SimpleJmNode) child.getModel();
 		EditPartViewer viewer = child.getViewer();
 		Rectangle rectangle = (Rectangle) constraint;
-		return new ChangeNodeConstraintCommand(context, TODO.DIAGRAM_INDEX, nodeModel, rectangle, viewer);
+		return new ChangeNodeConstraintCommand(context, TODO.DIAGRAM_INDEX, node, rectangle, viewer);
 	}
 	
 	/**

@@ -31,19 +31,19 @@ class Messages extends NLS {
 	
 	// CHECKSTYLE:OFF
 	
-	/** DbImportWizard のタイトル */
+	/** DbImporterWizard のタイトル */
 	public static String DbImportWizard_title;
 	
-	/** DbImportWizardPage タイトル */
+	/** DbImporterWizardPage タイトル */
 	public static String DbImportWizardPage_title;
 	
-	/** DbImportWizardPage ラベル DB種別 */
+	/** DbImporterWizardPage ラベル DB種別 */
 	public static String DbImportWizardPage_label_dbType;
 	
-	/** DbImportWizardPage 接続テストボタン */
+	/** DbImporterWizardPage 接続テストボタン */
 	public static String DbImportWizardPage_btn_connectionTest;
 	
-	/** DbImportWizardPage 再設定ボタン */
+	/** DbImporterWizardPage 再設定ボタン */
 	public static String DbImportWizardPage_btn_reconfigure;
 	
 	// CHECKSTYLE:ON

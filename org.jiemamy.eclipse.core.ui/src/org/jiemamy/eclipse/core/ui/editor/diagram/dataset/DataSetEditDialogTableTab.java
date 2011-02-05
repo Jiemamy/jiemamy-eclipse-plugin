@@ -72,45 +72,45 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	 * 
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
-	 * @param dataSetModel 編集対象{@link JmDataSet}
-	 * @param tableModel {@link JmDataSet}内での対象テーブル
+	 * @param dataSet 編集対象{@link JmDataSet}
+	 * @param swtTable {@link JmDataSet}内での対象テーブル
 	 */
-	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, JmDataSet dataSetModel,
-			JmTable tableModel) {
-		super(parentTabFolder, style, tableModel.getName());
-		getTabItem().setData(tableModel);
+	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, JmDataSet dataSet,
+			JmTable table) {
+		super(parentTabFolder, style, table.getName());
+		getTabItem().setData(table);
 		
 		Composite composite = new Composite(parentTabFolder, SWT.NULL);
 		composite.setLayout(new GridLayout(1, false));
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		final Table table = new Table(composite, SWT.BORDER | SWT.MULTI);
-		table.setLayoutData(new GridData(GridData.FILL_BOTH));
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-		table.setData(tableModel);
+		final Table swtTable = new Table(composite, SWT.BORDER | SWT.MULTI);
+		swtTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+		swtTable.setHeaderVisible(true);
+		swtTable.setLinesVisible(true);
+		swtTable.setData(table);
 		
-		List<JmColumn> columns = tableModel.getColumns();
-		for (JmColumn columnModel : columns) {
-			TableColumn column = new TableColumn(table, SWT.NONE);
-			column.setWidth(COL_WIDTH);
-			column.setText(columnModel.getName());
-			column.setData(columnModel);
+		List<JmColumn> columns = table.getColumns();
+		for (JmColumn column : columns) {
+			TableColumn swtColumn = new TableColumn(swtTable, SWT.NONE);
+			swtColumn.setWidth(COL_WIDTH);
+			swtColumn.setText(column.getName());
+			swtColumn.setData(column);
 		}
 		
-		final List<JmRecord> records = dataSetModel.getRecords().get(tableModel.toReference());
-		refreshTable(table, records);
+		final List<JmRecord> records = dataSet.getRecords().get(table.toReference());
+		refreshTable(swtTable, records);
 		
-		final TableEditor editor = new TableEditor(table);
+		final TableEditor editor = new TableEditor(swtTable);
 		editor.horizontalAlignment = SWT.LEFT;
 		editor.grabHorizontal = true;
-		table.addListener(SWT.MouseDown, new StartEditListener(editor, table));
+		swtTable.addListener(SWT.MouseDown, new StartEditListener(editor, swtTable));
 		
 		getTabItem().setControl(composite);
 		getTabItem().addListener(RECORD_CHANGED, new Listener() {
 			
 			public void handleEvent(Event event) {
-				refreshTable(table, records);
+				refreshTable(swtTable, records);
 			}
 		});
 	}
@@ -120,27 +120,27 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		return true;
 	}
 	
-	private void refreshTable(final Table table, List<JmRecord> records) {
-		for (TableItem item : table.getItems()) {
+	private void refreshTable(final Table swtTable, List<JmRecord> records) {
+		for (TableItem item : swtTable.getItems()) {
 			item.dispose();
 		}
 		
-		for (JmRecord recordModel : records) {
+		for (JmRecord record : records) {
 			List<ScriptString> data = Lists.newArrayList();
-			for (TableColumn tableColumn : table.getColumns()) {
-				JmColumn columnModel = (JmColumn) tableColumn.getData();
-				EntityRef<? extends JmColumn> columnRef = columnModel.toReference();
-				ScriptString string = recordModel.getValues().get(columnRef);
+			for (TableColumn tableColumn : swtTable.getColumns()) {
+				JmColumn column = (JmColumn) tableColumn.getData();
+				EntityRef<? extends JmColumn> columnRef = column.toReference();
+				ScriptString string = record.getValues().get(columnRef);
 				data.add(string);
 			}
-			TableItem item = new TableItem(table, SWT.NONE);
+			TableItem item = new TableItem(swtTable, SWT.NONE);
 			
 			List<String> strings = Lists.newArrayList();
 			for (ScriptString scriptString : data) {
 				strings.add(scriptString.getScript());
 			}
 			item.setText(strings.toArray(new String[data.size()]));
-			item.setData(recordModel);
+			item.setData(record);
 		}
 	}
 	
@@ -154,33 +154,33 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		
 		private final TableEditor editor;
 		
-		private final Table table;
+		private final Table swtTable;
 		
 
 		/**
 		 * インスタンスを生成する。
 		 * 
 		 * @param editor テーブルエディタ
-		 * @param table SWTテーブル
+		 * @param swtTable SWTテーブル
 		 */
-		private StartEditListener(TableEditor editor, Table table) {
+		private StartEditListener(TableEditor editor, Table swtTable) {
 			this.editor = editor;
-			this.table = table;
+			this.swtTable = swtTable;
 		}
 		
 		public void handleEvent(Event event) {
 			logger.debug(LogMarker.LIFECYCLE, "mouse down");
-			Rectangle clientArea = table.getClientArea();
+			Rectangle clientArea = swtTable.getClientArea();
 			Point pt = new Point(event.x, event.y);
-			int index = table.getTopIndex();
-			while (index < table.getItemCount()) {
+			int index = swtTable.getTopIndex();
+			while (index < swtTable.getItemCount()) {
 				boolean visible = false;
-				final TableItem item = table.getItem(index);
-				for (int i = 0; i < table.getColumnCount(); i++) {
+				final TableItem item = swtTable.getItem(index);
+				for (int i = 0; i < swtTable.getColumnCount(); i++) {
 					Rectangle rect = item.getBounds(i);
 					if (rect.contains(pt)) {
 						final int columnIndex = i;
-						final Text text = new Text(table, SWT.NONE);
+						final Text text = new Text(swtTable, SWT.NONE);
 						Listener textListener = new FinishEditListener(text, item, columnIndex);
 						text.addListener(SWT.FocusOut, textListener);
 						text.addListener(SWT.Traverse, textListener);
@@ -230,27 +230,27 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 			}
 			
 			public void handleEvent(final Event e) {
-				SimpleJmRecord recordModel;
-				JmColumn columnModel;
+				SimpleJmRecord record;
+				JmColumn column;
 				if (e.type == SWT.FocusOut) {
 					logger.debug(LogMarker.LIFECYCLE, "focus out");
 					item.setText(columnIndex, text.getText());
-					recordModel = (SimpleJmRecord) item.getData();
-					columnModel = (JmColumn) table.getColumn(columnIndex).getData();
+					record = (SimpleJmRecord) item.getData();
+					column = (JmColumn) swtTable.getColumn(columnIndex).getData();
 					Map<EntityRef<? extends JmColumn>, ScriptString> values =
-							Maps.newHashMap(recordModel.getValues());
-					values.put(columnModel.toReference(), new ScriptString(text.getText()));
+							Maps.newHashMap(record.getValues());
+					values.put(column.toReference(), new ScriptString(text.getText()));
 					item.setData(new SimpleJmRecord(values));
 					text.dispose();
 				} else if (e.type == SWT.Traverse) {
 					if (e.detail == SWT.TRAVERSE_RETURN) {
 						logger.debug(LogMarker.LIFECYCLE, "traverse return");
 						item.setText(columnIndex, text.getText());
-						recordModel = (SimpleJmRecord) item.getData();
-						columnModel = (JmColumn) table.getColumn(columnIndex).getData();
+						record = (SimpleJmRecord) item.getData();
+						column = (JmColumn) swtTable.getColumn(columnIndex).getData();
 						Map<EntityRef<? extends JmColumn>, ScriptString> values =
-								Maps.newHashMap(recordModel.getValues());
-						values.put(columnModel.toReference(), new ScriptString(text.getText()));
+								Maps.newHashMap(record.getValues());
+						values.put(column.toReference(), new ScriptString(text.getText()));
 						item.setData(new SimpleJmRecord(values));
 					}
 					

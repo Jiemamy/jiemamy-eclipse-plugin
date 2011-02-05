@@ -136,11 +136,11 @@ public class CreateConnectionCommand extends Command {
 	@Override
 	public void execute() {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
-		SimpleJmDiagram diagramModel =
+		SimpleJmDiagram diagram =
 				(SimpleJmDiagram) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
 		creation.setSourceTable((SimpleJmTable) sourceCore);
 		creation.setTargetTable((SimpleJmTable) targetCore);
-		creation.execute(context, diagramModel);
+		creation.execute(context, diagram);
 		
 //		jiemamyFacade.resetBendpoint(diagramIndex, connection);
 	}
@@ -189,21 +189,21 @@ public class CreateConnectionCommand extends Command {
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
-		SimpleJmDiagram diagramModel =
+		SimpleJmDiagram diagram =
 				(SimpleJmDiagram) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
-		creation.undo(context, diagramModel);
+		creation.undo(context, diagram);
 	}
 	
 	/**
 	 * 主キーがあれば主キー、なければ何らかのJmLocalKeyConstraintを取得する。
 	 * 
-	 * @param tableModel 検索するテーブル
+	 * @param table 検索するテーブル
 	 * @return キー. 見つからなかった場合は{@code null}
 	 */
-	private JmLocalKeyConstraint getKey(JmTable tableModel) {
-		JmLocalKeyConstraint key = tableModel.getPrimaryKey();
+	private JmLocalKeyConstraint getKey(JmTable table) {
+		JmLocalKeyConstraint key = table.getPrimaryKey();
 		if (key == null) {
-			Collection<JmLocalKeyConstraint> localKeys = tableModel.getConstraints(JmLocalKeyConstraint.class);
+			Collection<JmLocalKeyConstraint> localKeys = table.getConstraints(JmLocalKeyConstraint.class);
 			if (localKeys.size() > 0) {
 				key = Iterables.get(localKeys, 0);
 			}

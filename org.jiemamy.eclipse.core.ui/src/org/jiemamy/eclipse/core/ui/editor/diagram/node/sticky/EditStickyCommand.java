@@ -40,42 +40,42 @@ public class EditStickyCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final SimpleJmDiagram diagramModel;
+	private final SimpleJmDiagram diagram;
 	
-	private final JmStickyNode stickyModel;
+	private final JmStickyNode stickyNode;
 	
-	private final JmStickyNode oldStickyModel;
+	private final JmStickyNode oldStickyNode;
 	
 
 	/**
 	 * インスタンスを生成する。
 	 * 
 	 * @param context コンテキスト
-	 * @param diagramModel ダイアグラム
-	 * @param stickyModel メモ
+	 * @param diagram ダイアグラム
+	 * @param stickyNode メモ
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public EditStickyCommand(JiemamyContext context, SimpleJmDiagram diagramModel, JmStickyNode stickyModel) {
+	public EditStickyCommand(JiemamyContext context, SimpleJmDiagram diagram, JmStickyNode stickyNode) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
-		Validate.notNull(stickyModel);
+		Validate.notNull(diagram);
+		Validate.notNull(stickyNode);
 		this.context = context;
-		this.diagramModel = diagramModel;
-		this.stickyModel = stickyModel;
-		oldStickyModel = diagramModel.resolve(stickyModel.toReference());
+		this.diagram = diagram;
+		this.stickyNode = stickyNode;
+		oldStickyNode = diagram.resolve(stickyNode.toReference());
 	}
 	
 	@Override
 	public void execute() {
 		logger.debug("execute");
-		diagramModel.store(stickyModel);
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.store(stickyNode);
+		context.getFacet(DiagramFacet.class).store(diagram);
 	}
 	
 	@Override
 	public void undo() {
 		logger.debug("undo");
-		diagramModel.store(oldStickyModel);
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.store(oldStickyNode);
+		context.getFacet(DiagramFacet.class).store(diagram);
 	}
 }

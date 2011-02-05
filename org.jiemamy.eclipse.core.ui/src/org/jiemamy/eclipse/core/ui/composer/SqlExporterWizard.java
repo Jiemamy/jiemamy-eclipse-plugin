@@ -46,11 +46,11 @@ import org.jiemamy.model.dataset.JmDataSet;
  * 
  * @author daisuke
  */
-public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporter, SqlExportConfig>, IWorkbenchWizard {
+public class SqlExporterWizard extends Wizard implements ExporterWizard<SqlExporter, SqlExportConfig>, IWorkbenchWizard {
 	
 	private FileSelectWizardPage page1;
 	
-	private SqlExportWizardPage page2;
+	private SqlExporterWizardPage page2;
 	
 	private SimpleSqlExportConfig config;
 	
@@ -58,7 +58,7 @@ public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporte
 	/**
 	 * Creates a wizard for exporting SQL to the local file system.
 	 */
-	public SqlExportWizard() {
+	public SqlExporterWizard() {
 		IDialogSettings workbenchSettings = JiemamyUIPlugin.getDefault().getDialogSettings();
 		IDialogSettings section = workbenchSettings.getSection("ExportWizard"); // $NON-NLS-1$
 		if (section == null) {
@@ -73,10 +73,10 @@ public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporte
 		List<String> dataSetNames = Lists.newArrayList();
 		if (activeEditor instanceof JiemamyEditor) {
 			JiemamyEditor jiemamyEditor = (JiemamyEditor) activeEditor;
-			JiemamyContext rootModel = jiemamyEditor.getJiemamyContext();
-			List<JmDataSet> dataSets = rootModel.getDataSets();
-			for (JmDataSet dataSetModel : dataSets) {
-				dataSetNames.add(dataSetModel.getName());
+			JiemamyContext context = jiemamyEditor.getJiemamyContext();
+			List<JmDataSet> dataSets = context.getDataSets();
+			for (JmDataSet dataSet : dataSets) {
+				dataSetNames.add(dataSet.getName());
 			}
 		}
 		super.addPages();
@@ -91,7 +91,7 @@ public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporte
 		});
 		addPage(page1);
 		
-		page2 = new SqlExportWizardPage(dataSetNames);
+		page2 = new SqlExporterWizardPage(dataSetNames);
 		addPage(page2);
 	}
 	

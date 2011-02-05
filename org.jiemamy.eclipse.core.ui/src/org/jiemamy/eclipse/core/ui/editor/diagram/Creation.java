@@ -33,18 +33,18 @@ public interface Creation {
 	 * TODO for daisuke
 	 * 
 	 * @param context コンテキスト
-	 * @param diagramModel ダイアグラム
+	 * @param diagram ダイアグラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	void execute(JiemamyContext context, SimpleJmDiagram diagramModel);
+	void execute(JiemamyContext context, SimpleJmDiagram diagram);
 	
 	/**
 	 * TODO for daisuke
 	 * 
 	 * @param context コンテキスト
-	 * @param diagramModel ダイアグラム
+	 * @param diagram ダイアグラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	void undo(JiemamyContext context, SimpleJmDiagram diagramModel);
+	void undo(JiemamyContext context, SimpleJmDiagram diagram);
 	
 }

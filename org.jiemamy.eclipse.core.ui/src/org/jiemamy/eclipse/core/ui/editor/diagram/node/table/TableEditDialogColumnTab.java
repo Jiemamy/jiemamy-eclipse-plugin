@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -109,7 +108,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	
 	private final JiemamyContext context;
 	
-	private final SimpleJmTable tableModel;
+	private final SimpleJmTable table;
 	
 	private final Dialect dialect;
 	
@@ -124,14 +123,13 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
 	 * @param context コンテキスト
-	 * @param tableModel 編集対象{@link JmTable}
+	 * @param table 編集対象{@link JmTable}
 	 */
-	public TableEditDialogColumnTab(TabFolder parentTabFolder, int style, JiemamyContext context,
-			SimpleJmTable tableModel) {
+	public TableEditDialogColumnTab(TabFolder parentTabFolder, int style, JiemamyContext context, SimpleJmTable table) {
 		super(parentTabFolder, style, Messages.Tab_Table_Columns);
 		
 		this.context = context;
-		this.tableModel = tableModel;
+		this.table = table;
 		
 		Dialect dialect = null;
 		try {
@@ -147,8 +145,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		allTypes = Lists.newArrayListWithExpectedSize(size);
 		
 		allTypes.addAll(dialect.getAllRawTypeDescriptors());
-		for (JmDomain domainModel : context.getDomains()) {
-			allTypes.add(domainModel.asType());
+		for (JmDomain domain : context.getDomains()) {
+			allTypes.add(domain.asType());
 		}
 		
 		Composite composite = new Composite(parentTabFolder, SWT.NULL);
@@ -212,16 +210,15 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return null;
 			}
 			
-			JmColumn columnModel = (JmColumn) element;
+			JmColumn column = (JmColumn) element;
 			ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 			
 			switch (columnIndex) {
 				case 0:
-					return tableModel.isPrimaryKeyColumn(columnModel.toReference()) ? ir.get(Images.ICON_PK) : null;
+					return table.isPrimaryKeyColumn(column.toReference()) ? ir.get(Images.ICON_PK) : null;
 					
 				case 4:
-					return ir.get(tableModel.isNotNullColumn(columnModel.toReference()) ? Images.CHECK_ON
-							: Images.CHECK_OFF);
+					return ir.get(table.isNotNullColumn(column.toReference()) ? Images.CHECK_ON : Images.CHECK_OFF);
 					
 				default:
 					return null;
@@ -234,16 +231,16 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return StringUtils.EMPTY;
 			}
 			
-			JmColumn columnModel = (JmColumn) element;
+			JmColumn column = (JmColumn) element;
 			switch (columnIndex) {
 				case 1:
-					return columnModel.getName();
+					return column.getName();
 					
 				case 2:
-					return LabelStringUtil.toString(dialect, columnModel.getDataType());
+					return LabelStringUtil.toString(dialect, column.getDataType());
 					
 				case 3:
-					return columnModel.getDefaultValue();
+					return column.getDefaultValue();
 					
 				default:
 					return StringUtils.EMPTY;
@@ -315,18 +312,18 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					Table table = getTableViewer().getTable();
-					int index = table.getSelectionIndex();
-					if (index < 0 || index >= table.getItemCount()) {
+					Table swtTable = getTableViewer().getTable();
+					int index = swtTable.getSelectionIndex();
+					if (index < 0 || index >= swtTable.getItemCount()) {
 						return;
 					}
 					
-					SimpleJmColumn columnModel = (SimpleJmColumn) getTableViewer().getElementAt(index);
-					TypeParameterManager typeOptionManager = typeOptionManagers.get(columnModel.toReference());
+					SimpleJmColumn column = (SimpleJmColumn) getTableViewer().getElementAt(index);
+					TypeParameterManager typeOptionManager = typeOptionManagers.get(column.toReference());
 					RawTypeDescriptor dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
 					Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataTypeMold);
 					Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
-					typeOptionManager.createTypeOptionControl(columnModel, keys);
+					typeOptionManager.createTypeOptionControl(column, keys);
 				}
 			});
 			
@@ -348,9 +345,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			tableViewer.setLabelProvider(new ColumnLabelProvider());
 			final ColumnContentProvider contentProvider = new ColumnContentProvider();
 			tableViewer.setContentProvider(contentProvider);
-			tableViewer.setInput(tableModel);
+			tableViewer.setInput(table);
 			
-			final EventBroker eventBroker = tableModel.getEventBroker();
+			final EventBroker eventBroker = table.getEventBroker();
 			eventBroker.addListener(contentProvider);
 			
 			// THINK んーーー？？ このタイミングか？ AbstractTableEditor#dispose かな？
@@ -378,10 +375,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			
 			typeOptionManagers.clear();
-			for (JmColumn columnModel : tableModel.getColumns()) {
+			for (JmColumn column : table.getColumns()) {
 				TypeParameterManager typeOptionManager =
 						new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
-				typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
+				typeOptionManagers.put(column.toReference(), typeOptionManager);
 			}
 		}
 		
@@ -451,24 +448,24 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		@Override
-		protected void createTableColumns(Table table) {
-			TableColumn colMark = new TableColumn(table, SWT.LEFT);
+		protected void createTableColumns(Table swtTable) {
+			TableColumn colMark = new TableColumn(swtTable, SWT.LEFT);
 			colMark.setText(StringUtils.EMPTY);
 			colMark.setWidth(20);
 			
-			TableColumn colName = new TableColumn(table, SWT.LEFT);
+			TableColumn colName = new TableColumn(swtTable, SWT.LEFT);
 			colName.setText("カラム名"); // RESOURCE
 			colName.setWidth(COL_WIDTH_NAME);
 			
-			TableColumn colType = new TableColumn(table, SWT.LEFT);
+			TableColumn colType = new TableColumn(swtTable, SWT.LEFT);
 			colType.setText("データ型"); // RESOURCE
 			colType.setWidth(COL_WIDTH_TYPE);
 			
-			TableColumn colSimple = new TableColumn(table, SWT.LEFT);
+			TableColumn colSimple = new TableColumn(swtTable, SWT.LEFT);
 			colSimple.setText("デフォルト値"); // RESOURCE
 			colSimple.setWidth(COL_WIDTH_DEFAULT);
 			
-			TableColumn colNotNull = new TableColumn(table, SWT.LEFT);
+			TableColumn colNotNull = new TableColumn(swtTable, SWT.LEFT);
 			colNotNull.setText("NN");
 			colNotNull.setWidth(COL_WIDTH_NN);
 		}
@@ -500,7 +497,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			SimpleJmColumn columnModel = (SimpleJmColumn) getTableViewer().getElementAt(index);
+			SimpleJmColumn column = (SimpleJmColumn) getTableViewer().getElementAt(index);
 			
 			txtColumnName.setEnabled(true);
 			txtColumnLogicalName.setEnabled(true);
@@ -511,32 +508,32 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsNotNull.setEnabled(true);
 			chkIsDisabled.setEnabled(true);
 			
-			DataType dataType = columnModel.getDataType();
+			DataType dataType = column.getDataType();
 			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
 			Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
-			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
-			manager.createTypeOptionControl(columnModel, keys);
+			TypeParameterManager manager = typeOptionManagers.get(column.toReference());
+			manager.createTypeOptionControl(column, keys);
 			
 			// 現在値の設定
-			txtColumnName.setText(columnModel.getName());
-			txtColumnLogicalName.setText(StringUtils.defaultString(columnModel.getLogicalName()));
+			txtColumnName.setText(column.getName());
+			txtColumnLogicalName.setText(StringUtils.defaultString(column.getLogicalName()));
 			
-			chkIsNotNull.setSelection(tableModel.isNotNullColumn(columnModel.toReference()));
+			chkIsNotNull.setSelection(table.isNotNullColumn(column.toReference()));
 			
 			if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 				DomainType domainRef = (DomainType) dataType.getRawTypeDescriptor();
-				JmDomain domainModel = context.resolve(domainRef);
-				cmbDataType.setText(domainModel.getName());
+				JmDomain domain = context.resolve(domainRef);
+				cmbDataType.setText(domain.getName());
 			} else {
 				cmbDataType.setText(dataType.getRawTypeDescriptor().getTypeName());
-				typeOptionManagers.get(columnModel.toReference()).setValue(columnModel);
+				typeOptionManagers.get(column.toReference()).setValue(column);
 			}
-			txtSimpleValue.setText(StringUtils.defaultString(columnModel.getDefaultValue()));
-			txtDescription.setText(StringUtils.defaultString(columnModel.getDescription()));
+			txtSimpleValue.setText(StringUtils.defaultString(column.getDefaultValue()));
+			txtDescription.setText(StringUtils.defaultString(column.getDescription()));
 			
-			chkIsPK.setSelection(tableModel.isPrimaryKeyColumn(columnModel.toReference()));
+			chkIsPK.setSelection(table.isPrimaryKeyColumn(column.toReference()));
 			
-			Boolean disabled = columnModel.getParam(ColumnParameterKey.DISABLED);
+			Boolean disabled = column.getParam(ColumnParameterKey.DISABLED);
 			if (disabled != null && disabled) {
 				chkIsDisabled.setSelection(true);
 			} else {
@@ -546,118 +543,118 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		@Override
 		protected void performAddItem() {
-			Table table = getTableViewer().getTable();
-			SimpleJmColumn columnModel = new SimpleJmColumn(UUID.randomUUID());
+			Table swtTable = getTableViewer().getTable();
+			SimpleJmColumn column = new SimpleJmColumn();
 			
-			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
-			columnModel.setName(newName); // TODO autoname
+			String newName = "COLUMN_" + (table.getColumns().size() + 1);
+			column.setName(newName); // TODO autoname
 			
 			SimpleDataType type = new SimpleDataType(allTypes.get(0));
-			columnModel.setDataType(type);
-			tableModel.store(columnModel);
+			column.setDataType(type);
+			table.store(column);
 			
 			TypeParameterManager typeOptionManager =
 					new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
-			typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
+			typeOptionManagers.put(column.toReference(), typeOptionManager);
 			
-			int addedIndex = columnModel.getIndex();
-			table.setSelection(addedIndex);
+			int addedIndex = column.getIndex();
+			swtTable.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtColumnName.setFocus();
 		}
 		
 		@Override
 		protected void performInsertItem() {
-			Table table = getTableViewer().getTable();
-			int index = table.getSelectionIndex();
+			Table swtTable = getTableViewer().getTable();
+			int index = swtTable.getSelectionIndex();
 			
-			SimpleJmColumn columnModel = new SimpleJmColumn(UUID.randomUUID());
+			SimpleJmColumn column = new SimpleJmColumn();
 			
-			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
-			columnModel.setName(newName); // TODO autoname
+			String newName = "COLUMN_" + (table.getColumns().size() + 1);
+			column.setName(newName); // TODO autoname
 			
 			SimpleDataType type = new SimpleDataType(allTypes.get(0));
-			columnModel.setDataType(type);
-			columnModel.setIndex(index);
-			tableModel.store(columnModel);
+			column.setDataType(type);
+			column.setIndex(index);
+			table.store(column);
 			
 			TypeParameterManager typeOptionManager =
 					new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
-			typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
+			typeOptionManagers.put(column.toReference(), typeOptionManager);
 			
-			int addedIndex = tableModel.getColumns().indexOf(columnModel);
-			table.setSelection(addedIndex);
+			int addedIndex = table.getColumns().indexOf(column);
+			swtTable.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtColumnName.setFocus();
 		}
 		
 		@Override
 		protected void performMoveDownItem() {
-			Table table = getTableViewer().getTable();
-			int index = table.getSelectionIndex();
-			if (index < 0 || index >= table.getItemCount()) {
+			Table swtTable = getTableViewer().getTable();
+			int index = swtTable.getSelectionIndex();
+			if (index < 0 || index >= swtTable.getItemCount()) {
 				return;
 			}
 			
-			tableModel.swapColumn(index, index + 1);
+			table.swapColumn(index, index + 1);
 			
-			table.setSelection(index + 1);
+			swtTable.setSelection(index + 1);
 			enableEditControls(index + 1);
 		}
 		
 		@Override
 		protected void performMoveUpItem() {
-			Table table = getTableViewer().getTable();
-			int index = table.getSelectionIndex();
-			if (index <= 0 || index > table.getItemCount()) {
+			Table swtTable = getTableViewer().getTable();
+			int index = swtTable.getSelectionIndex();
+			if (index <= 0 || index > swtTable.getItemCount()) {
 				return;
 			}
 			
-			tableModel.swapColumn(index - 1, index);
+			table.swapColumn(index - 1, index);
 			
-			table.setSelection(index - 1);
+			swtTable.setSelection(index - 1);
 			enableEditControls(index - 1);
 		}
 		
 		@Override
 		protected void performRemoveItem() {
 			TableViewer tableViewer = getTableViewer();
-			Table table = tableViewer.getTable();
-			int index = table.getSelectionIndex();
-			if (index < 0 || index > table.getItemCount()) {
+			Table swtTable = tableViewer.getTable();
+			int index = swtTable.getSelectionIndex();
+			if (index < 0 || index > swtTable.getItemCount()) {
 				return;
 			}
 			
 			JmColumn subject = (JmColumn) getTableViewer().getElementAt(index);
 			
 			// 削除対象カラムに対するNNは削除
-			Set<JmNotNullConstraint> nns = tableModel.getConstraints(JmNotNullConstraint.class);
+			Set<JmNotNullConstraint> nns = table.getConstraints(JmNotNullConstraint.class);
 			for (JmNotNullConstraint nn : nns) {
 				if (nn.getColumn().isReferenceOf(subject)) {
-					tableModel.deleteConstraint(nn.toReference());
+					table.deleteConstraint(nn.toReference());
 				}
 			}
 			
 			// 削除対象カラムがキーの一部になっていたら、そのキーセットからカラムを削除
-			Set<SimpleJmKeyConstraint> keys = tableModel.getConstraints(SimpleJmKeyConstraint.class);
+			Set<SimpleJmKeyConstraint> keys = table.getConstraints(SimpleJmKeyConstraint.class);
 			for (SimpleJmKeyConstraint key : keys) {
 				if (key.getKeyColumns().contains(subject.toReference())) {
 					key.removeKeyColumn(subject.toReference());
-					tableModel.store(key);
+					table.store(key);
 				}
 			}
 			
-			tableModel.deleteColumn(subject.toReference());
+			table.deleteColumn(subject.toReference());
 			
 			tableViewer.remove(subject);
-			int nextSelection = table.getItemCount() > index ? index : index - 1;
+			int nextSelection = swtTable.getItemCount() > index ? index : index - 1;
 			if (nextSelection >= 0) {
-				table.setSelection(nextSelection);
+				swtTable.setSelection(nextSelection);
 				enableEditorControls(nextSelection);
 			} else {
 				disableEditorControls();
 			}
-			table.setFocus();
+			swtTable.setFocus();
 			
 			typeOptionManagers.remove(subject.toReference());
 		}
@@ -695,71 +692,71 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			SimpleJmColumn columnModel = (SimpleJmColumn) tableModel.getColumns().get(editIndex);
+			SimpleJmColumn column = (SimpleJmColumn) table.getColumns().get(editIndex);
 			
 			String columnName = StringUtils.defaultString(txtColumnName.getText());
-			columnModel.setName(columnName);
+			column.setName(columnName);
 			
 			String logicalName = StringUtils.defaultString(txtColumnLogicalName.getText());
-			columnModel.setLogicalName(logicalName);
+			column.setLogicalName(logicalName);
 			
 			int selectionInedx = cmbDataType.getSelectionIndex();
 			if (selectionInedx != -1) {
 				SimpleDataType dataType = new SimpleDataType(allTypes.get(selectionInedx));
-				columnModel.setDataType(dataType);
+				column.setDataType(dataType);
 			}
 			
 			String defaultValue = StringUtils.defaultString(txtSimpleValue.getText());
-			columnModel.setDefaultValue(defaultValue);
+			column.setDefaultValue(defaultValue);
 			
 			String description = StringUtils.defaultString(txtDescription.getText());
-			columnModel.setDescription(description);
+			column.setDescription(description);
 			
 			if (chkIsNotNull.getSelection() == false) {
-				JmNotNullConstraint nn = tableModel.getNotNullConstraintFor(columnModel.toReference());
+				JmNotNullConstraint nn = table.getNotNullConstraintFor(column.toReference());
 				if (nn != null) {
-					tableModel.deleteConstraint(nn.toReference());
+					table.deleteConstraint(nn.toReference());
 				}
-			} else if (tableModel.getNotNullConstraintFor(columnModel.toReference()) == null) {
-				tableModel.store(SimpleJmNotNullConstraint.of(columnModel));
+			} else if (table.getNotNullConstraintFor(column.toReference()) == null) {
+				table.store(SimpleJmNotNullConstraint.of(column));
 			}
 			
-			SimpleJmPrimaryKeyConstraint primaryKey = (SimpleJmPrimaryKeyConstraint) tableModel.getPrimaryKey();
+			SimpleJmPrimaryKeyConstraint primaryKey = (SimpleJmPrimaryKeyConstraint) table.getPrimaryKey();
 			if (chkIsPK.getSelection() == false) {
 				if (primaryKey != null) {
-					primaryKey.removeKeyColumn(columnModel.toReference());
-					tableModel.store(primaryKey);
+					primaryKey.removeKeyColumn(column.toReference());
+					table.store(primaryKey);
 				}
 			} else {
 				if (primaryKey == null) {
-					primaryKey = SimpleJmPrimaryKeyConstraint.of(columnModel);
-					tableModel.store(primaryKey);
-				} else if (primaryKey.getKeyColumns().contains(columnModel.toReference()) == false) {
-					primaryKey.addKeyColumn(columnModel.toReference());
-					tableModel.store(primaryKey);
+					primaryKey = SimpleJmPrimaryKeyConstraint.of(column);
+					table.store(primaryKey);
+				} else if (primaryKey.getKeyColumns().contains(column.toReference()) == false) {
+					primaryKey.addKeyColumn(column.toReference());
+					table.store(primaryKey);
 				}
 			}
 			
 			// THINK
 //			if (primaryKey != null && primaryKey.getKeyColumns().size() <= 0) {
-//				tableModel.deleteConstraint(primaryKey.toReference());
+//				table.deleteConstraint(primaryKey.toReference());
 //			}
 			
-			Boolean disabled = columnModel.getParam(ColumnParameterKey.DISABLED);
+			Boolean disabled = column.getParam(ColumnParameterKey.DISABLED);
 			if (chkIsDisabled.getSelection() == false) {
 				if (disabled != null && disabled) {
-					columnModel.removeParam(ColumnParameterKey.DISABLED);
+					column.removeParam(ColumnParameterKey.DISABLED);
 				}
 			} else {
 				if (disabled == null || disabled == false) {
-					columnModel.putParam(ColumnParameterKey.DISABLED, true);
+					column.putParam(ColumnParameterKey.DISABLED, true);
 				}
 			}
 			
-			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
-			manager.writeBackToAdapter(columnModel);
+			TypeParameterManager manager = typeOptionManagers.get(column.toReference());
+			manager.writeBackToAdapter(column);
 			
-			tableModel.store(columnModel);
+			table.store(column);
 		}
 		
 

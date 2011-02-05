@@ -127,9 +127,9 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 	}
 	
 	private boolean prepare() {
-		JiemamyContext rootModel = (JiemamyContext) getViewer().getContents().getModel();
+		JiemamyContext context = (JiemamyContext) getViewer().getContents().getModel();
 		
-		WizardDialog dialog = new WizardDialog(null, new GraphicWizard(rootModel));
+		WizardDialog dialog = new WizardDialog(null, new GraphicWizard(context));
 		
 		if (dialog.open() == Dialog.CANCEL) {
 			return false;
@@ -153,9 +153,9 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 		/**
 		 * インスタンスを生成する。
 		 * 
-		 * @param rootModel ルートモデル
+		 * @param context コンテキスト
 		 */
-		public GraphicWizard(JiemamyContext rootModel) {
+		public GraphicWizard(JiemamyContext context) {
 			setWindowTitle(Messages.GraphicWizard_title);
 		}
 		

@@ -52,11 +52,11 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param stickyModel コントロール対象の付箋モデル
+	 * @param stickyNode コントロール対象の付箋モデル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public StickyEditPart(JmStickyNode stickyModel) {
-		super(stickyModel);
+	public StickyEditPart(JmStickyNode stickyNode) {
+		super(stickyNode);
 	}
 	
 	@Override
@@ -66,17 +66,17 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	
 	public void openEditDialog() {
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		JmStickyNode stickyModel = getModel();
-		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", stickyModel);
+		JmStickyNode stickyNode = getModel();
+		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", stickyNode);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
 		Shell shell = getViewer().getControl().getShell();
-		StickyEditDialog dialog = new StickyEditDialog(shell, context, stickyModel, diagramModel);
+		StickyEditDialog dialog = new StickyEditDialog(shell, context, stickyNode, diagram);
 		
 		if (dialog.open() == Dialog.OK) {
-			org.eclipse.gef.commands.Command command = new EditStickyCommand(context, diagramModel, stickyModel);
+			org.eclipse.gef.commands.Command command = new EditStickyCommand(context, diagram, stickyNode);
 			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 			viewer.getEditDomain().getCommandStack().execute(command);
 		}
@@ -116,10 +116,10 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	protected void updateFigure(IFigure figure) {
 		logger.debug(LogMarker.LIFECYCLE, "updateFigure");
 		
-		JmStickyNode stickyModel = getModel();
+		JmStickyNode stickyNode = getModel();
 		StickyFigure stickyFigure = (StickyFigure) figure;
 		
-		stickyFigure.setContents(stickyModel.getContents());
-		stickyFigure.setBgColor(ConvertUtil.convert(stickyModel.getColor()));
+		stickyFigure.setContents(stickyNode.getContents());
+		stickyFigure.setBgColor(ConvertUtil.convert(stickyNode.getColor()));
 	}
 }

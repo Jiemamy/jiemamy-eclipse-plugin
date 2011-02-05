@@ -36,8 +36,8 @@ import org.jiemamy.model.DbObject;
  */
 public abstract class DbObjectFigure extends Figure {
 	
-	/** エンティティ名表示部分Figure */
-	private Label entityNameLabel;
+	/** {@link DbObject}名表示部分Figure */
+	private Label dbObjectNameLabel;
 	
 	/** カラム表示部分Figure */
 	private CompartmentFigure columnFigure;
@@ -52,8 +52,8 @@ public abstract class DbObjectFigure extends Figure {
 	 * @param defaultColor デフォルト背景色
 	 */
 	public DbObjectFigure(Color defaultColor) {
-		entityNameLabel = new Label();
-		entityNameLabel.setBorder(new MarginBorder(2, 2, 0, 2));
+		dbObjectNameLabel = new Label();
+		dbObjectNameLabel.setBorder(new MarginBorder(2, 2, 0, 2));
 		
 		columnFigure = new CompartmentFigure();
 		columnFigure.setBorder(new CompartmentFigureBorder());
@@ -80,12 +80,12 @@ public abstract class DbObjectFigure extends Figure {
 	}
 	
 	/**
-	 * エンティティ名表示部分Figureを取得する。
+	 * {@link DbObject}名表示部分Figureを取得する。
 	 * 
-	 * @return エンティティ名表示部分Figure
+	 * @return {@link DbObject}名表示部分Figure
 	 */
-	public Label getEntityNameLabel() {
-		return entityNameLabel;
+	public Label getDbObjectNameLabel() {
+		return dbObjectNameLabel;
 	}
 	
 	/**
@@ -96,10 +96,10 @@ public abstract class DbObjectFigure extends Figure {
 	public void setBgColor(Color bgColor) {
 		setBackgroundColor(bgColor == null ? defaultColor : bgColor);
 		if (SwtColorUtil.isDarkColor(getBackgroundColor())) {
-			entityNameLabel.setForegroundColor(ColorConstants.white);
+			dbObjectNameLabel.setForegroundColor(ColorConstants.white);
 			columnFigure.setForegroundColor(ColorConstants.white);
 		} else {
-			entityNameLabel.setForegroundColor(ColorConstants.black);
+			dbObjectNameLabel.setForegroundColor(ColorConstants.black);
 			columnFigure.setForegroundColor(ColorConstants.black);
 		}
 	}
@@ -107,10 +107,10 @@ public abstract class DbObjectFigure extends Figure {
 	/**
 	 * DbObject名を設定する。
 	 * 
-	 * @param databaseObjectName DbObject名
+	 * @param dbObjectName DbObject名
 	 */
-	public void setDbObjectName(String databaseObjectName) {
-		entityNameLabel.setText(databaseObjectName);
+	public void setDbObjectName(String dbObjectName) {
+		dbObjectNameLabel.setText(dbObjectName);
 	}
 	
 }

@@ -56,7 +56,7 @@ public class TableFigure extends DbObjectFigure {
 	public TableFigure() {
 		super(ColorConstants.tooltipBackground);
 		
-		Label entityNameLabel = getEntityNameLabel();
+		Label entityNameLabel = getDbObjectNameLabel();
 		ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 		entityNameLabel.setIcon(ir.get(Images.LABEL_TABLE));
 		

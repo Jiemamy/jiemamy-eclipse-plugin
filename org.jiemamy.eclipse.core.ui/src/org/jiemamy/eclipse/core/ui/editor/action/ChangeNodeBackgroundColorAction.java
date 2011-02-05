@@ -74,11 +74,11 @@ public class ChangeNodeBackgroundColorAction extends AbstractJiemamyAction {
 				CommandStack stack = getViewer().getEditDomain().getCommandStack();
 				
 				for (AbstractJmNodeEditPart editPart : editParts) {
-					SimpleJmNode nodeModel = (SimpleJmNode) editPart.getModel();
-					EntityRef<? extends SimpleJmNode> ref = nodeModel.toReference();
-					SimpleJmDiagram diagramModel =
+					SimpleJmNode node = (SimpleJmNode) editPart.getModel();
+					EntityRef<? extends SimpleJmNode> ref = node.toReference();
+					SimpleJmDiagram diagram =
 							(SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
-					Command command = new ChangeNodeColorCommand(facet, diagramModel, ref, newColor);
+					Command command = new ChangeNodeColorCommand(facet, diagram, ref, newColor);
 					
 					stack.execute(command);
 				}

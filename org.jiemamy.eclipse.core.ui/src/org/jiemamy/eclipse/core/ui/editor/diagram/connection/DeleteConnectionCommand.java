@@ -39,11 +39,11 @@ public class DeleteConnectionCommand extends Command {
 	
 	private JmConnection connection;
 	
-	private SimpleJmTable tableModel;
+	private SimpleJmTable table;
 	
 	private SimpleJmForeignKeyConstraint foreignKey;
 	
-	private SimpleJmDiagram diagmramModel;
+	private SimpleJmDiagram diagmram;
 	
 
 	/**
@@ -62,21 +62,21 @@ public class DeleteConnectionCommand extends Command {
 		foreignKey = (SimpleJmForeignKeyConstraint) context.resolve(connection.getCoreModelRef());
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		diagmramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		diagmramModel.deleteConnection(connection.toReference());
-		facet.store(diagmramModel);
+		diagmram = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		diagmram.deleteConnection(connection.toReference());
+		facet.store(diagmram);
 		
-		tableModel = (SimpleJmTable) foreignKey.findDeclaringTable(context.getTables());
-		tableModel.deleteConstraint(foreignKey.toReference());
-		context.store(tableModel);
+		table = (SimpleJmTable) foreignKey.findDeclaringTable(context.getTables());
+		table.deleteConstraint(foreignKey.toReference());
+		context.store(table);
 	}
 	
 	@Override
 	public void undo() {
-		tableModel.store(foreignKey);
-		context.store(tableModel);
+		table.store(foreignKey);
+		context.store(table);
 		
-		diagmramModel.store(connection);
-		context.getFacet(DiagramFacet.class).store(diagmramModel);
+		diagmram.store(connection);
+		context.getFacet(DiagramFacet.class).store(diagmram);
 	}
 }

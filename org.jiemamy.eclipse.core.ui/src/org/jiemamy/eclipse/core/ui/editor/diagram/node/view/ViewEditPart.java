@@ -57,11 +57,11 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param nodeModel コントロール対象のノード
+	 * @param node コントロール対象のノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditPart(SimpleDbObjectNode nodeModel) {
-		super(nodeModel);
+	public ViewEditPart(SimpleDbObjectNode node) {
+		super(node);
 	}
 	
 	@Override
@@ -73,14 +73,14 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		SimpleDbObjectNode nodeModel = getModel();
-		SimpleJmView viewModel = (SimpleJmView) context.resolve(nodeModel.getCoreModelRef());
+		SimpleDbObjectNode node = getModel();
+		SimpleJmView view = (SimpleJmView) context.resolve(node.getCoreModelRef());
 		
 		Shell shell = getViewer().getControl().getShell();
-		ViewEditDialog dialog = new ViewEditDialog(shell, context, viewModel, nodeModel);
+		ViewEditDialog dialog = new ViewEditDialog(shell, context, view, node);
 		
 		if (dialog.open() == Dialog.OK) {
-			Command command = new EditDbObjectCommand(context, viewModel, nodeModel, TODO.DIAGRAM_INDEX);
+			Command command = new EditDbObjectCommand(context, view, node, TODO.DIAGRAM_INDEX);
 			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 			viewer.getEditDomain().getCommandStack().execute(command);
 		}
@@ -99,8 +99,8 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		ViewFigure figure = new ViewFigure();
 		DbObjectNode node = getModel();
 		
-		JmView viewModel = (JmView) context.resolve(node.getCoreModelRef());
-		String description = viewModel.getDescription();
+		JmView view = (JmView) context.resolve(node.getCoreModelRef());
+		String description = view.getDescription();
 		
 		if (StringUtils.isEmpty(description) == false) {
 			Panel tooltip = new Panel();
@@ -120,10 +120,10 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 		logger.debug(LogMarker.LIFECYCLE, "updateFigure");
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DbObjectNode node = getModel();
-		JmView viewModel = (JmView) context.resolve(node.getCoreModelRef());
+		JmView view = (JmView) context.resolve(node.getCoreModelRef());
 		ViewFigure viewFigure = (ViewFigure) figure;
 		
-		viewFigure.setDbObjectName(viewModel.getName());
+		viewFigure.setDbObjectName(view.getName());
 		
 		JmColor color = node.getColor();
 		viewFigure.setBgColor(ConvertUtil.convert(color));

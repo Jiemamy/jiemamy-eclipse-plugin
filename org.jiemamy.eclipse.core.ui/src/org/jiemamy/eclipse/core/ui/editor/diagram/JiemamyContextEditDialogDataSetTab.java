@@ -190,10 +190,10 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				public void widgetSelected(SelectionEvent e) {
 					logger.info("edit data set");
 					int selectionIndex = dataSetTableEditor.getTableViewer().getTable().getSelectionIndex();
-					SimpleJmDataSet dataSetModel = (SimpleJmDataSet) context.getDataSets().get(selectionIndex);
-					DataSetEditDialog dataSetEditDialog = new DataSetEditDialog(getShell(), context, dataSetModel);
+					SimpleJmDataSet dataSet = (SimpleJmDataSet) context.getDataSets().get(selectionIndex);
+					DataSetEditDialog dataSetEditDialog = new DataSetEditDialog(getShell(), context, dataSet);
 					if (dataSetEditDialog.open() == Window.OK) {
-						context.store(dataSetModel);
+						context.store(dataSet);
 					}
 				}
 			});
@@ -270,14 +270,14 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		protected void performAddItem() {
 			Table table = getTableViewer().getTable();
 			
-			SimpleJmDataSet dataSetModel = new SimpleJmDataSet(UUID.randomUUID());
+			SimpleJmDataSet dataSet = new SimpleJmDataSet(UUID.randomUUID());
 			
 			String newName = "DATASET_" + (context.getDataSets().size() + 1);
-			dataSetModel.setName(newName);
+			dataSet.setName(newName);
 			
-			context.store(dataSetModel);
+			context.store(dataSet);
 			
-			int addedIndex = context.getDataSets().indexOf(dataSetModel);
+			int addedIndex = context.getDataSets().indexOf(dataSet);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtDataSetName.setFocus();
@@ -288,15 +288,15 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
-			SimpleJmDataSet dataSetModel = new SimpleJmDataSet(UUID.randomUUID());
+			SimpleJmDataSet dataSet = new SimpleJmDataSet(UUID.randomUUID());
 			
 			String newName = "DATASET_" + (context.getDataSets().size() + 1);
-			dataSetModel.setName(newName);
+			dataSet.setName(newName);
 			
-			dataSetModel.setIndex(index);
-			context.store(dataSetModel);
+			dataSet.setIndex(index);
+			context.store(dataSet);
 			
-			int addedIndex = context.getDataSets().indexOf(dataSetModel);
+			int addedIndex = context.getDataSets().indexOf(dataSet);
 			table.setSelection(addedIndex);
 			enableEditControls(addedIndex);
 			txtDataSetName.setFocus();
@@ -359,8 +359,8 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				return;
 			}
 			
-			SimpleJmDataSet dataSetModel = (SimpleJmDataSet) context.getDataSets().get(editIndex);
-			dataSetModel.setName(StringUtils.defaultString(txtDataSetName.getText()));
+			SimpleJmDataSet dataSet = (SimpleJmDataSet) context.getDataSets().get(editIndex);
+			dataSet.setName(StringUtils.defaultString(txtDataSetName.getText()));
 		}
 		
 

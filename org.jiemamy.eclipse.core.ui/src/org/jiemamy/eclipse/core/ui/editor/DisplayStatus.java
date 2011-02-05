@@ -56,12 +56,12 @@ enum DisplayStatus {
 	/**
 	 * ダイアグラム表現に設定されたモードとレベルから、適切なステータスを探す。
 	 * 
-	 * @param presentationModel ダイアグラム表現
+	 * @param diagram ダイアグラム
 	 * @return ステータス. 見つからなかった場合は{@code null}
 	 */
-	public static DisplayStatus find(JmDiagram presentationModel) {
+	public static DisplayStatus find(JmDiagram diagram) {
 		for (DisplayStatus status : values()) {
-			if (presentationModel.getMode() == status.mode && presentationModel.getLevel() == status.level) {
+			if (diagram.getMode() == status.mode && diagram.getLevel() == status.level) {
 				return status;
 			}
 		}

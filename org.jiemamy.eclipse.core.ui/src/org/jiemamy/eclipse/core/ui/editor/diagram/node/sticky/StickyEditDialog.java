@@ -42,8 +42,8 @@ import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.editor.diagram.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.SimpleJmDiagram;
 
 /** 
  * {@link JmStickyNode}の詳細編集ダイアログクラス。
@@ -56,7 +56,7 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 	
 	private TextEditTab tabContents;
 	
-	private SimpleJmDiagram diagramModel;
+	private final SimpleJmDiagram diagram;
 	
 
 	/**
@@ -64,23 +64,23 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 	 * 
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
-	 * @param stickyModel 編集対象付箋モデル
-	 * @param diagramModel ダイアグラム
-	 * @throws IllegalArgumentException 引数stickyModel, jiemamyFacadeに{@code null}を与えた場合
+	 * @param stickyNode 編集対象付箋モデル
+	 * @param diagram ダイアグラム
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public StickyEditDialog(Shell parentShell, JiemamyContext context, JmStickyNode stickyModel,
-			SimpleJmDiagram diagramModel) {
-		super(parentShell, context, stickyModel, JmStickyNode.class);
+	public StickyEditDialog(Shell parentShell, JiemamyContext context, JmStickyNode stickyNode, SimpleJmDiagram diagram) {
+		super(parentShell, context, stickyNode, JmStickyNode.class);
 		
-		Validate.notNull(stickyModel);
+		Validate.notNull(stickyNode);
+		Validate.notNull(diagram);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		this.diagramModel = diagramModel;
+		this.diagram = diagram;
 	}
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final JmStickyNode stickyModel = getTargetCoreModel();
+		final JmStickyNode stickyNode = getTargetCoreModel();
 		getShell().setText(Messages.Dialog_Title);
 		
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -98,9 +98,9 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					stickyModel.setColor(ConvertUtil.convert(rgb));
-					diagramModel.store(stickyModel);
-					getContext().getFacet(DiagramFacet.class).store(diagramModel);
+					stickyNode.setColor(ConvertUtil.convert(rgb));
+					diagram.store(stickyNode);
+					getContext().getFacet(DiagramFacet.class).store(diagram);
 				}
 			}
 		});
@@ -111,9 +111,9 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				stickyModel.setColor(null);
-				diagramModel.store(stickyModel);
-				getContext().getFacet(DiagramFacet.class).store(diagramModel);
+				stickyNode.setColor(null);
+				diagram.store(stickyNode);
+				getContext().getFacet(DiagramFacet.class).store(diagram);
 			}
 		});
 		
@@ -124,7 +124,7 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 		tabFolder.setLayoutData(gd);
 		
 		// ---- B-1. Contents
-		String contents = StringUtils.defaultString(stickyModel.getContents());
+		String contents = StringUtils.defaultString(stickyNode.getContents());
 		tabContents = new TextEditTab(tabFolder, Messages.Tab_Sticky_Contents, contents);
 		tabContents.addKeyListener(new EditListenerImpl());
 		addTab(tabContents);
@@ -141,10 +141,10 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 	
 	@Override
 	protected boolean performOk() {
-		JmStickyNode stickyModel = getTargetCoreModel();
+		JmStickyNode stickyNode = getTargetCoreModel();
 		
 		String contents = StringUtils.defaultString(tabContents.getTextWidget().getText());
-		stickyModel.setContents(contents);
+		stickyNode.setContents(contents);
 		
 		return true;
 	}

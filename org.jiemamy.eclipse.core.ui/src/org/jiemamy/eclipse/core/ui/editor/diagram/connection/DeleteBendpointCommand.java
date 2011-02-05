@@ -36,7 +36,7 @@ public class DeleteBendpointCommand extends Command {
 	private int diagramIndex;
 	
 	/** 削除元のコネクション */
-	private SimpleJmConnection connectionModel;
+	private SimpleJmConnection connection;
 	
 	/** source側からtarget側に向かって数えたベンドポイントのインデックス */
 	private int bendpointIndex;
@@ -49,29 +49,30 @@ public class DeleteBendpointCommand extends Command {
 	 * 
 	 * @param context ルートモデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param connectionModel ベンドポイント削除対象のコネクション
+	 * @param connection ベンドポイント削除対象のコネクション
 	 * @param bendpointIndex source側からtarget側に向かって数えたベンドポイントのインデックス
 	 */
-	public DeleteBendpointCommand(JiemamyContext context, int diagramIndex, SimpleJmConnection connectionModel,
+	public DeleteBendpointCommand(JiemamyContext context, int diagramIndex, SimpleJmConnection connection,
 			int bendpointIndex) {
 		this.context = context;
 		this.diagramIndex = diagramIndex;
-		this.connectionModel = connectionModel;
+		this.connection = connection;
 		this.bendpointIndex = bendpointIndex;
 	}
 	
 	@Override
 	public void execute() {
-		connectionModel.breachEncapsulationOfBendpoints().remove(bendpointIndex);
+		connection.breachEncapsulationOfBendpoints().remove(bendpointIndex);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(connectionModel);
-		facet.store(diagramModel);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagram.store(connection);
+		facet.store(diagram);
 	}
 	
 	@Override
 	public void undo() {
+		// TODO undo
 //		jiemamyFacade.rollback(save);
 	}
 }

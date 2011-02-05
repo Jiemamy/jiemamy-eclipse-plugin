@@ -95,10 +95,10 @@ public class DiagramEditPartFactory implements EditPartFactory {
 		} else if (model instanceof JmStickyNode) {
 			part = new StickyEditPart((JmStickyNode) model);
 		} else if (model instanceof JmConnection) {
-			JmConnection connectionModel = (JmConnection) model;
-			JmForeignKeyConstraint foreignKey = context.resolve(connectionModel.getCoreModelRef());
+			JmConnection connection = (JmConnection) model;
+			JmForeignKeyConstraint foreignKey = context.resolve(connection.getCoreModelRef());
 			if (foreignKey != null) {
-				part = new ForeignKeyEditPart(connectionModel);
+				part = new ForeignKeyEditPart(connection);
 			}
 		}
 		

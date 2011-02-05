@@ -38,7 +38,7 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 	
 	private final JiemamyContext context;
 	
-	private final SimpleJmConnection connectionModel;
+	private final SimpleJmConnection connection;
 	
 	private final Point location;
 	
@@ -54,19 +54,19 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 	 * 
 	 * @param context ルートモデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param connectionModel ベンドポイント追加対象のrelation
+	 * @param connection ベンドポイント追加対象のrelation
 	 * @param location ベンドポイントの座標
 	 * @param bendpointIndex source側からtarget側に向かって数えたベンドポイントのインデックス
 	 */
-	public CreateBendpointCommand(JiemamyContext context, int diagramIndex, SimpleJmConnection connectionModel,
+	public CreateBendpointCommand(JiemamyContext context, int diagramIndex, SimpleJmConnection connection,
 			Point location, int bendpointIndex) {
 		Validate.notNull(context);
-		Validate.notNull(connectionModel);
+		Validate.notNull(connection);
 		Validate.notNull(location);
 		
 		this.context = context;
 		this.diagramIndex = diagramIndex;
-		this.connectionModel = connectionModel;
+		this.connection = connection;
 		this.location = location;
 		this.bendpointIndex = bendpointIndex;
 		
@@ -78,24 +78,24 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 	
 	@Override
 	public void execute() {
-		connectionModel.breachEncapsulationOfBendpoints().add(bendpointIndex, ConvertUtil.convert(location));
+		connection.breachEncapsulationOfBendpoints().add(bendpointIndex, ConvertUtil.convert(location));
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(connectionModel);
-		shiftPosition(false, diagramModel);
-		facet.store(diagramModel);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagram.store(connection);
+		shiftPosition(false, diagram);
+		facet.store(diagram);
 	}
 	
 	@Override
 	public void undo() {
-		connectionModel.breachEncapsulationOfBendpoints().remove(bendpointIndex);
+		connection.breachEncapsulationOfBendpoints().remove(bendpointIndex);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(connectionModel);
-		shiftPosition(true, diagramModel);
-		facet.store(diagramModel);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagram.store(connection);
+		shiftPosition(true, diagram);
+		facet.store(diagram);
 	}
 	
 }

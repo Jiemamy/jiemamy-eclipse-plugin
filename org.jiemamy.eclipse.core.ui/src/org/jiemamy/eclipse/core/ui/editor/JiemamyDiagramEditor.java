@@ -113,7 +113,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	private static Logger logger = LoggerFactory.getLogger(JiemamyDiagramEditor.class);
 	
 	/** Palette component, holding the tools and shapes. */
-	private static PaletteRoot paletteModel;
+	private static PaletteRoot palette;
 	
 	/** DELキーのキーコード */
 	private static final int KEYCODE_DEL = 127;
@@ -540,12 +540,12 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	
 	@Override
 	protected PaletteRoot getPaletteRoot() {
-		if (paletteModel == null) {
-			paletteModel = DiagramEditorPaletteFactory.createPalette();
+		if (palette == null) {
+			palette = DiagramEditorPaletteFactory.createPalette();
 			logger.debug(LogMarker.LIFECYCLE, "palette created");
 		}
 		
-		return paletteModel;
+		return palette;
 	}
 	
 	@Override
@@ -570,9 +570,9 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		} finally {
 			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
 			if (diagramPresentations.getDiagrams().size() < 1) {
-				SimpleJmDiagram diagramModel = new SimpleJmDiagram(UUID.randomUUID());
-				diagramModel.setName("default");
-				diagramPresentations.store(diagramModel);
+				SimpleJmDiagram diagram = new SimpleJmDiagram(UUID.randomUUID());
+				diagram.setName("default");
+				diagramPresentations.store(diagram);
 			}
 		}
 		

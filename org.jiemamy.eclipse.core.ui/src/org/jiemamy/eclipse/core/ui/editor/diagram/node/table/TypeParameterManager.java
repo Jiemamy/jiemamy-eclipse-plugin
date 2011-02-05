@@ -126,17 +126,17 @@ class TypeParameterManager {
 	 * 
 	 * <p>元から存在したコントロールはすべて破棄される。</p>
 	 * 
-	 * @param columnModel カラム
+	 * @param column カラム
 	 * @param keys データ型パラメータキー集合
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void createTypeOptionControl(SimpleJmColumn columnModel, Collection<TypeParameterKey<?>> keys) {
-		Validate.notNull(columnModel);
+	public void createTypeOptionControl(SimpleJmColumn column, Collection<TypeParameterKey<?>> keys) {
+		Validate.notNull(column);
 		Validate.noNullElements(keys);
 		
 		clearTypeOptionControl();
 		
-		DataType dataType = columnModel.getDataType();
+		DataType dataType = column.getDataType();
 		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 			return;
 		}
@@ -177,7 +177,7 @@ class TypeParameterManager {
 		}
 		
 		if (handler != null) {
-			handler.createControl(columnModel, composite, editListener);
+			handler.createControl(column, composite, editListener);
 		}
 		
 		// HACK 再描画されない問題への暫定解決策。
@@ -240,12 +240,12 @@ class TypeParameterManager {
 	/**
 	 * アダプタからコントロールに値を格納する。
 	 * 
-	 * @param columnModel カラム
+	 * @param column カラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void setValue(SimpleJmColumn columnModel) {
-		Validate.notNull(columnModel);
-		DataType dataType = columnModel.getDataType();
+	public void setValue(SimpleJmColumn column) {
+		Validate.notNull(column);
+		DataType dataType = column.getDataType();
 		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 			return;
 		}
@@ -280,12 +280,12 @@ class TypeParameterManager {
 	/**
 	 * コントロールからアダプタにデータを書き戻す。
 	 * 
-	 * @param columnModel カラム
+	 * @param column カラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void writeBackToAdapter(SimpleJmColumn columnModel) {
-		Validate.notNull(columnModel);
-		SimpleDataType dataType = (SimpleDataType) columnModel.getDataType();
+	public void writeBackToAdapter(SimpleJmColumn column) {
+		Validate.notNull(column);
+		SimpleDataType dataType = (SimpleDataType) column.getDataType();
 		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 			return;
 		}
@@ -360,6 +360,6 @@ class TypeParameterManager {
 		if (handler != null) {
 			handler.writeBackToAdapter();
 		}
-		columnModel.setDataType(dataType);
+		column.setDataType(dataType);
 	}
 }

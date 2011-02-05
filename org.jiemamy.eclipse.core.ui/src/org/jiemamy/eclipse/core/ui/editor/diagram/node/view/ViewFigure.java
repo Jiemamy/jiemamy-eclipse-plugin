@@ -49,16 +49,16 @@ public class ViewFigure extends DbObjectFigure {
 	public ViewFigure() {
 		super(DEFAULT);
 		
-		Label entityNameLabel = getEntityNameLabel();
+		Label dbObjectNameLabel = getDbObjectNameLabel();
 		ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
-		entityNameLabel.setIcon(ir.get(Images.LABEL_VIEW));
+		dbObjectNameLabel.setIcon(ir.get(Images.LABEL_VIEW));
 		
 		setLayoutManager(new ToolbarLayout());
 		setBorder(new LineBorder(ColorConstants.black, 1));
 		setBackgroundColor(getDefaultColor());
 		setOpaque(true);
 		
-		add(entityNameLabel);
+		add(dbObjectNameLabel);
 		add(getColumnFigure());
 	}
 	

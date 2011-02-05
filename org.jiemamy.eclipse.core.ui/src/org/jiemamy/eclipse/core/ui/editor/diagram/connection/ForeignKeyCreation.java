@@ -58,17 +58,17 @@ public class ForeignKeyCreation implements Creation {
 		connection = new SimpleJmConnection(UUID.randomUUID(), foreignKey.toReference());
 	}
 	
-	public void execute(JiemamyContext context, SimpleJmDiagram diagramModel) {
+	public void execute(JiemamyContext context, SimpleJmDiagram diagram) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
+		Validate.notNull(diagram);
 		
 		ForeignKeyFactory.setup(foreignKey, context, sourceTable, targetTable);
 		
 		sourceTable.store(foreignKey);
 		context.store(sourceTable);
 		
-		diagramModel.store(connection);
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.store(connection);
+		context.getFacet(DiagramFacet.class).store(diagram);
 	}
 	
 	/**
@@ -115,12 +115,12 @@ public class ForeignKeyCreation implements Creation {
 		this.targetTable = targetTable;
 	}
 	
-	public void undo(JiemamyContext context, SimpleJmDiagram diagramModel) {
+	public void undo(JiemamyContext context, SimpleJmDiagram diagram) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
+		Validate.notNull(diagram);
 		
-		diagramModel.deleteConnection(connection.toReference());
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.deleteConnection(connection.toReference());
+		context.getFacet(DiagramFacet.class).store(diagram);
 		
 		sourceTable.deleteConstraint(foreignKey.toReference());
 		context.store(sourceTable);

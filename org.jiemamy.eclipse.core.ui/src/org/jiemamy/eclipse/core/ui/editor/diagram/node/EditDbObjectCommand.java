@@ -37,13 +37,13 @@ public class EditDbObjectCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final DbObject dom;
+	private final DbObject dbObject;
 	
-	private final DbObject oldDom;
+	private final DbObject oldDbObject;
 	
-	private final JmNode nodeModel;
+	private final JmNode node;
 	
-	private final JmNode oldJmNode;
+	private final JmNode oldNode;
 	
 	private final int diagramIndex;
 	
@@ -52,42 +52,42 @@ public class EditDbObjectCommand extends Command {
 	 * インスタンスを生成する。
 	 * 
 	 * @param context コンテキスト
-	 * @param dom 編集対象{@link DbObject}
-	 * @param nodeModel ノード
+	 * @param dbObject 編集対象{@link DbObject}
+	 * @param node ノード
 	 * @param diagramIndex
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public EditDbObjectCommand(JiemamyContext context, DbObject dom, JmNode nodeModel,
+	public EditDbObjectCommand(JiemamyContext context, DbObject dbObject, JmNode node,
 			int diagramIndex) {
 		Validate.notNull(context);
-		Validate.notNull(dom);
-		Validate.notNull(nodeModel);
+		Validate.notNull(dbObject);
+		Validate.notNull(node);
 		
 		this.context = context;
-		this.dom = dom;
-		this.nodeModel = nodeModel;
+		this.dbObject = dbObject;
+		this.node = node;
 		this.diagramIndex = diagramIndex;
-		oldJmNode = context.resolve(nodeModel.toReference());
-		oldDom = context.resolve(dom.toReference());
+		oldNode = context.resolve(node.toReference());
+		oldDbObject = context.resolve(dbObject.toReference());
 	}
 	
 	@Override
 	public void execute() {
-		context.store(dom);
+		context.store(dbObject);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(nodeModel);
-		facet.store(diagramModel);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagram.store(node);
+		facet.store(diagram);
 	}
 	
 	@Override
 	public void undo() {
-		context.store(oldDom);
+		context.store(oldDbObject);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(oldJmNode);
-		facet.store(diagramModel);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagram.store(oldNode);
+		facet.store(diagram);
 	}
 }

@@ -66,37 +66,37 @@ public abstract class AbstractMovePositionCommand extends Command {
 	 * ダイアグラムを全体的に移動させる。
 	 * 
 	 * @param negative 正方向に移動させる場合は{@code true}、負方向の場合は{@code false}
-	 * @param diagramModel 操作対象ダイアグラム
+	 * @param diagram 操作対象ダイアグラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	protected void shiftPosition(boolean negative, SimpleJmDiagram diagramModel) {
-		Validate.notNull(diagramModel);
-		for (JmNode node : diagramModel.getNodes()) {
+	protected void shiftPosition(boolean negative, SimpleJmDiagram diagram) {
+		Validate.notNull(diagram);
+		for (JmNode node : diagram.getNodes()) {
 			if (node instanceof SimpleJmNode == false) {
 				continue;
 			}
-			SimpleJmNode nodeModel = (SimpleJmNode) node;
+			SimpleJmNode simpleNode = (SimpleJmNode) node;
 			
 			// ノードの移動
-			JmRectangle old = nodeModel.getBoundary();
+			JmRectangle old = simpleNode.getBoundary();
 			JmRectangle newBoundary;
 			if (negative) {
 				newBoundary = new JmRectangle(old.x - shift.x, old.y - shift.y, old.width, old.height);
 			} else {
 				newBoundary = new JmRectangle(old.x + shift.x, old.y + shift.y, old.width, old.height);
 			}
-			nodeModel.setBoundary(newBoundary);
+			simpleNode.setBoundary(newBoundary);
 			
 			// ベンドポイントの移動
 			Collection<? extends JmConnection> sourceConnections =
-					diagramModel.getSourceConnectionsFor(nodeModel.toReference());
+					diagram.getSourceConnectionsFor(simpleNode.toReference());
 			for (JmConnection connection : sourceConnections) {
 				if (connection instanceof SimpleJmConnection == false) {
 					continue;
 				}
-				SimpleJmConnection connectionModel = (SimpleJmConnection) connection;
-				List<JmPoint> bendpoints = connectionModel.getBendpoints();
-				for (int bendpointIndex = 0; bendpointIndex < connectionModel.getBendpoints().size(); bendpointIndex++) {
+				SimpleJmConnection simpleConnection = (SimpleJmConnection) connection;
+				List<JmPoint> bendpoints = simpleConnection.getBendpoints();
+				for (int bendpointIndex = 0; bendpointIndex < simpleConnection.getBendpoints().size(); bendpointIndex++) {
 					JmPoint bendpoint = bendpoints.get(bendpointIndex);
 					JmPoint newLocation;
 					if (negative) {
@@ -104,11 +104,11 @@ public abstract class AbstractMovePositionCommand extends Command {
 					} else {
 						newLocation = new JmPoint(bendpoint.x + shift.x, bendpoint.y + shift.y);
 					}
-					connectionModel.breachEncapsulationOfBendpoints().set(bendpointIndex, newLocation);
+					simpleConnection.breachEncapsulationOfBendpoints().set(bendpointIndex, newLocation);
 				}
-				diagramModel.store(connectionModel);
+				diagram.store(simpleConnection);
 			}
-			diagramModel.store(nodeModel);
+			diagram.store(simpleNode);
 		}
 	}
 }

@@ -184,8 +184,8 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 	protected List<JmNode> getModelChildren() {
 		JiemamyContext context = getModel();
 		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-		JmDiagram diagramModel = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		Collection<? extends JmNode> nodes = diagramModel.getNodes();
+		JmDiagram diagram = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		Collection<? extends JmNode> nodes = diagram.getNodes();
 		return Lists.newArrayList(nodes);
 	}
 	

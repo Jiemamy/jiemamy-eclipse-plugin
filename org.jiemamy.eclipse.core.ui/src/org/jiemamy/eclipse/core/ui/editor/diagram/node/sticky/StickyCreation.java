@@ -51,12 +51,12 @@ public class StickyCreation implements NodeCreation {
 		stickyJmNode.setContents(DEFAULT_STICKY_CONTENTS);
 	}
 	
-	public void execute(JiemamyContext context, SimpleJmDiagram diagramModel) {
+	public void execute(JiemamyContext context, SimpleJmDiagram diagram) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
+		Validate.notNull(diagram);
 		
-		diagramModel.store(stickyJmNode);
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.store(stickyJmNode);
+		context.getFacet(DiagramFacet.class).store(diagram);
 	}
 	
 	public void setBoundary(JmRectangle boundary) {
@@ -64,11 +64,11 @@ public class StickyCreation implements NodeCreation {
 		stickyJmNode.setBoundary(boundary);
 	}
 	
-	public void undo(JiemamyContext context, SimpleJmDiagram diagramModel) {
+	public void undo(JiemamyContext context, SimpleJmDiagram diagram) {
 		Validate.notNull(context);
-		Validate.notNull(diagramModel);
+		Validate.notNull(diagram);
 		
-		diagramModel.deleteNode(stickyJmNode.toReference());
-		context.getFacet(DiagramFacet.class).store(diagramModel);
+		diagram.deleteNode(stickyJmNode.toReference());
+		context.getFacet(DiagramFacet.class).store(diagram);
 	}
 }

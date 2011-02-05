@@ -58,7 +58,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
 	private final int diagramIndex;
 	
-	private final SimpleJmNode nodeModel;
+	private final SimpleJmNode node;
 	
 	private final JmRectangle boundary;
 	
@@ -72,22 +72,22 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	 * 
 	 * @param context ルートモデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param nodeModel 操作対象ノード
+	 * @param node 操作対象ノード
 	 * @param boundary 新しい位置サイズ
 	 * @param viewer ビューア
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, SimpleJmNode nodeModel,
+	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, SimpleJmNode node,
 			JmRectangle boundary, EditPartViewer viewer) {
 		Validate.notNull(context);
-		Validate.notNull(nodeModel);
+		Validate.notNull(node);
 		Validate.notNull(boundary);
 		Validate.notNull(viewer);
 		
 		this.context = context;
 		this.diagramIndex = diagramIndex;
-		this.nodeModel = nodeModel;
-		oldBoundary = nodeModel.getBoundary();
+		this.node = node;
+		oldBoundary = node.getBoundary();
 		this.boundary = boundary;
 		this.viewer = viewer;
 		
@@ -102,49 +102,49 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	 * 
 	 * @param context ルートモデル
 	 * @param diagramIndex ダイアグラムエディタのインデックス（エディタ内のタブインデックス）
-	 * @param nodeModel 操作対象ノード
+	 * @param node 操作対象ノード
 	 * @param rectangle 新しい位置サイズ
 	 * @param viewer ビューア
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, SimpleJmNode nodeModel,
+	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, SimpleJmNode node,
 			Rectangle rectangle, EditPartViewer viewer) {
-		this(context, diagramIndex, nodeModel, ConvertUtil.convert(rectangle), viewer);
+		this(context, diagramIndex, node, ConvertUtil.convert(rectangle), viewer);
 	}
 	
 	@Override
 	public void execute() {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
-		nodeModel.setBoundary(boundary);
+		node.setBoundary(boundary);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(nodeModel);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagram.store(node);
 		
 		// ベンドポイントの移動
-		shiftBendpoints(false, diagramModel);
+		shiftBendpoints(false, diagram);
 		
 		// 負領域に移動した際、全体を移動させ、すべて正領域に
-		shiftPosition(false, diagramModel);
+		shiftPosition(false, diagram);
 		
-		facet.store(diagramModel);
+		facet.store(diagram);
 	}
 	
 	@Override
 	public void undo() {
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		
-		nodeModel.setBoundary(oldBoundary);
+		node.setBoundary(oldBoundary);
 		
 		// ベンドポイントの移動
-		shiftBendpoints(true, diagramModel);
+		shiftBendpoints(true, diagram);
 		
-		diagramModel.store(nodeModel);
-		facet.store(diagramModel);
+		diagram.store(node);
+		facet.store(diagram);
 	}
 	
-	private void shiftBendpoints(boolean positive, SimpleJmDiagram diagramModel) {
+	private void shiftBendpoints(boolean positive, SimpleJmDiagram diagram) {
 		JmPoint delta = JmPointUtil.delta(oldBoundary, boundary);
 		
 		// 選択しているノードに対応するモデルのリストを得る
@@ -156,7 +156,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		}
 		
 		// ベンドポイントも同時に移動させる（必要なもののみ）
-		for (JmConnection connection : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
+		for (JmConnection connection : diagram.getSourceConnectionsFor(node.toReference())) {
 			if (selectedModels.contains(connection.getSource()) && selectedModels.contains(connection.getTarget())) {
 				List<JmPoint> bendpoints = connection.getBendpoints();
 				for (int i = 0; i < bendpoints.size(); i++) {
@@ -169,7 +169,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 					}
 					((SimpleJmConnection) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
 				}
-				diagramModel.store(connection);
+				diagram.store(connection);
 			}
 		}
 	}

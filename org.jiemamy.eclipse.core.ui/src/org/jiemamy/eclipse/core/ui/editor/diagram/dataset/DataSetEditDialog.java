@@ -66,8 +66,8 @@ import org.jiemamy.eclipse.core.ui.CommonMessages;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.model.dataset.JmDataSet;
-import org.jiemamy.model.dataset.SimpleJmDataSet;
 import org.jiemamy.model.dataset.JmRecord;
+import org.jiemamy.model.dataset.SimpleJmDataSet;
 import org.jiemamy.model.table.JmTable;
 import org.jiemamy.utils.DataSetUtil;
 
@@ -99,20 +99,20 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 	 * 
 	 * @param shell 親シェルオブジェクト
 	 * @param context {@link JiemamyContext}
-	 * @param dataSetModel 編集対象{@link JiemamyContext}
-	 * @throws IllegalArgumentException 引数rootModel, jiemamyFacadeに{@code null}を与えた場合
+	 * @param dataSet 編集対象{@link JiemamyContext}
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public DataSetEditDialog(Shell shell, JiemamyContext context, SimpleJmDataSet dataSetModel) {
-		super(shell, context, dataSetModel, JmDataSet.class);
+	public DataSetEditDialog(Shell shell, JiemamyContext context, SimpleJmDataSet dataSet) {
+		super(shell, context, dataSet, JmDataSet.class);
 		
-		Validate.notNull(dataSetModel);
+		Validate.notNull(dataSet);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final SimpleJmDataSet dataSetModel = getTargetCoreModel();
+		final SimpleJmDataSet dataSet = getTargetCoreModel();
 		getShell().setText(Messages.DataSetEditDialog_title);
 		
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -127,14 +127,14 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 		
 		final Menu menu = new Menu(tabFolder);
 		tabFolder.setMenu(menu);
-		menu.addMenuListener(new TabMenuListener(dataSetModel, menu));
+		menu.addMenuListener(new TabMenuListener(dataSet, menu));
 		
 		JiemamyContext context = getContext();
-		Set<EntityRef<? extends JmTable>> tableRefs = dataSetModel.getRecords().keySet();
+		Set<EntityRef<? extends JmTable>> tableRefs = dataSet.getRecords().keySet();
 		for (EntityRef<? extends JmTable> tableRef : tableRefs) {
 			try {
-				JmTable tableModel = context.resolve(tableRef);
-				addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
+				JmTable table = context.resolve(tableRef);
+				addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSet, table));
 			} catch (EntityNotFoundException e) {
 				logger.warn("table unresolvable");
 				continue;
@@ -209,7 +209,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 			}
 		}
 		
-		JmDataSet dataSetModel = getTargetCoreModel();
+		JmDataSet dataSet = getTargetCoreModel();
 		int tabIndex = tabFolder.getSelectionIndex();
 		if (tabIndex <= 0) {
 			MessageDialog.openInformation(getShell(), "テーブル未選択", "エクスポートするテーブルのタブを選択してください。"); // RESOURCE
@@ -217,12 +217,12 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 		}
 		
 		TabItem item = tabFolder.getItem(tabIndex);
-		JmTable tableModel = (JmTable) item.getData();
+		JmTable table = (JmTable) item.getData();
 		
 		OutputStream out = null;
 		try {
 			out = new FileOutputStream(csv);
-			DataSetUtil.exportToCsv(dataSetModel, tableModel, out);
+			DataSetUtil.exportToCsv(dataSet, table, out);
 		} catch (IOException e) {
 			ExceptionHandler.handleException(e);
 		} finally {
@@ -283,12 +283,12 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 			return;
 		}
 		TabItem item = tabFolder.getItem(tabIndex);
-		JmTable tableModel = (JmTable) item.getData();
+		JmTable table = (JmTable) item.getData();
 		
-		JmDataSet dataSetModel = getTargetCoreModel();
+		JmDataSet dataSet = getTargetCoreModel();
 		
 		try {
-			DataSetUtil.importFromCsv(dataSetModel, tableModel, new FileInputStream(csv));
+			DataSetUtil.importFromCsv(dataSet, table, new FileInputStream(csv));
 		} catch (FileNotFoundException e) {
 			MessageDialog.openError(getShell(), Messages.DataSetEditDialog_import_title,
 					NLS.bind(CommonMessages.Common_fileNotFound, csv.getPath()));
@@ -310,7 +310,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 	 */
 	private final class TabMenuListener extends MenuAdapter {
 		
-		private final SimpleJmDataSet dataSetModel;
+		private final SimpleJmDataSet dataSet;
 		
 		private final Menu menu;
 		
@@ -318,11 +318,11 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 		/**
 		 * インスタンスを生成する。
 		 * 
-		 * @param dataSetModel データセット
+		 * @param dataSet データセット
 		 * @param menu コンテキストメニュー
 		 */
-		private TabMenuListener(SimpleJmDataSet dataSetModel, Menu menu) {
-			this.dataSetModel = dataSetModel;
+		private TabMenuListener(SimpleJmDataSet dataSet, Menu menu) {
+			this.dataSet = dataSet;
 			this.menu = menu;
 		}
 		
@@ -343,10 +343,10 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 					List<JmTable> list = Lists.newArrayList(tables);
 					TableSelectDialog dialog = new TableSelectDialog(getShell(), list);
 					dialog.open();
-					JmTable tableModel = dialog.getResult();
-					if (tableModel != null) {
-						dataSetModel.putRecord(tableModel.toReference(), new ArrayList<JmRecord>());
-						addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
+					JmTable table = dialog.getResult();
+					if (table != null) {
+						dataSet.putRecord(table.toReference(), new ArrayList<JmRecord>());
+						addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSet, table));
 					}
 				}
 			});
@@ -358,17 +358,17 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex());
-					JmTable tableModel = (JmTable) item.getData();
-					if (tableModel == null) {
+					JmTable table = (JmTable) item.getData();
+					if (table == null) {
 						return;
 					}
-					String message = NLS.bind(Messages.DataSetEditDialog_deleteTable_confirm, tableModel.getName());
+					String message = NLS.bind(Messages.DataSetEditDialog_deleteTable_confirm, table.getName());
 					boolean result = MessageDialog.openQuestion(getShell(), Messages.DataSetEditDialog_title, message);
 					if (result == false) {
 						return;
 					}
 					
-					dataSetModel.removeRecord(tableModel.toReference());
+					dataSet.removeRecord(table.toReference());
 					item.dispose();
 				}
 			});

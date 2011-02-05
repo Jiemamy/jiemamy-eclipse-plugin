@@ -94,8 +94,8 @@ public class ImportAction extends AbstractJiemamyAction {
 	public void run() {
 		logger.debug(LogMarker.LIFECYCLE, "run " + importer.getName());
 		GraphicalViewer viewer = getViewer();
-		JiemamyContextEditPart rootEditPart = (JiemamyContextEditPart) viewer.getContents();
-		JiemamyContext rootModel = rootEditPart.getModel();
+		JiemamyContextEditPart contextEditPart = (JiemamyContextEditPart) viewer.getContents();
+		JiemamyContext context = contextEditPart.getModel();
 		IFileEditorInput input = (IFileEditorInput) editor.getEditorInput();
 		wizard.setInput(input);
 		
@@ -119,10 +119,10 @@ public class ImportAction extends AbstractJiemamyAction {
 			ImportConfig config = wizard.getConfig();
 			if (config != null) {
 				// 実行
-				boolean success = importer.importModel(rootModel, config);
+				boolean success = importer.importModel(context, config);
 				
 				if (success) {
-					rootEditPart.refresh();
+					contextEditPart.refresh();
 					new AutoLayoutAction(viewer).run();
 					MessageDialog.openInformation(shell, "import succeeded", "インポートが正常に完了しました。"); // RESOURCE
 				} else {

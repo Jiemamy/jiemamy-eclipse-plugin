@@ -35,9 +35,9 @@ public class EditForeignKeyCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final SimpleJmTable tableModel;
+	private final SimpleJmTable table;
 	
-	private final SimpleJmTable oldJmTable;
+	private final SimpleJmTable oldTable;
 	
 
 	/**
@@ -51,19 +51,19 @@ public class EditForeignKeyCommand extends Command {
 		Validate.notNull(context);
 		Validate.notNull(foreignKey);
 		this.context = context;
-		tableModel = (SimpleJmTable) foreignKey.findDeclaringTable(context.getTables());
-		oldJmTable = context.resolve(tableModel.toReference());
+		table = (SimpleJmTable) foreignKey.findDeclaringTable(context.getTables());
+		oldTable = context.resolve(table.toReference());
 		
-		tableModel.store(foreignKey);
+		table.store(foreignKey);
 	}
 	
 	@Override
 	public void execute() {
-		context.store(tableModel);
+		context.store(table);
 	}
 	
 	@Override
 	public void undo() {
-		context.store(oldJmTable);
+		context.store(oldTable);
 	}
 }

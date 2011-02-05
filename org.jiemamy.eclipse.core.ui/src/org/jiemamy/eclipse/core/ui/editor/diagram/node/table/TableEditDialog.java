@@ -57,13 +57,13 @@ import org.jiemamy.model.DbObject;
 import org.jiemamy.model.SimpleDbObjectNode;
 import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.SimpleJmNode;
-import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.column.ColumnParameterKey;
+import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.constraint.JmKeyConstraint;
-import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.model.script.Position;
-import org.jiemamy.model.table.SimpleJmTable;
+import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.table.SimpleJmTable;
 
 /**
  * {@link SimpleJmTable}の詳細編集ダイアログクラス。
@@ -96,13 +96,12 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 	 * 
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
-	 * @param tableModel 編集対象モデル
-	 * @param nodeModel {@link SimpleJmDiagram}
+	 * @param table 編集対象モデル
+	 * @param node {@link SimpleJmDiagram}
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TableEditDialog(Shell parentShell, JiemamyContext context, SimpleJmTable tableModel,
-			SimpleDbObjectNode nodeModel) {
-		super(parentShell, context, tableModel, SimpleJmTable.class, nodeModel);
+	public TableEditDialog(Shell parentShell, JiemamyContext context, SimpleJmTable table, SimpleDbObjectNode node) {
+		super(parentShell, context, table, SimpleJmTable.class, node);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -115,7 +114,7 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final SimpleJmTable tableModel = getTargetCoreModel();
+		final SimpleJmTable table = getTargetCoreModel();
 		getShell().setText("テーブル情報編集"); // RESOURCE
 		
 		// ---- A. 最上段名称欄
@@ -128,7 +127,7 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		
 		txtName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		txtName.setText(StringUtils.defaultString(tableModel.getName()));
+		txtName.setText(StringUtils.defaultString(table.getName()));
 		txtName.addFocusListener(new TextSelectionAdapter(txtName));
 		txtName.addKeyListener(editListener);
 		
@@ -138,7 +137,7 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		
 		txtLogicalName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtLogicalName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		txtLogicalName.setText(StringUtils.defaultString(tableModel.getLogicalName()));
+		txtLogicalName.setText(StringUtils.defaultString(table.getLogicalName()));
 		txtLogicalName.addFocusListener(new TextSelectionAdapter(txtLogicalName));
 		txtLogicalName.addKeyListener(editListener);
 		
@@ -154,8 +153,8 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					SimpleJmNode nodeModel = getJmNode();
-					nodeModel.setColor(ConvertUtil.convert(rgb));
+					SimpleJmNode node = getJmNode();
+					node.setColor(ConvertUtil.convert(rgb));
 				}
 			}
 		});
@@ -166,8 +165,8 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				SimpleJmNode nodeModel = getJmNode();
-				nodeModel.setColor(null);
+				SimpleJmNode node = getJmNode();
+				node.setColor(null);
 			}
 		});
 		
@@ -177,20 +176,20 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				Boolean disabled = tableModel.getParam(ColumnParameterKey.DISABLED);
+				Boolean disabled = table.getParam(ColumnParameterKey.DISABLED);
 				if (btnDisable.getSelection() == false) {
 					if (disabled != null && disabled) {
-						tableModel.removeParam(ColumnParameterKey.DISABLED);
+						table.removeParam(ColumnParameterKey.DISABLED);
 					}
 				} else {
 					if (disabled == null || disabled == false) {
-						tableModel.putParam(ColumnParameterKey.DISABLED, true);
+						table.putParam(ColumnParameterKey.DISABLED, true);
 					}
 				}
 			}
 			
 		});
-		Boolean disabled = tableModel.getParam(ColumnParameterKey.DISABLED);
+		Boolean disabled = table.getParam(ColumnParameterKey.DISABLED);
 		if (disabled != null && disabled) {
 			btnDisable.setSelection(true);
 		}
@@ -201,7 +200,7 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		gd.horizontalSpan = 7;
 		tabFolder.setLayoutData(gd);
 		
-		createTabs(tableModel, tabFolder);
+		createTabs(table, tabFolder);
 		
 		return composite;
 	}
@@ -213,27 +212,26 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 	
 	@Override
 	protected boolean performOk() {
-		SimpleJmTable tableModel = getTargetCoreModel();
+		SimpleJmTable table = getTargetCoreModel();
 		
-		if (confirmConsistency(tableModel) == false) {
+		if (confirmConsistency(table) == false) {
 			return false;
 		}
 		
 		String name = txtName.getText();
-		tableModel.setName(name);
+		table.setName(name);
 		
 		String logicalName = txtLogicalName.getText();
-		tableModel.setLogicalName(logicalName);
+		table.setLogicalName(logicalName);
 		
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		SimpleJmAroundScript aroundScript =
-				(SimpleJmAroundScript) facet.getAroundScriptFor(tableModel.toReference());
+		SimpleJmAroundScript aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(table.toReference());
 		if (aroundScript == null) {
 			aroundScript = new SimpleJmAroundScript(UUID.randomUUID());
-			aroundScript.setCoreModelRef(tableModel.toReference());
+			aroundScript.setCoreModelRef(table.toReference());
 		}
 		
 		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
@@ -249,12 +247,12 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		}
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
-		tableModel.setDescription(description);
+		table.setDescription(description);
 		
-		Set<JmKeyConstraint> constraints = tableModel.getConstraints(JmKeyConstraint.class);
+		Set<JmKeyConstraint> constraints = table.getConstraints(JmKeyConstraint.class);
 		for (JmKeyConstraint keyConstraint : constraints) {
 			if (keyConstraint.getKeyColumns().isEmpty()) {
-				tableModel.deleteConstraint(keyConstraint.toReference());
+				table.deleteConstraint(keyConstraint.toReference());
 			}
 		}
 		
@@ -264,29 +262,30 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 	/**
 	 * 整合性をチェックし、ダイアログでユーザに確認する。
 	 * 
-	 * @param tableModel テーブル
+	 * @param table テーブル
 	 * @return 警告を無視する場合は{@code true}、そうでない場合は{@code false}
 	 */
-	private boolean confirmConsistency(JmTable tableModel) {
+	private boolean confirmConsistency(JmTable table) {
 		boolean result = true;
 		
 		Set<DbObject> doms = getContext().getDbObjects();
 		Set<String> domNames = Sets.newHashSetWithExpectedSize(doms.size());
 		for (DbObject dom : doms) {
-			if (dom.equals(tableModel) == false) {
+			if (dom.equals(table) == false) {
 				domNames.add(dom.getName());
 			}
 		}
 		
 		if (domNames.contains(txtName.getText())) {
 			// RESOURCE
-			boolean entityCheckOk = MessageDialog.openQuestion(getParentShell(), "Confirm", "エンティティ名が重複しますが、よろしいですか？");
+			boolean entityCheckOk =
+					MessageDialog.openQuestion(getParentShell(), "Confirm", "DbObject名が重複しますが、よろしいですか？");
 			if (entityCheckOk == false) {
 				result = false;
 			}
 		}
 		
-		List<JmColumn> columns = tableModel.getColumns();
+		List<JmColumn> columns = table.getColumns();
 		Set<String> columnNames = Sets.newHashSetWithExpectedSize(columns.size());
 		for (JmColumn column : columns) {
 			columnNames.add(column.getName());
@@ -302,27 +301,26 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		return result;
 	}
 	
-	private void createTabs(final SimpleJmTable tableModel, TabFolder tabFolder) {
+	private void createTabs(final SimpleJmTable table, TabFolder tabFolder) {
 		// ---- B-1. カラム
-		AbstractTab tabColumn = new TableEditDialogColumnTab(tabFolder, SWT.NULL, getContext(), tableModel);
+		AbstractTab tabColumn = new TableEditDialogColumnTab(tabFolder, SWT.NULL, getContext(), table);
 		tabColumn.addKeyListener(editListener);
 		addTab(tabColumn);
 		
 		// ---- B-2. 制約
-		AbstractTab tabConstraint = new TableEditDialogConstraintTab(tabFolder, SWT.NULL, getContext(), tableModel);
+		AbstractTab tabConstraint = new TableEditDialogConstraintTab(tabFolder, SWT.NULL, getContext(), table);
 		tabConstraint.addKeyListener(editListener);
 		addTab(tabConstraint);
 		
 //		// ---- B-3. インデックス
-//		AbstractTab tabIndex = new TableEditDialogIndexTab(tabFolder, SWT.NULL, getContext(), tableModel);
+//		AbstractTab tabIndex = new TableEditDialogIndexTab(tabFolder, SWT.NULL, getContext(), table);
 //		tabIndex.addKeyListener(editListener);
 //		addTab(tabIndex);
 		
 		String beginScript = "";
 		String endScript = "";
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		SimpleJmAroundScript aroundScript =
-				(SimpleJmAroundScript) facet.getAroundScriptFor(tableModel.toReference());
+		SimpleJmAroundScript aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(table.toReference());
 		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
@@ -337,7 +335,7 @@ public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 		addTab(tabEndScript);
 		
 		// ---- B-6. Description
-		String description = StringUtils.defaultString(tableModel.getDescription());
+		String description = StringUtils.defaultString(table.getDescription());
 		tabDescription = new TextEditTab(tabFolder, Messages.Tab_Table_Description, description);
 		addTab(tabDescription);
 		

@@ -37,8 +37,8 @@ public class JmComponentEditPolicy extends ComponentEditPolicy {
 	@Override
 	protected Command createDeleteCommand(GroupRequest deleteRequest) {
 		JiemamyContext context = (JiemamyContext) getHost().getParent().getModel();
-		JmNode nodeModel = (JmNode) getHost().getModel();
+		JmNode node = (JmNode) getHost().getModel();
 		
-		return new DeleteNodeCommand(context, TODO.DIAGRAM_INDEX, nodeModel);
+		return new DeleteNodeCommand(context, TODO.DIAGRAM_INDEX, node);
 	}
 }

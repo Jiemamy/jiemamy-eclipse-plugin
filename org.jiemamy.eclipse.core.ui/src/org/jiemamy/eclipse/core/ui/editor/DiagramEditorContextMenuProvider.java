@@ -158,7 +158,7 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 		}
 		
 		// Match width Actions
-		// TODO エンティティでないときはdisableにする。 hint: getViewer().getSelectedEditParts()を使う？
+		// TODO nodeでないときはdisableにする。 hint: getViewer().getSelectedEditParts()を使う？
 		MenuManager matchSizeMenu = new MenuManager("サイズ調整(&Z)"); // RESOURCE
 		matchSizeMenu.add(new FitNodeConstraintAction(viewer));
 		

@@ -10,7 +10,7 @@
 	  <exporter
 	        name="SQL"
             class="org.jiemamy.composer.exporter.SqlExporter"
-            wizard="org.jiemamy.eclipse.core.ui.composer.SqlExportWizard"/>
+            wizard="org.jiemamy.eclipse.core.ui.composer.SqlExporterWizard"/>
    </extension>
 
    <extension point="org.jiemamy.eclipse.core.importers">

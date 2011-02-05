@@ -96,7 +96,7 @@ public class ExportAction extends AbstractJiemamyAction {
 	@Override
 	public void run() {
 		logger.debug(LogMarker.LIFECYCLE, "run " + exporter.getName());
-		JiemamyContext rootModel = (JiemamyContext) getViewer().getContents().getModel();
+		JiemamyContext context = (JiemamyContext) getViewer().getContents().getModel();
 		IFileEditorInput input = (IFileEditorInput) editor.getEditorInput();
 		wizard.setInput(input);
 		
@@ -120,7 +120,7 @@ public class ExportAction extends AbstractJiemamyAction {
 			ExportConfig config = wizard.getConfig();
 			
 			// 実行
-			boolean success = exporter.exportModel(rootModel, config);
+			boolean success = exporter.exportModel(context, config);
 			
 			if (success) {
 				if (SystemUtils.IS_OS_WINDOWS && config instanceof FileExportConfig) {

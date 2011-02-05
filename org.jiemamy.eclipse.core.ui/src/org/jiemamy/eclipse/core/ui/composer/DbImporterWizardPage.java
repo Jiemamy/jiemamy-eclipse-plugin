@@ -68,7 +68,7 @@ import org.jiemamy.utils.sql.DriverUtil;
  * 
  * @author daisuke
  */
-class DbImportWizardPage extends WizardPage {
+class DbImporterWizardPage extends WizardPage {
 	
 	protected static final String[] JAR_EXTENSIONS = new String[] {
 		"*.jar",
@@ -106,7 +106,7 @@ class DbImportWizardPage extends WizardPage {
 	 * インスタンスを生成する。
 	 * @param settings ダイアログセッティング
 	 */
-	DbImportWizardPage(IDialogSettings settings) {
+	DbImporterWizardPage(IDialogSettings settings) {
 		super(Messages.DbImportWizardPage_title, Messages.DbImportWizardPage_title, (ImageDescriptor) null);
 		dialectResolver = JiemamyCorePlugin.getDialectResolver();
 		setPageComplete(false);
@@ -141,7 +141,7 @@ class DbImportWizardPage extends WizardPage {
 			}
 		});
 		// THINK JiemamyContextに設定されたDialectを設定する?
-//		cmbDialect.setText(rootModel.getDialectClassName());
+//		cmbDialect.setText(context.getMetadata().getDialectClassName());
 		cmbDialect.setText(StringUtils.defaultIfEmpty(settings.get("cmbDialect"), ""));
 		
 		label = new Label(composite, SWT.NONE);

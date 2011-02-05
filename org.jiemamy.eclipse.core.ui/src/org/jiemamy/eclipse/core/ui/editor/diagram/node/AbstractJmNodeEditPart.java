@@ -70,12 +70,12 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	/**
 	 * インスタンスを生成する。
 	 * 
-	 * @param nodeModel コントロール対象のノード
+	 * @param node コントロール対象のノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public AbstractJmNodeEditPart(JmNode nodeModel) {
-		Validate.notNull(nodeModel);
-		setModel(nodeModel);
+	public AbstractJmNodeEditPart(JmNode node) {
+		Validate.notNull(node);
+		setModel(node);
 	}
 	
 	@Override
@@ -106,9 +106,9 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 //		JiemamyContext context = getJiemamyContext();
 //		
 //		if (node.getCoreModelRef() != null) {
-//			DbObject entityModel = context.resolve(node.getCoreModelRef());
-//			if (entityModel.hasAdapter(key)) {
-//				return entityModel.getAdapter(key);
+//			DbObject dbObject = context.resolve(node.getCoreModelRef());
+//			if (dbObject.hasAdapter(key)) {
+//				return dbObject.getAdapter(key);
 //			}
 //		}
 //		return super.getAdapter(key);
@@ -191,19 +191,19 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		}
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		if (diagramModel.contains(getModel().toReference()) == false) {
+		if (diagram.contains(getModel().toReference()) == false) {
 			return Collections.emptyList();
 		}
 		
-		List<JmConnection> result = Lists.newArrayList(diagramModel.getSourceConnectionsFor(getModel().toReference()));
+		List<JmConnection> result = Lists.newArrayList(diagram.getSourceConnectionsFor(getModel().toReference()));
 		
 		// 以下ログのためのロジック
 		JmNode model = getModel();
 		if (model instanceof SimpleDbObjectNode) {
-			SimpleDbObjectNode databaseObjectJmNode = (SimpleDbObjectNode) model;
-			DbObject core = context.resolve(databaseObjectJmNode.getCoreModelRef());
+			SimpleDbObjectNode dbObjectNode = (SimpleDbObjectNode) model;
+			DbObject core = context.resolve(dbObjectNode.getCoreModelRef());
 			logger.debug(core + " sourceConnections = " + result);
 		} else {
 			logger.debug(model + " sourceConnections = " + result);
@@ -218,19 +218,19 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		}
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
-		if (diagramModel.contains(getModel().toReference()) == false) {
+		if (diagram.contains(getModel().toReference()) == false) {
 			return Collections.emptyList();
 		}
 		
-		List<JmConnection> result = Lists.newArrayList(diagramModel.getTargetConnectionsFor(getModel().toReference()));
+		List<JmConnection> result = Lists.newArrayList(diagram.getTargetConnectionsFor(getModel().toReference()));
 		
 		// 以下ログのためのロジック
 		JmNode model = getModel();
 		if (model instanceof SimpleDbObjectNode) {
-			SimpleDbObjectNode databaseObjectJmNode = (SimpleDbObjectNode) model;
-			DbObject core = context.resolve(databaseObjectJmNode.getCoreModelRef());
+			SimpleDbObjectNode dbObjectNode = (SimpleDbObjectNode) model;
+			DbObject core = context.resolve(dbObjectNode.getCoreModelRef());
 			logger.debug(core + " sourceConnections = " + result);
 		} else {
 			logger.debug(model + " sourceConnections = " + result);

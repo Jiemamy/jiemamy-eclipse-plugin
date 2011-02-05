@@ -117,15 +117,15 @@ public class JmActionBarContributor extends ActionBarContributor {
 	 * 
 	 * <p>Thanks to Naokiさん</p>
 	 * 
-	 * @param rootModel 現在編集中のルートモデル
+	 * @param context 現在編集中のルートモデル
 	 */
-	public void selectCombo(JiemamyContext rootModel) {
+	public void selectCombo(JiemamyContext context) {
 		if (cmbDisplayStatus == null || cmbDisplayStatus.isDisposed()) {
 			logger.error("combo is null or disposed");
 			return;
 		}
 		
-		DiagramFacet diagramFacet = rootModel.getFacet(DiagramFacet.class);
+		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
 		JmDiagram presentation = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		for (DisplayStatus displayStatus : DisplayStatus.values()) {
 			if (presentation.getMode() == displayStatus.getMode()
@@ -214,9 +214,9 @@ public class JmActionBarContributor extends ActionBarContributor {
 			
 			IEditorPart editor = EditorUtil.getActiveEditor();
 			if (editor instanceof JiemamyEditor) {
-				JiemamyContext rootModel = ((JiemamyEditor) editor).getJiemamyContext();
-				if (rootModel != null) {
-					selectCombo(rootModel);
+				JiemamyContext context = ((JiemamyEditor) editor).getJiemamyContext();
+				if (context != null) {
+					selectCombo(context);
 				}
 			}
 			

@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Label;
  * 
  * @author daisuke
  */
-class SqlExportWizardPage extends WizardPage {
+class SqlExporterWizardPage extends WizardPage {
 	
 	private Button chkDropStatements;
 	
@@ -52,7 +52,7 @@ class SqlExportWizardPage extends WizardPage {
 	 * 
 	 * @param dataSetNames データセット名のリスト
 	 */
-	SqlExportWizardPage(List<String> dataSetNames) {
+	SqlExporterWizardPage(List<String> dataSetNames) {
 		super("SQL出力設定", "SQL出力設定", (ImageDescriptor) null); // RESOURCE
 		this.dataSetNames = dataSetNames;
 	}

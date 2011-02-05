@@ -87,13 +87,13 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 	 * 
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
-	 * @param viewModel 編集対象モデル
-	 * @param nodeModel ノード
+	 * @param view 編集対象モデル
+	 * @param node ノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditDialog(Shell parentShell, JiemamyContext context, SimpleJmView viewModel,
-			SimpleDbObjectNode nodeModel) {
-		super(parentShell, context, viewModel, SimpleJmView.class, nodeModel);
+	public ViewEditDialog(Shell parentShell, JiemamyContext context, SimpleJmView view,
+			SimpleDbObjectNode node) {
+		super(parentShell, context, view, SimpleJmView.class, node);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -107,7 +107,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final SimpleJmView viewModel = getTargetCoreModel();
+		final SimpleJmView view = getTargetCoreModel();
 		getShell().setText(Messages.Dialog_Title);
 		
 		// ---- A. 最上段名称欄
@@ -120,7 +120,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		
 		txtName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		txtName.setText(StringUtils.defaultString(viewModel.getName()));
+		txtName.setText(StringUtils.defaultString(view.getName()));
 		txtName.addFocusListener(new TextSelectionAdapter(txtName));
 		txtName.addKeyListener(editListener);
 		
@@ -130,7 +130,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		
 		txtLogicalName = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		txtLogicalName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		txtLogicalName.setText(StringUtils.defaultString(viewModel.getLogicalName()));
+		txtLogicalName.setText(StringUtils.defaultString(view.getLogicalName()));
 		txtLogicalName.addFocusListener(new TextSelectionAdapter(txtLogicalName));
 		txtLogicalName.addKeyListener(editListener);
 		
@@ -146,8 +146,8 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					SimpleJmNode nodeModel = getJmNode();
-					nodeModel.setColor(ConvertUtil.convert(rgb));
+					SimpleJmNode node = getJmNode();
+					node.setColor(ConvertUtil.convert(rgb));
 				}
 			}
 		});
@@ -158,8 +158,8 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				SimpleJmNode nodeModel = getJmNode();
-				nodeModel.setColor(null);
+				SimpleJmNode node = getJmNode();
+				node.setColor(null);
 			}
 		});
 		
@@ -169,20 +169,20 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				Boolean disabled = viewModel.getParam(ColumnParameterKey.DISABLED);
+				Boolean disabled = view.getParam(ColumnParameterKey.DISABLED);
 				if (btnDisable.getSelection() == false) {
 					if (disabled != null && disabled) {
-						viewModel.removeParam(ColumnParameterKey.DISABLED);
+						view.removeParam(ColumnParameterKey.DISABLED);
 					}
 				} else {
 					if (disabled == null || disabled == false) {
-						viewModel.putParam(ColumnParameterKey.DISABLED, true);
+						view.putParam(ColumnParameterKey.DISABLED, true);
 					}
 				}
 			}
 			
 		});
-		Boolean disabled = viewModel.getParam(ColumnParameterKey.DISABLED);
+		Boolean disabled = view.getParam(ColumnParameterKey.DISABLED);
 		if (disabled != null && disabled) {
 			btnDisable.setSelection(true);
 		}
@@ -200,7 +200,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		gd.horizontalSpan = 7;
 		tabFolder.setLayoutData(gd);
 		
-		createTabs(viewModel, tabFolder);
+		createTabs(view, tabFolder);
 		
 		return composite;
 	}
@@ -216,26 +216,26 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 			return false;
 		}
 		
-		SimpleJmView viewModel = getTargetCoreModel();
+		SimpleJmView view = getTargetCoreModel();
 		
 		String name = txtName.getText();
-		viewModel.setName(name);
+		view.setName(name);
 		
 		String logicalName = txtLogicalName.getText();
-		viewModel.setLogicalName(logicalName);
+		view.setLogicalName(logicalName);
 		
 		String definition = tabDefinition.getTextWidget().getText();
-		viewModel.setDefinition(definition);
+		view.setDefinition(definition);
 		
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
 		SimpleJmAroundScript aroundScript;
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(viewModel.toReference());
+		aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(view.toReference());
 		if (aroundScript == null) {
 			aroundScript = new SimpleJmAroundScript(UUID.randomUUID());
-			aroundScript.setCoreModelRef(viewModel.toReference());
+			aroundScript.setCoreModelRef(view.toReference());
 		}
 		
 		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
@@ -251,14 +251,14 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		}
 		
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
-		viewModel.setDescription(description);
+		view.setDescription(description);
 		
 		return true;
 	}
 	
-	private void createTabs(final SimpleJmView viewModel, TabFolder tabFolder) {
+	private void createTabs(final SimpleJmView view, TabFolder tabFolder) {
 		// ---- B-1. Definition
-		String definition = StringUtils.defaultString(viewModel.getDefinition());
+		String definition = StringUtils.defaultString(view.getDefinition());
 		tabDefinition = new TextEditTab(tabFolder, Messages.Tab_View_Definition, definition);
 		tabDefinition.addKeyListener(editListener);
 		addTab(tabDefinition);
@@ -267,7 +267,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		String endScript = "";
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
 		SimpleJmAroundScript aroundScript =
-				(SimpleJmAroundScript) facet.getAroundScriptFor(viewModel.toReference());
+				(SimpleJmAroundScript) facet.getAroundScriptFor(view.toReference());
 		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
@@ -282,7 +282,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 		addTab(tabEndScript);
 		
 		// ---- B-4. Description
-		String description = StringUtils.defaultString(viewModel.getDescription());
+		String description = StringUtils.defaultString(view.getDescription());
 		tabDescription = new TextEditTab(tabFolder, Messages.Tab_View_Description, description);
 		tabDefinition.addKeyListener(editListener);
 		addTab(tabDescription);

@@ -122,8 +122,8 @@ public class TableSelectDialog extends Dialog {
 		}
 	}
 	
-	private void updateColumnTableItem(TableItem item, JmTable tableModel) {
+	private void updateColumnTableItem(TableItem item, JmTable table) {
 		item.setText(0, "");
-		item.setText(1, tableModel.getName());
+		item.setText(1, table.getName());
 	}
 }

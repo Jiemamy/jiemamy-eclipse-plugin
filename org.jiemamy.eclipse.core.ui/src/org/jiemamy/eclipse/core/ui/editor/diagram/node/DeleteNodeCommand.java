@@ -48,13 +48,13 @@ public class DeleteNodeCommand extends Command {
 	
 	private final DiagramFacet diagramFacet;
 	
-	private final SimpleJmDiagram diagramModel;
+	private final SimpleJmDiagram diagram;
 	
 	/** 削除されるノード */
-	private final JmNode nodeModel;
+	private final JmNode node;
 	
 	/** 削除されるコネクション */
-	private final Collection<JmConnection> connectionModels;
+	private final Collection<JmConnection> connections;
 	
 	/** （主ノードではないノードに属する）削除される外部キー */
 	private final Collection<Entry> outerForeingKeys;
@@ -69,54 +69,54 @@ public class DeleteNodeCommand extends Command {
 	 * 
 	 * @param context {@link JiemamyContext}
 	 * @param diagramIndex ダイアグラムindex
-	 * @param nodeModel 削除されるノード
+	 * @param node 削除されるノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 * @throws IllegalArgumentException 引数{@code context}が {@link DiagramFacet} を持っていない場合
 	 */
-	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, JmNode nodeModel) {
+	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, JmNode node) {
 		Validate.notNull(context);
-		Validate.notNull(nodeModel);
+		Validate.notNull(node);
 		Validate.isTrue(context.hasFacet(DiagramFacet.class));
 		
 		this.context = context;
-		this.nodeModel = nodeModel;
+		this.node = node;
 		diagramFacet = context.getFacet(DiagramFacet.class);
-		diagramModel = (SimpleJmDiagram) diagramFacet.getDiagrams().get(diagramIndex);
+		diagram = (SimpleJmDiagram) diagramFacet.getDiagrams().get(diagramIndex);
 		
 		Set<JmTable> tables = context.getTables();
 		
-		Collection<JmConnection> connectionModels = Sets.newHashSet();
+		Collection<JmConnection> connections = Sets.newHashSet();
 		Collection<Entry> outerForeingKeys = Sets.newHashSet();
-		for (JmConnection connectionModel : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
-			connectionModels.add(connectionModel);
+		for (JmConnection connection : diagram.getSourceConnectionsFor(node.toReference())) {
+			connections.add(connection);
 		}
-		for (JmConnection connectionModel : diagramModel.getTargetConnectionsFor(nodeModel.toReference())) {
-			connectionModels.add(connectionModel);
+		for (JmConnection connection : diagram.getTargetConnectionsFor(node.toReference())) {
+			connections.add(connection);
 			
-			JmForeignKeyConstraint fk = context.resolve(connectionModel.getCoreModelRef());
+			JmForeignKeyConstraint fk = context.resolve(connection.getCoreModelRef());
 			JmTable table = fk.findDeclaringTable(tables);
 			if (table instanceof SimpleJmTable) {
 				SimpleJmTable t = (SimpleJmTable) table;
 				outerForeingKeys.add(new Entry(t, fk));
 			}
 		}
-		this.connectionModels = ImmutableSet.copyOf(connectionModels);
+		this.connections = ImmutableSet.copyOf(connections);
 		this.outerForeingKeys = ImmutableSet.copyOf(outerForeingKeys);
 	}
 	
 	@Override
 	public void execute() {
-		for (JmConnection connectionModel : connectionModels) {
-			diagramModel.deleteConnection(connectionModel.toReference());
+		for (JmConnection connection : connections) {
+			diagram.deleteConnection(connection.toReference());
 		}
-		diagramFacet.store(diagramModel);
+		diagramFacet.store(diagram);
 		
-		diagramModel.deleteNode(nodeModel.toReference());
-		diagramFacet.store(diagramModel);
+		diagram.deleteNode(node.toReference());
+		diagramFacet.store(diagram);
 		
-		if (nodeModel instanceof DbObjectNode) {
-			DbObjectNode databaseObjectJmNode = (DbObjectNode) nodeModel;
-			EntityRef<? extends DbObject> coreRef = databaseObjectJmNode.getCoreModelRef();
+		if (node instanceof DbObjectNode) {
+			DbObjectNode dbObjectNode = (DbObjectNode) node;
+			EntityRef<? extends DbObject> coreRef = dbObjectNode.getCoreModelRef();
 			deletedCore = context.resolve(coreRef);
 			context.deleteDbObject(coreRef);
 			
@@ -136,13 +136,13 @@ public class DeleteNodeCommand extends Command {
 			context.store(e.table);
 		}
 		
-		diagramModel.store(nodeModel);
+		diagram.store(node);
 		
-		for (JmConnection connectionModel : connectionModels) {
-			diagramModel.store(connectionModel);
+		for (JmConnection connection : connections) {
+			diagram.store(connection);
 		}
 		
-		diagramFacet.store(diagramModel);
+		diagramFacet.store(diagram);
 	}
 	
 

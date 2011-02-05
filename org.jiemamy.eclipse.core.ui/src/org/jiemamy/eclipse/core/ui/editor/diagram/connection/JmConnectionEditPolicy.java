@@ -23,10 +23,10 @@ import org.eclipse.gef.editpolicies.ConnectionEditPolicy;
 import org.eclipse.gef.requests.GroupRequest;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.JmConnection;
 
 /**
- * {@link ConnectionModel}のEditPolicy。 
+ * {@link JmConnection}のEditPolicy。 
  * 
  * @author daisuke
  */
@@ -35,7 +35,7 @@ public class JmConnectionEditPolicy extends ConnectionEditPolicy {
 	@Override
 	protected Command getDeleteCommand(GroupRequest request) {
 		JiemamyContext context = (JiemamyContext) getHost().getRoot().getContents().getModel();
-		return new DeleteConnectionCommand(context, (ConnectionModel) getHost().getModel());
+		return new DeleteConnectionCommand(context, (JmConnection) getHost().getModel());
 	}
 	
 }

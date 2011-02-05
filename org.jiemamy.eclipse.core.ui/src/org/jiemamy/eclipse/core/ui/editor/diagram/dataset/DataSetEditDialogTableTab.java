@@ -43,11 +43,11 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractTab;
-import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.dataset.DataSetModel;
-import org.jiemamy.model.dataset.DefaultRecordModel;
-import org.jiemamy.model.dataset.RecordModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.column.JmColumn;
+import org.jiemamy.model.dataset.JmDataSet;
+import org.jiemamy.model.dataset.SimpleJmRecord;
+import org.jiemamy.model.dataset.JmRecord;
+import org.jiemamy.model.table.JmTable;
 import org.jiemamy.script.ScriptString;
 import org.jiemamy.utils.LogMarker;
 
@@ -72,11 +72,11 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	 * 
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
-	 * @param dataSetModel 編集対象{@link DataSetModel}
-	 * @param tableModel {@link DataSetModel}内での対象テーブル
+	 * @param dataSetModel 編集対象{@link JmDataSet}
+	 * @param tableModel {@link JmDataSet}内での対象テーブル
 	 */
-	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, DataSetModel dataSetModel,
-			TableModel tableModel) {
+	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, JmDataSet dataSetModel,
+			JmTable tableModel) {
 		super(parentTabFolder, style, tableModel.getName());
 		getTabItem().setData(tableModel);
 		
@@ -90,15 +90,15 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		table.setLinesVisible(true);
 		table.setData(tableModel);
 		
-		List<ColumnModel> columns = tableModel.getColumns();
-		for (ColumnModel columnModel : columns) {
+		List<JmColumn> columns = tableModel.getColumns();
+		for (JmColumn columnModel : columns) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setWidth(COL_WIDTH);
 			column.setText(columnModel.getName());
 			column.setData(columnModel);
 		}
 		
-		final List<RecordModel> records = dataSetModel.getRecords().get(tableModel.toReference());
+		final List<JmRecord> records = dataSetModel.getRecords().get(tableModel.toReference());
 		refreshTable(table, records);
 		
 		final TableEditor editor = new TableEditor(table);
@@ -120,16 +120,16 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		return true;
 	}
 	
-	private void refreshTable(final Table table, List<RecordModel> records) {
+	private void refreshTable(final Table table, List<JmRecord> records) {
 		for (TableItem item : table.getItems()) {
 			item.dispose();
 		}
 		
-		for (RecordModel recordModel : records) {
+		for (JmRecord recordModel : records) {
 			List<ScriptString> data = Lists.newArrayList();
 			for (TableColumn tableColumn : table.getColumns()) {
-				ColumnModel columnModel = (ColumnModel) tableColumn.getData();
-				EntityRef<? extends ColumnModel> columnRef = columnModel.toReference();
+				JmColumn columnModel = (JmColumn) tableColumn.getData();
+				EntityRef<? extends JmColumn> columnRef = columnModel.toReference();
 				ScriptString string = recordModel.getValues().get(columnRef);
 				data.add(string);
 			}
@@ -146,7 +146,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	
 
 	/**
-	 * {@link DataSetModel}編集テーブルにおける編集の開始を検知し、セルエディタの起動を行うリスナ。
+	 * {@link JmDataSet}編集テーブルにおける編集の開始を検知し、セルエディタの起動を行うリスナ。
 	 * 
 	 * @author daisuke
 	 */
@@ -203,7 +203,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		
 
 		/**
-		 * {@link DataSetModel}編集テーブルにおける編集の終了を検知し、セルエディタの終了＆後処理を行うリスナ。
+		 * {@link JmDataSet}編集テーブルにおける編集の終了を検知し、セルエディタの終了＆後処理を行うリスナ。
 		 * 
 		 * @author daisuke
 		 */
@@ -230,28 +230,28 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 			}
 			
 			public void handleEvent(final Event e) {
-				DefaultRecordModel recordModel;
-				ColumnModel columnModel;
+				SimpleJmRecord recordModel;
+				JmColumn columnModel;
 				if (e.type == SWT.FocusOut) {
 					logger.debug(LogMarker.LIFECYCLE, "focus out");
 					item.setText(columnIndex, text.getText());
-					recordModel = (DefaultRecordModel) item.getData();
-					columnModel = (ColumnModel) table.getColumn(columnIndex).getData();
-					Map<EntityRef<? extends ColumnModel>, ScriptString> values =
+					recordModel = (SimpleJmRecord) item.getData();
+					columnModel = (JmColumn) table.getColumn(columnIndex).getData();
+					Map<EntityRef<? extends JmColumn>, ScriptString> values =
 							Maps.newHashMap(recordModel.getValues());
 					values.put(columnModel.toReference(), new ScriptString(text.getText()));
-					item.setData(new DefaultRecordModel(values));
+					item.setData(new SimpleJmRecord(values));
 					text.dispose();
 				} else if (e.type == SWT.Traverse) {
 					if (e.detail == SWT.TRAVERSE_RETURN) {
 						logger.debug(LogMarker.LIFECYCLE, "traverse return");
 						item.setText(columnIndex, text.getText());
-						recordModel = (DefaultRecordModel) item.getData();
-						columnModel = (ColumnModel) table.getColumn(columnIndex).getData();
-						Map<EntityRef<? extends ColumnModel>, ScriptString> values =
+						recordModel = (SimpleJmRecord) item.getData();
+						columnModel = (JmColumn) table.getColumn(columnIndex).getData();
+						Map<EntityRef<? extends JmColumn>, ScriptString> values =
 								Maps.newHashMap(recordModel.getValues());
 						values.put(columnModel.toReference(), new ScriptString(text.getText()));
-						item.setData(new DefaultRecordModel(values));
+						item.setData(new SimpleJmRecord(values));
 					}
 					
 					if (e.detail == SWT.TRAVERSE_RETURN || e.detail == SWT.TRAVERSE_ESCAPE) {

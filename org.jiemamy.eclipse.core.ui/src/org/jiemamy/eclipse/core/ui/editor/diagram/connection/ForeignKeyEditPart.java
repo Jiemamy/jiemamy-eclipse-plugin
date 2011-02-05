@@ -41,11 +41,11 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditDialogSupport;
-import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.JmConnection;
 import org.jiemamy.model.ModelConsistencyException;
-import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
+import org.jiemamy.model.column.JmColumn;
+import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -66,16 +66,16 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 	 * @param connectionAdapter コントロール対象のコネクション
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ForeignKeyEditPart(ConnectionModel connectionAdapter) {
+	public ForeignKeyEditPart(JmConnection connectionAdapter) {
 		super(connectionAdapter);
 		logger.debug(LogMarker.LIFECYCLE, "construct");
 	}
 	
 	public void openEditDialog() {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		ConnectionModel connection = getModel();
-		DefaultForeignKeyConstraintModel foreignKey =
-				(DefaultForeignKeyConstraintModel) context.resolve(connection.getCoreModelRef());
+		JmConnection connection = getModel();
+		SimpleJmForeignKeyConstraint foreignKey =
+				(SimpleJmForeignKeyConstraint) context.resolve(connection.getCoreModelRef());
 		
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", foreignKey);
 		
@@ -124,7 +124,7 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 		return connection;
 	}
 	
-	private String toString(JiemamyContext context, ForeignKeyConstraintModel foreignKey) {
+	private String toString(JiemamyContext context, JmForeignKeyConstraint foreignKey) {
 		StringBuilder sb = new StringBuilder();
 		
 		if (StringUtils.isEmpty(foreignKey.getName()) == false) {
@@ -137,9 +137,9 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 				sb.append("\n");
 			}
 			if (foreignKey.getKeyColumns().size() > i) {
-				EntityRef<? extends ColumnModel> keyColumnRef = foreignKey.getKeyColumns().get(i);
+				EntityRef<? extends JmColumn> keyColumnRef = foreignKey.getKeyColumns().get(i);
 				try {
-					ColumnModel keyColumn = context.resolve(keyColumnRef);
+					JmColumn keyColumn = context.resolve(keyColumnRef);
 					sb.append(keyColumn.getName());
 				} catch (EntityNotFoundException e) {
 					sb.append("UNKNOWN");
@@ -149,9 +149,9 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 			}
 			sb.append(" -> ");
 			if (foreignKey.getReferenceColumns().size() > i) {
-				EntityRef<? extends ColumnModel> referenceColumnRef = foreignKey.getReferenceColumns().get(i);
+				EntityRef<? extends JmColumn> referenceColumnRef = foreignKey.getReferenceColumns().get(i);
 				try {
-					ColumnModel referenceColumn = context.resolve(referenceColumnRef);
+					JmColumn referenceColumn = context.resolve(referenceColumnRef);
 					sb.append(referenceColumn.getName());
 				} catch (EntityNotFoundException e) {
 					sb.append("UNKNOWN");
@@ -172,8 +172,8 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 			return;
 		}
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
-		ConnectionModel connection = getModel();
-		ForeignKeyConstraintModel foreignKey = context.resolve(connection.getCoreModelRef());
+		JmConnection connection = getModel();
+		JmForeignKeyConstraint foreignKey = context.resolve(connection.getCoreModelRef());
 		
 		String labelString = toString(context, foreignKey);
 		label.setText(labelString);

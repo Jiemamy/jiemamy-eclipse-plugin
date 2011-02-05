@@ -27,14 +27,14 @@ import org.eclipse.swt.graphics.Color;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.CompartmentFigure;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.CompartmentFigureBorder;
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.DatabaseObjectModel;
+import org.jiemamy.model.DbObject;
 
 /**
- * {@link DatabaseObjectModel}のFigure（ビュー）。
+ * {@link DbObject}のFigure（ビュー）。
  * 
  * @author daisuke
  */
-public abstract class DatabaseObjectFigure extends Figure {
+public abstract class DbObjectFigure extends Figure {
 	
 	/** エンティティ名表示部分Figure */
 	private Label entityNameLabel;
@@ -51,7 +51,7 @@ public abstract class DatabaseObjectFigure extends Figure {
 	 * 
 	 * @param defaultColor デフォルト背景色
 	 */
-	public DatabaseObjectFigure(Color defaultColor) {
+	public DbObjectFigure(Color defaultColor) {
 		entityNameLabel = new Label();
 		entityNameLabel.setBorder(new MarginBorder(2, 2, 0, 2));
 		
@@ -105,11 +105,11 @@ public abstract class DatabaseObjectFigure extends Figure {
 	}
 	
 	/**
-	 * DatabaseObject名を設定する。
+	 * DbObject名を設定する。
 	 * 
-	 * @param databaseObjectName DatabaseObject名
+	 * @param databaseObjectName DbObject名
 	 */
-	public void setDatabaseObjectName(String databaseObjectName) {
+	public void setDbObjectName(String databaseObjectName) {
 		entityNameLabel.setText(databaseObjectName);
 	}
 	

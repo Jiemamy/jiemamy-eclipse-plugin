@@ -79,8 +79,8 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.ContextMetadata;
-import org.jiemamy.DefaultContextMetadata;
+import org.jiemamy.JmMetadata;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.SqlFacet;
@@ -89,7 +89,7 @@ import org.jiemamy.dialect.GenericDialect;
 import org.jiemamy.eclipse.core.ui.editor.diagram.DiagramEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
-import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.serializer.JiemamySerializer;
 import org.jiemamy.serializer.SerializationException;
 import org.jiemamy.transaction.EventBrokerImpl;
@@ -197,10 +197,10 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 			Dialect dialect = context.findDialect();
 			validator = dialect.getValidator();
 		} catch (IllegalStateException e) {
-			configureDefaultDialect();
+			configureSimpleDialect();
 			validator = new AllValidator();
 		} catch (ClassNotFoundException e) {
-			configureDefaultDialect();
+			configureSimpleDialect();
 			validator = new AllValidator();
 		}
 		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
@@ -570,7 +570,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		} finally {
 			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
 			if (diagramPresentations.getDiagrams().size() < 1) {
-				DefaultDiagramModel diagramModel = new DefaultDiagramModel(UUID.randomUUID());
+				SimpleJmDiagram diagramModel = new SimpleJmDiagram(UUID.randomUUID());
 				diagramModel.setName("default");
 				diagramPresentations.store(diagramModel);
 			}
@@ -592,10 +592,10 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		setPartName(input.getName());
 	}
 	
-	private void configureDefaultDialect() {
-		ContextMetadata metadata = context.getMetadata();
-		if (metadata instanceof DefaultContextMetadata) {
-			((DefaultContextMetadata) metadata).setDialectClassName(GenericDialect.class.getName());
+	private void configureSimpleDialect() {
+		JmMetadata metadata = context.getMetadata();
+		if (metadata instanceof SimpleJmMetadata) {
+			((SimpleJmMetadata) metadata).setDialectClassName(GenericDialect.class.getName());
 		}
 		context.setMetadata(metadata);
 	}

@@ -23,10 +23,10 @@ import org.eclipse.gef.commands.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.ContextMetadata;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.JmMetadata;
 import org.jiemamy.SqlFacet;
-import org.jiemamy.model.script.AroundScriptModel;
+import org.jiemamy.model.script.JmAroundScript;
 
 /**
  * {@link JiemamyContext}を編集するコマンド。
@@ -40,13 +40,13 @@ public class EditJiemamyContextCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final ContextMetadata metadata;
+	private final JmMetadata metadata;
 	
-	private final AroundScriptModel universalAroundScript;
+	private final JmAroundScript universalAroundScript;
 	
-	private final ContextMetadata oldMetadata;
+	private final JmMetadata oldMetadata;
 	
-	private final AroundScriptModel oldUniversalAroundScript;
+	private final JmAroundScript oldUniversalAroundScript;
 	
 
 	/**
@@ -57,8 +57,7 @@ public class EditJiemamyContextCommand extends Command {
 	 * @param universalAroundScript new around script.  May be {@code null}
 	 * @throws IllegalArgumentException 引数{@code context}または{@code metadata}に{@code null}を与えた場合
 	 */
-	public EditJiemamyContextCommand(JiemamyContext context, ContextMetadata metadata,
-			AroundScriptModel universalAroundScript) {
+	public EditJiemamyContextCommand(JiemamyContext context, JmMetadata metadata, JmAroundScript universalAroundScript) {
 		Validate.notNull(context);
 		Validate.notNull(metadata);
 		this.context = context;

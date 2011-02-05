@@ -25,35 +25,35 @@ import org.apache.commons.lang.Validate;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.NodeCreation;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.geometory.JmRectangle;
-import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.utils.NamingUtil;
 
 /**
- * {@link DefaultTableModel}とその{@link DefaultNodeModel}の生成を表す実装クラス。
+ * {@link SimpleJmTable}とその{@link SimpleJmNode}の生成を表す実装クラス。
  * 
  * @version $Id$
  * @author daisuke
  */
 public class TableCreation implements NodeCreation {
 	
-	private final DefaultTableModel table;
+	private final SimpleJmTable table;
 	
-	private final DefaultNodeModel node;
+	private final SimpleJmNode node;
 	
 
 	/**
 	 * インスタンスを生成する。
 	 */
 	public TableCreation() {
-		table = new DefaultTableModel(UUID.randomUUID());
-		node = new DefaultDatabaseObjectNodeModel(UUID.randomUUID(), table.toReference());
+		table = new SimpleJmTable(UUID.randomUUID());
+		node = new SimpleDbObjectNode(UUID.randomUUID(), table.toReference());
 	}
 	
-	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public void execute(JiemamyContext context, SimpleJmDiagram diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		
@@ -68,12 +68,12 @@ public class TableCreation implements NodeCreation {
 		node.setBoundary(boundary);
 	}
 	
-	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public void undo(JiemamyContext context, SimpleJmDiagram diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		
 		diagramModel.deleteNode(node.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
-		context.deleteDatabaseObject(table.toReference());
+		context.deleteDbObject(table.toReference());
 	}
 }

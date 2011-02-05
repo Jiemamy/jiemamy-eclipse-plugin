@@ -31,15 +31,15 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.model.constraint.LocalKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
-import org.jiemamy.model.view.ViewModel;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmNode;
+import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.constraint.JmLocalKeyConstraint;
+import org.jiemamy.model.table.SimpleJmTable;
+import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.view.JmView;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -52,10 +52,10 @@ public class CreateConnectionCommand extends Command {
 	private static Logger logger = LoggerFactory.getLogger(CreateConnectionCommand.class);
 	
 	/** 接続元ノード */
-	private NodeModel source;
+	private JmNode source;
 	
 	/** 接続先ノード */
-	private NodeModel target;
+	private JmNode target;
 	
 	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
 	private int diagramIndex;
@@ -66,9 +66,9 @@ public class CreateConnectionCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private DatabaseObjectModel sourceCore;
+	private DbObject sourceCore;
 	
-	private DatabaseObjectModel targetCore;
+	private DbObject targetCore;
 	
 	private final ForeignKeyCreation creation;
 	
@@ -98,34 +98,34 @@ public class CreateConnectionCommand extends Command {
 		}
 		
 		// Viewとはコネクションが貼れない
-		if (sourceCore instanceof ViewModel || targetCore instanceof ViewModel) {
+		if (sourceCore instanceof JmView || targetCore instanceof JmView) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_01);
 			return false;
 		}
 		
 		// 現状、付箋とはコネクションが貼れない
-		if (source instanceof StickyNodeModel || target instanceof StickyNodeModel) {
+		if (source instanceof JmStickyNode || target instanceof JmStickyNode) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_02);
 			return false;
 		}
 		
 		// カラムが1つもないテーブルからは外部キーが貼れない
-		if (((TableModel) sourceCore).getColumns().size() < 1) {
+		if (((JmTable) sourceCore).getColumns().size() < 1) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_03);
 			return false;
 		}
 		
 		// ローカルキーが1つもないテーブルへは外部キーが貼れない
-		if (getKey((TableModel) targetCore) == null) {
+		if (getKey((JmTable) targetCore) == null) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_04);
 			return false;
 		}
 		
 		// 循環参照の禁止（ターゲットの親に自分がいたら、参照不可）
 		// THINK 違うキー同士で参照してる可能性は？
-		Collection<DatabaseObjectModel> superDatabaseObjectsRecursive =
-				context.findSuperDatabaseObjectsRecursive(targetCore);
-		if (superDatabaseObjectsRecursive.contains(sourceCore)) {
+		Collection<DbObject> superDbObjectsRecursive =
+				context.findSuperDbObjectsRecursive(targetCore);
+		if (superDbObjectsRecursive.contains(sourceCore)) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_05);
 			return false;
 		}
@@ -136,10 +136,10 @@ public class CreateConnectionCommand extends Command {
 	@Override
 	public void execute() {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
-		DefaultDiagramModel diagramModel =
-				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
-		creation.setSourceTable((DefaultTableModel) sourceCore);
-		creation.setTargetTable((DefaultTableModel) targetCore);
+		SimpleJmDiagram diagramModel =
+				(SimpleJmDiagram) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		creation.setSourceTable((SimpleJmTable) sourceCore);
+		creation.setTargetTable((SimpleJmTable) targetCore);
 		creation.execute(context, diagramModel);
 		
 //		jiemamyFacade.resetBendpoint(diagramIndex, connection);
@@ -159,13 +159,13 @@ public class CreateConnectionCommand extends Command {
 	 * 
 	 * @param source 接続元ノード
 	 */
-	public void setSource(NodeModel source) {
+	public void setSource(JmNode source) {
 		logger.trace(LogMarker.LIFECYCLE, "setSource");
 		logger.trace(LogMarker.DETAIL, "source = " + source);
 		this.source = source;
-		if (source instanceof DefaultDatabaseObjectNodeModel) {
-			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) source;
-			sourceCore = context.resolve(dboNodeModel.getCoreModelRef());
+		if (source instanceof SimpleDbObjectNode) {
+			SimpleDbObjectNode dboJmNode = (SimpleDbObjectNode) source;
+			sourceCore = context.resolve(dboJmNode.getCoreModelRef());
 		}
 		creation.setSource(source.toReference());
 	}
@@ -175,13 +175,13 @@ public class CreateConnectionCommand extends Command {
 	 * 
 	 * @param target 接続先ノード
 	 */
-	public void setTarget(NodeModel target) {
+	public void setTarget(JmNode target) {
 		logger.trace(LogMarker.LIFECYCLE, "setTarget");
 		logger.trace(LogMarker.DETAIL, "target = " + target);
 		this.target = target;
-		if (target instanceof DefaultDatabaseObjectNodeModel) {
-			DefaultDatabaseObjectNodeModel dboNodeModel = (DefaultDatabaseObjectNodeModel) target;
-			targetCore = context.resolve(dboNodeModel.getCoreModelRef());
+		if (target instanceof SimpleDbObjectNode) {
+			SimpleDbObjectNode dboJmNode = (SimpleDbObjectNode) target;
+			targetCore = context.resolve(dboJmNode.getCoreModelRef());
 		}
 		creation.setTarget(target.toReference());
 	}
@@ -189,21 +189,21 @@ public class CreateConnectionCommand extends Command {
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
-		DefaultDiagramModel diagramModel =
-				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel =
+				(SimpleJmDiagram) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
 		creation.undo(context, diagramModel);
 	}
 	
 	/**
-	 * 主キーがあれば主キー、なければ何らかのLocalKeyConstraintを取得する。
+	 * 主キーがあれば主キー、なければ何らかのJmLocalKeyConstraintを取得する。
 	 * 
 	 * @param tableModel 検索するテーブル
 	 * @return キー. 見つからなかった場合は{@code null}
 	 */
-	private LocalKeyConstraintModel getKey(TableModel tableModel) {
-		LocalKeyConstraintModel key = tableModel.getPrimaryKey();
+	private JmLocalKeyConstraint getKey(JmTable tableModel) {
+		JmLocalKeyConstraint key = tableModel.getPrimaryKey();
 		if (key == null) {
-			Collection<LocalKeyConstraintModel> localKeys = tableModel.getConstraints(LocalKeyConstraintModel.class);
+			Collection<JmLocalKeyConstraint> localKeys = tableModel.getConstraints(JmLocalKeyConstraint.class);
 			if (localKeys.size() > 0) {
 				key = Iterables.get(localKeys, 0);
 			}

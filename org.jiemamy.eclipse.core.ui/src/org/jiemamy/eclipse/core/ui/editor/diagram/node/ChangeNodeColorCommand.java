@@ -22,8 +22,8 @@ import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.dddbase.EntityRef;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.geometory.JmColor;
 
 /**
@@ -35,9 +35,9 @@ public class ChangeNodeColorCommand extends Command {
 	
 	private final DiagramFacet diagramFacet;
 	
-	private final DefaultDiagramModel diagramModel;
+	private final SimpleJmDiagram diagramModel;
 	
-	private final EntityRef<? extends DefaultNodeModel> nodeRef;
+	private final EntityRef<? extends SimpleJmNode> nodeRef;
 	
 	private final JmColor newColor;
 	
@@ -52,19 +52,19 @@ public class ChangeNodeColorCommand extends Command {
 	 * @param nodeRef 変更対象のエンティティ
 	 * @param newColor newColor
 	 */
-	public ChangeNodeColorCommand(DiagramFacet diagramFacet, DefaultDiagramModel diagramModel,
-			EntityRef<? extends DefaultNodeModel> nodeRef, JmColor newColor) {
+	public ChangeNodeColorCommand(DiagramFacet diagramFacet, SimpleJmDiagram diagramModel,
+			EntityRef<? extends SimpleJmNode> nodeRef, JmColor newColor) {
 		this.diagramFacet = diagramFacet;
 		this.diagramModel = diagramModel;
 		this.nodeRef = nodeRef;
 		this.newColor = newColor;
-		DefaultNodeModel node = diagramModel.resolve(nodeRef);
+		SimpleJmNode node = diagramModel.resolve(nodeRef);
 		oldColor = node.getColor();
 	}
 	
 	@Override
 	public void execute() {
-		DefaultNodeModel node = diagramModel.resolve(nodeRef);
+		SimpleJmNode node = diagramModel.resolve(nodeRef);
 		
 		node.setColor(newColor);
 		diagramModel.store(node);
@@ -73,7 +73,7 @@ public class ChangeNodeColorCommand extends Command {
 	
 	@Override
 	public void undo() {
-		DefaultNodeModel node = diagramModel.resolve(nodeRef);
+		SimpleJmNode node = diagramModel.resolve(nodeRef);
 		
 		node.setColor(oldColor);
 		diagramModel.store(node);

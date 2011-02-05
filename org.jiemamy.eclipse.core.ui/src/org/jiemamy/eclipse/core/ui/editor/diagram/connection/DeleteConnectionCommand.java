@@ -23,10 +23,10 @@ import org.eclipse.gef.commands.Command;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
+import org.jiemamy.model.table.SimpleJmTable;
 
 /**
  * コネクション削除GEFコマンド。
@@ -37,13 +37,13 @@ public class DeleteConnectionCommand extends Command {
 	
 	private JiemamyContext context;
 	
-	private ConnectionModel connection;
+	private JmConnection connection;
 	
-	private DefaultTableModel tableModel;
+	private SimpleJmTable tableModel;
 	
-	private DefaultForeignKeyConstraintModel foreignKey;
+	private SimpleJmForeignKeyConstraint foreignKey;
 	
-	private DefaultDiagramModel diagmramModel;
+	private SimpleJmDiagram diagmramModel;
 	
 
 	/**
@@ -52,21 +52,21 @@ public class DeleteConnectionCommand extends Command {
 	 * @param context コンテスキースト
 	 * @param connection 削除対象のコネクション
 	 */
-	public DeleteConnectionCommand(JiemamyContext context, ConnectionModel connection) {
+	public DeleteConnectionCommand(JiemamyContext context, JmConnection connection) {
 		this.context = context;
 		this.connection = connection;
 	}
 	
 	@Override
 	public void execute() {
-		foreignKey = (DefaultForeignKeyConstraintModel) context.resolve(connection.getCoreModelRef());
+		foreignKey = (SimpleJmForeignKeyConstraint) context.resolve(connection.getCoreModelRef());
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		diagmramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		diagmramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		diagmramModel.deleteConnection(connection.toReference());
 		facet.store(diagmramModel);
 		
-		tableModel = (DefaultTableModel) foreignKey.findDeclaringTable(context.getTables());
+		tableModel = (SimpleJmTable) foreignKey.findDeclaringTable(context.getTables());
 		tableModel.deleteConstraint(foreignKey.toReference());
 		context.store(tableModel);
 	}

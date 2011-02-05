@@ -78,21 +78,21 @@ import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
 import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
-import org.jiemamy.model.column.ColumnModel;
 import org.jiemamy.model.column.ColumnParameterKey;
-import org.jiemamy.model.column.DefaultColumnModel;
-import org.jiemamy.model.constraint.DefaultKeyConstraintModel;
-import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
-import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
-import org.jiemamy.model.constraint.NotNullConstraintModel;
+import org.jiemamy.model.column.JmColumn;
+import org.jiemamy.model.column.SimpleJmColumn;
+import org.jiemamy.model.constraint.JmNotNullConstraint;
+import org.jiemamy.model.constraint.SimpleJmKeyConstraint;
+import org.jiemamy.model.constraint.SimpleJmNotNullConstraint;
+import org.jiemamy.model.constraint.SimpleJmPrimaryKeyConstraint;
 import org.jiemamy.model.datatype.DataType;
-import org.jiemamy.model.datatype.DefaultDataType;
+import org.jiemamy.model.datatype.RawTypeDescriptor;
+import org.jiemamy.model.datatype.SimpleDataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
-import org.jiemamy.model.datatype.TypeReference;
-import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
-import org.jiemamy.model.domain.DomainModel;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.domain.JmDomain;
+import org.jiemamy.model.domain.SimpleJmDomain.DomainType;
+import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
@@ -109,11 +109,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	
 	private final JiemamyContext context;
 	
-	private final DefaultTableModel tableModel;
+	private final SimpleJmTable tableModel;
 	
 	private final Dialect dialect;
 	
-	private List<TypeReference> allTypes;
+	private List<RawTypeDescriptor> allTypes;
 	
 	private AbstractTableEditor columnTableEditor;
 	
@@ -124,10 +124,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
 	 * @param context コンテキスト
-	 * @param tableModel 編集対象{@link TableModel}
+	 * @param tableModel 編集対象{@link JmTable}
 	 */
 	public TableEditDialogColumnTab(TabFolder parentTabFolder, int style, JiemamyContext context,
-			DefaultTableModel tableModel) {
+			SimpleJmTable tableModel) {
 		super(parentTabFolder, style, Messages.Tab_Table_Columns);
 		
 		this.context = context;
@@ -146,8 +146,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		int size = context.getDomains().size() + dialect.getAllTypeReferences().size();
 		allTypes = Lists.newArrayListWithExpectedSize(size);
 		
-		allTypes.addAll(dialect.getAllTypeReferences());
-		for (DomainModel domainModel : context.getDomains()) {
+		allTypes.addAll(dialect.getAllRawTypeDescriptors());
+		for (JmDomain domainModel : context.getDomains()) {
 			allTypes.add(domainModel.asType());
 		}
 		
@@ -185,8 +185,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		public Object[] getElements(Object inputElement) {
-			if (inputElement instanceof TableModel) {
-				return ((TableModel) inputElement).getColumns().toArray();
+			if (inputElement instanceof JmTable) {
+				return ((JmTable) inputElement).getColumns().toArray();
 			}
 			logger.error("unknown input: " + inputElement.getClass().getName());
 			return new Object[0];
@@ -207,12 +207,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	private class ColumnLabelProvider extends BaseLabelProvider implements ITableLabelProvider {
 		
 		public Image getColumnImage(Object element, int columnIndex) {
-			if ((element instanceof ColumnModel) == false) {
+			if ((element instanceof JmColumn) == false) {
 				logger.error("unknown element: " + element.getClass().getName());
 				return null;
 			}
 			
-			ColumnModel columnModel = (ColumnModel) element;
+			JmColumn columnModel = (JmColumn) element;
 			ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 			
 			switch (columnIndex) {
@@ -229,12 +229,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			if ((element instanceof ColumnModel) == false) {
+			if ((element instanceof JmColumn) == false) {
 				logger.error("unknown element: " + element.getClass().getName());
 				return StringUtils.EMPTY;
 			}
 			
-			ColumnModel columnModel = (ColumnModel) element;
+			JmColumn columnModel = (JmColumn) element;
 			switch (columnIndex) {
 				case 1:
 					return columnModel.getName();
@@ -269,7 +269,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Combo cmbDataType;
 		
-		private Text txtDefaultValue;
+		private Text txtSimpleValue;
 		
 		private Button chkIsNotNull;
 		
@@ -281,7 +281,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Composite cmpTypeOption;
 		
-		private Map<EntityRef<? extends ColumnModel>, TypeParameterManager> typeOptionManagers = Maps.newHashMap();
+		private Map<EntityRef<? extends JmColumn>, TypeParameterManager> typeOptionManagers = Maps.newHashMap();
 		
 		private TypeParameterHandler typeOptionHandler;
 		
@@ -300,7 +300,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		protected void configureEditorControls() {
 			super.configureEditorControls();
 			
-			for (TypeReference reference : allTypes) {
+			for (RawTypeDescriptor reference : allTypes) {
 				cmbDataType.add(reference.getTypeName());
 			}
 			
@@ -321,9 +321,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 						return;
 					}
 					
-					DefaultColumnModel columnModel = (DefaultColumnModel) getTableViewer().getElementAt(index);
+					SimpleJmColumn columnModel = (SimpleJmColumn) getTableViewer().getElementAt(index);
 					TypeParameterManager typeOptionManager = typeOptionManagers.get(columnModel.toReference());
-					TypeReference dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
+					RawTypeDescriptor dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
 					Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataTypeMold);
 					Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
 					typeOptionManager.createTypeOptionControl(columnModel, keys);
@@ -336,10 +336,10 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			chkIsDisabled.addSelectionListener(editListener);
 			
-			txtDefaultValue.addFocusListener(new TextSelectionAdapter(txtDefaultValue));
-			txtDefaultValue.addKeyListener(editListener);
+			txtSimpleValue.addFocusListener(new TextSelectionAdapter(txtSimpleValue));
+			txtSimpleValue.addKeyListener(editListener);
 			
-			txtDescription.addFocusListener(new TextSelectionAdapter(txtDefaultValue));
+			txtDescription.addFocusListener(new TextSelectionAdapter(txtSimpleValue));
 			txtDescription.addKeyListener(editListener);
 		}
 		
@@ -378,7 +378,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			
 			typeOptionManagers.clear();
-			for (ColumnModel columnModel : tableModel.getColumns()) {
+			for (JmColumn columnModel : tableModel.getColumns()) {
 				TypeParameterManager typeOptionManager =
 						new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
 				typeOptionManagers.put(columnModel.toReference(), typeOptionManager);
@@ -464,9 +464,9 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			colType.setText("データ型"); // RESOURCE
 			colType.setWidth(COL_WIDTH_TYPE);
 			
-			TableColumn colDefault = new TableColumn(table, SWT.LEFT);
-			colDefault.setText("デフォルト値"); // RESOURCE
-			colDefault.setWidth(COL_WIDTH_DEFAULT);
+			TableColumn colSimple = new TableColumn(table, SWT.LEFT);
+			colSimple.setText("デフォルト値"); // RESOURCE
+			colSimple.setWidth(COL_WIDTH_DEFAULT);
 			
 			TableColumn colNotNull = new TableColumn(table, SWT.LEFT);
 			colNotNull.setText("NN");
@@ -481,7 +481,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setSelection(false);
 			chkIsNotNull.setSelection(false);
 			chkIsDisabled.setSelection(false);
-			txtDefaultValue.setText(StringUtils.EMPTY);
+			txtSimpleValue.setText(StringUtils.EMPTY);
 			txtDescription.setText(StringUtils.EMPTY);
 			
 			txtColumnName.setEnabled(false);
@@ -490,7 +490,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setEnabled(false);
 			chkIsNotNull.setEnabled(false);
 			chkIsDisabled.setEnabled(false);
-			txtDefaultValue.setEnabled(false);
+			txtSimpleValue.setEnabled(false);
 			txtDescription.setEnabled(false);
 			
 			for (Control control : cmpTypeOption.getChildren()) {
@@ -500,19 +500,19 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			DefaultColumnModel columnModel = (DefaultColumnModel) getTableViewer().getElementAt(index);
+			SimpleJmColumn columnModel = (SimpleJmColumn) getTableViewer().getElementAt(index);
 			
 			txtColumnName.setEnabled(true);
 			txtColumnLogicalName.setEnabled(true);
 			cmbDataType.setEnabled(true);
-			txtDefaultValue.setEnabled(true);
+			txtSimpleValue.setEnabled(true);
 			txtDescription.setEnabled(true);
 			chkIsPK.setEnabled(true);
 			chkIsNotNull.setEnabled(true);
 			chkIsDisabled.setEnabled(true);
 			
 			DataType dataType = columnModel.getDataType();
-			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
+			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
 			Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
 			TypeParameterManager manager = typeOptionManagers.get(columnModel.toReference());
 			manager.createTypeOptionControl(columnModel, keys);
@@ -523,15 +523,15 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			chkIsNotNull.setSelection(tableModel.isNotNullColumn(columnModel.toReference()));
 			
-			if (dataType.getTypeReference() instanceof DomainType) {
-				DomainType domainRef = (DomainType) dataType.getTypeReference();
-				DomainModel domainModel = context.resolve(domainRef);
+			if (dataType.getRawTypeDescriptor() instanceof DomainType) {
+				DomainType domainRef = (DomainType) dataType.getRawTypeDescriptor();
+				JmDomain domainModel = context.resolve(domainRef);
 				cmbDataType.setText(domainModel.getName());
 			} else {
-				cmbDataType.setText(dataType.getTypeReference().getTypeName());
+				cmbDataType.setText(dataType.getRawTypeDescriptor().getTypeName());
 				typeOptionManagers.get(columnModel.toReference()).setValue(columnModel);
 			}
-			txtDefaultValue.setText(StringUtils.defaultString(columnModel.getDefaultValue()));
+			txtSimpleValue.setText(StringUtils.defaultString(columnModel.getDefaultValue()));
 			txtDescription.setText(StringUtils.defaultString(columnModel.getDescription()));
 			
 			chkIsPK.setSelection(tableModel.isPrimaryKeyColumn(columnModel.toReference()));
@@ -547,12 +547,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		@Override
 		protected void performAddItem() {
 			Table table = getTableViewer().getTable();
-			DefaultColumnModel columnModel = new DefaultColumnModel(UUID.randomUUID());
+			SimpleJmColumn columnModel = new SimpleJmColumn(UUID.randomUUID());
 			
 			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			columnModel.setName(newName); // TODO autoname
 			
-			DefaultDataType type = new DefaultDataType(allTypes.get(0));
+			SimpleDataType type = new SimpleDataType(allTypes.get(0));
 			columnModel.setDataType(type);
 			tableModel.store(columnModel);
 			
@@ -571,12 +571,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
-			DefaultColumnModel columnModel = new DefaultColumnModel(UUID.randomUUID());
+			SimpleJmColumn columnModel = new SimpleJmColumn(UUID.randomUUID());
 			
 			String newName = "COLUMN_" + (tableModel.getColumns().size() + 1);
 			columnModel.setName(newName); // TODO autoname
 			
-			DefaultDataType type = new DefaultDataType(allTypes.get(0));
+			SimpleDataType type = new SimpleDataType(allTypes.get(0));
 			columnModel.setDataType(type);
 			columnModel.setIndex(index);
 			tableModel.store(columnModel);
@@ -628,19 +628,19 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			ColumnModel subject = (ColumnModel) getTableViewer().getElementAt(index);
+			JmColumn subject = (JmColumn) getTableViewer().getElementAt(index);
 			
 			// 削除対象カラムに対するNNは削除
-			Set<NotNullConstraintModel> nns = tableModel.getConstraints(NotNullConstraintModel.class);
-			for (NotNullConstraintModel nn : nns) {
-				if (nn.getColumnRef().isReferenceOf(subject)) {
+			Set<JmNotNullConstraint> nns = tableModel.getConstraints(JmNotNullConstraint.class);
+			for (JmNotNullConstraint nn : nns) {
+				if (nn.getColumn().isReferenceOf(subject)) {
 					tableModel.deleteConstraint(nn.toReference());
 				}
 			}
 			
 			// 削除対象カラムがキーの一部になっていたら、そのキーセットからカラムを削除
-			Set<DefaultKeyConstraintModel> keys = tableModel.getConstraints(DefaultKeyConstraintModel.class);
-			for (DefaultKeyConstraintModel key : keys) {
+			Set<SimpleJmKeyConstraint> keys = tableModel.getConstraints(SimpleJmKeyConstraint.class);
+			for (SimpleJmKeyConstraint key : keys) {
 				if (key.getKeyColumns().contains(subject.toReference())) {
 					key.removeKeyColumn(subject.toReference());
 					tableModel.store(key);
@@ -679,8 +679,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			label = new Label(cmpAdvanced, SWT.NULL);
 			label.setText("デフォルト値(&F)"); // RESOURCE
 			
-			txtDefaultValue = new Text(cmpAdvanced, SWT.BORDER);
-			txtDefaultValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			txtSimpleValue = new Text(cmpAdvanced, SWT.BORDER);
+			txtSimpleValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			
 			label = new Label(cmpAdvanced, SWT.NULL);
 			label.setText("説明(&D)"); // RESOURCE
@@ -695,7 +695,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				return;
 			}
 			
-			DefaultColumnModel columnModel = (DefaultColumnModel) tableModel.getColumns().get(editIndex);
+			SimpleJmColumn columnModel = (SimpleJmColumn) tableModel.getColumns().get(editIndex);
 			
 			String columnName = StringUtils.defaultString(txtColumnName.getText());
 			columnModel.setName(columnName);
@@ -705,26 +705,26 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			int selectionInedx = cmbDataType.getSelectionIndex();
 			if (selectionInedx != -1) {
-				DefaultDataType dataType = new DefaultDataType(allTypes.get(selectionInedx));
+				SimpleDataType dataType = new SimpleDataType(allTypes.get(selectionInedx));
 				columnModel.setDataType(dataType);
 			}
 			
-			String defaultValue = StringUtils.defaultString(txtDefaultValue.getText());
+			String defaultValue = StringUtils.defaultString(txtSimpleValue.getText());
 			columnModel.setDefaultValue(defaultValue);
 			
 			String description = StringUtils.defaultString(txtDescription.getText());
 			columnModel.setDescription(description);
 			
 			if (chkIsNotNull.getSelection() == false) {
-				NotNullConstraintModel nn = tableModel.getNotNullConstraintFor(columnModel.toReference());
+				JmNotNullConstraint nn = tableModel.getNotNullConstraintFor(columnModel.toReference());
 				if (nn != null) {
 					tableModel.deleteConstraint(nn.toReference());
 				}
 			} else if (tableModel.getNotNullConstraintFor(columnModel.toReference()) == null) {
-				tableModel.store(DefaultNotNullConstraintModel.of(columnModel));
+				tableModel.store(SimpleJmNotNullConstraint.of(columnModel));
 			}
 			
-			DefaultPrimaryKeyConstraintModel primaryKey = (DefaultPrimaryKeyConstraintModel) tableModel.getPrimaryKey();
+			SimpleJmPrimaryKeyConstraint primaryKey = (SimpleJmPrimaryKeyConstraint) tableModel.getPrimaryKey();
 			if (chkIsPK.getSelection() == false) {
 				if (primaryKey != null) {
 					primaryKey.removeKeyColumn(columnModel.toReference());
@@ -732,7 +732,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				}
 			} else {
 				if (primaryKey == null) {
-					primaryKey = DefaultPrimaryKeyConstraintModel.of(columnModel);
+					primaryKey = SimpleJmPrimaryKeyConstraint.of(columnModel);
 					tableModel.store(primaryKey);
 				} else if (primaryKey.getKeyColumns().contains(columnModel.toReference()) == false) {
 					primaryKey.addKeyColumn(columnModel.toReference());

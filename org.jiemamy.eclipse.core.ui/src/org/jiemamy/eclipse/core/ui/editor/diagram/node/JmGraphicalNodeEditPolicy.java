@@ -27,7 +27,7 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.connection.CreateConnectionCommand;
 import org.jiemamy.eclipse.core.ui.editor.diagram.connection.ForeignKeyCreation;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.JmNode;
 
 /**
  * GraphicalNodeののEditPolicy。
@@ -44,7 +44,7 @@ public class JmGraphicalNodeEditPolicy extends GraphicalNodeEditPolicy {
 	@Override
 	protected Command getConnectionCompleteCommand(CreateConnectionRequest request) {
 		CreateConnectionCommand command = (CreateConnectionCommand) request.getStartCommand();
-		command.setTarget((NodeModel) getHost().getModel());
+		command.setTarget((JmNode) getHost().getModel());
 		return command;
 	}
 	
@@ -58,7 +58,7 @@ public class JmGraphicalNodeEditPolicy extends GraphicalNodeEditPolicy {
 		ForeignKeyCreation creation = (ForeignKeyCreation) request.getNewObject();
 		CreateConnectionCommand command =
 				new CreateConnectionCommand(getJiemamyContext(), TODO.DIAGRAM_INDEX, creation);
-		command.setSource((NodeModel) getHost().getModel());
+		command.setSource((JmNode) getHost().getModel());
 		command.setFigureSize(getHostFigure().getSize());
 		request.setStartCommand(command);
 		

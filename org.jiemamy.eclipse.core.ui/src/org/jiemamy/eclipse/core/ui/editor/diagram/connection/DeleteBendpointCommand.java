@@ -22,8 +22,8 @@ import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.SimpleJmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
 
 /**
  * ベンドポイント削除GEFコマンド。
@@ -36,7 +36,7 @@ public class DeleteBendpointCommand extends Command {
 	private int diagramIndex;
 	
 	/** 削除元のコネクション */
-	private DefaultConnectionModel connectionModel;
+	private SimpleJmConnection connectionModel;
 	
 	/** source側からtarget側に向かって数えたベンドポイントのインデックス */
 	private int bendpointIndex;
@@ -52,7 +52,7 @@ public class DeleteBendpointCommand extends Command {
 	 * @param connectionModel ベンドポイント削除対象のコネクション
 	 * @param bendpointIndex source側からtarget側に向かって数えたベンドポイントのインデックス
 	 */
-	public DeleteBendpointCommand(JiemamyContext context, int diagramIndex, DefaultConnectionModel connectionModel,
+	public DeleteBendpointCommand(JiemamyContext context, int diagramIndex, SimpleJmConnection connectionModel,
 			int bendpointIndex) {
 		this.context = context;
 		this.diagramIndex = diagramIndex;
@@ -65,7 +65,7 @@ public class DeleteBendpointCommand extends Command {
 		connectionModel.breachEncapsulationOfBendpoints().remove(bendpointIndex);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(connectionModel);
 		facet.store(diagramModel);
 	}

@@ -25,50 +25,50 @@ import org.apache.commons.lang.Validate;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.NodeCreation;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmStickyNode;
 import org.jiemamy.model.geometory.JmRectangle;
 
 /**
- * {@link StickyNodeModel}の生成を表す実装クラス。
+ * {@link JmStickyNode}の生成を表す実装クラス。
  * 
  * @version $Id$
  * @author daisuke
  */
 public class StickyCreation implements NodeCreation {
 	
-	/** {@link StickyNodeModel}が作られた時、はじめに設定されている値 */
+	/** {@link JmStickyNode}が作られた時、はじめに設定されている値 */
 	private static final String DEFAULT_STICKY_CONTENTS = "memo";
 	
-	private final StickyNodeModel stickyNodeModel;
+	private final JmStickyNode stickyJmNode;
 	
 
 	/**
 	 * インスタンスを生成する。
 	 */
 	public StickyCreation() {
-		stickyNodeModel = new StickyNodeModel(UUID.randomUUID());
-		stickyNodeModel.setContents(DEFAULT_STICKY_CONTENTS);
+		stickyJmNode = new JmStickyNode(UUID.randomUUID());
+		stickyJmNode.setContents(DEFAULT_STICKY_CONTENTS);
 	}
 	
-	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public void execute(JiemamyContext context, SimpleJmDiagram diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		
-		diagramModel.store(stickyNodeModel);
+		diagramModel.store(stickyJmNode);
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
 	
 	public void setBoundary(JmRectangle boundary) {
 		Validate.notNull(boundary);
-		stickyNodeModel.setBoundary(boundary);
+		stickyJmNode.setBoundary(boundary);
 	}
 	
-	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public void undo(JiemamyContext context, SimpleJmDiagram diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		
-		diagramModel.deleteNode(stickyNodeModel.toReference());
+		diagramModel.deleteNode(stickyJmNode.toReference());
 		context.getFacet(DiagramFacet.class).store(diagramModel);
 	}
 }

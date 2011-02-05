@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.ConnectionModel;
+import org.jiemamy.model.JmConnection;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
@@ -53,7 +53,7 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	 * @param connectionAdapter コントロール対象のコネクション
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public AbstractJmConnectionEditPart(ConnectionModel connectionAdapter) {
+	public AbstractJmConnectionEditPart(JmConnection connectionAdapter) {
 		Validate.notNull(connectionAdapter);
 		setModel(connectionAdapter);
 	}
@@ -78,8 +78,8 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	}
 	
 	@Override
-	public ConnectionModel getModel() {
-		return (ConnectionModel) super.getModel();
+	public JmConnection getModel() {
+		return (JmConnection) super.getModel();
 	}
 	
 	@Override
@@ -90,7 +90,7 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	
 	@Override
 	public void setModel(Object model) {
-		if (model instanceof ConnectionModel) {
+		if (model instanceof JmConnection) {
 			super.setModel(model);
 		} else {
 			throw new IllegalArgumentException();
@@ -119,7 +119,7 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 			return;
 		}
 		
-		ConnectionModel connection = getModel();
+		JmConnection connection = getModel();
 		if (connection == null) {
 			return;
 		}

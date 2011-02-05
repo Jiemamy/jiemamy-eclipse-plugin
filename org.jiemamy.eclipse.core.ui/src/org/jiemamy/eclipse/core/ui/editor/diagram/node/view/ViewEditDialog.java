@@ -47,19 +47,19 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.diagram.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.column.ColumnParameterKey;
-import org.jiemamy.model.script.DefaultAroundScriptModel;
+import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.model.script.Position;
-import org.jiemamy.model.view.DefaultViewModel;
+import org.jiemamy.model.view.SimpleJmView;
 
 /**
- * {@link DefaultViewModel}の詳細編集ダイアログクラス。
+ * {@link SimpleJmView}の詳細編集ダイアログクラス。
  * 
  * @author daisuke
  */
-public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
+public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 	
 	private static final Point DEFAULT_SIZE = new Point((int) (370 * 1.618), 370);
 	
@@ -91,9 +91,9 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	 * @param nodeModel ノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ViewEditDialog(Shell parentShell, JiemamyContext context, DefaultViewModel viewModel,
-			DefaultDatabaseObjectNodeModel nodeModel) {
-		super(parentShell, context, viewModel, DefaultViewModel.class, nodeModel);
+	public ViewEditDialog(Shell parentShell, JiemamyContext context, SimpleJmView viewModel,
+			SimpleDbObjectNode nodeModel) {
+		super(parentShell, context, viewModel, SimpleJmView.class, nodeModel);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -107,7 +107,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final DefaultViewModel viewModel = getTargetCoreModel();
+		final SimpleJmView viewModel = getTargetCoreModel();
 		getShell().setText(Messages.Dialog_Title);
 		
 		// ---- A. 最上段名称欄
@@ -146,19 +146,19 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					DefaultNodeModel nodeModel = getNodeModel();
+					SimpleJmNode nodeModel = getJmNode();
 					nodeModel.setColor(ConvertUtil.convert(rgb));
 				}
 			}
 		});
 		
-		Button btnDefaultColor = new Button(composite, SWT.PUSH);
-		btnDefaultColor.setText("default color"); // RESOURCE
-		btnDefaultColor.addSelectionListener(new SelectionAdapter() {
+		Button btnSimpleColor = new Button(composite, SWT.PUSH);
+		btnSimpleColor.setText("default color"); // RESOURCE
+		btnSimpleColor.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				DefaultNodeModel nodeModel = getNodeModel();
+				SimpleJmNode nodeModel = getJmNode();
 				nodeModel.setColor(null);
 			}
 		});
@@ -216,7 +216,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 			return false;
 		}
 		
-		DefaultViewModel viewModel = getTargetCoreModel();
+		SimpleJmView viewModel = getTargetCoreModel();
 		
 		String name = txtName.getText();
 		viewModel.setName(name);
@@ -228,13 +228,13 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 		viewModel.setDefinition(definition);
 		
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		DefaultAroundScriptModel aroundScript;
+		SimpleJmAroundScript aroundScript;
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		aroundScript = (DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+		aroundScript = (SimpleJmAroundScript) facet.getAroundScriptFor(viewModel.toReference());
 		if (aroundScript == null) {
-			aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+			aroundScript = new SimpleJmAroundScript(UUID.randomUUID());
 			aroundScript.setCoreModelRef(viewModel.toReference());
 		}
 		
@@ -256,7 +256,7 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 		return true;
 	}
 	
-	private void createTabs(final DefaultViewModel viewModel, TabFolder tabFolder) {
+	private void createTabs(final SimpleJmView viewModel, TabFolder tabFolder) {
 		// ---- B-1. Definition
 		String definition = StringUtils.defaultString(viewModel.getDefinition());
 		tabDefinition = new TextEditTab(tabFolder, Messages.Tab_View_Definition, definition);
@@ -266,8 +266,8 @@ public class ViewEditDialog extends JiemamyEditDialog<DefaultViewModel> {
 		String beginScript = "";
 		String endScript = "";
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		DefaultAroundScriptModel aroundScript =
-				(DefaultAroundScriptModel) facet.getAroundScriptFor(viewModel.toReference());
+		SimpleJmAroundScript aroundScript =
+				(SimpleJmAroundScript) facet.getAroundScriptFor(viewModel.toReference());
 		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));

@@ -30,14 +30,14 @@ import org.eclipse.gef.commands.Command;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.DbObjectNode;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.JmNode;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint;
+import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.table.SimpleJmTable;
 
 /**
  * ノード削除GEFコマンド。
@@ -48,20 +48,20 @@ public class DeleteNodeCommand extends Command {
 	
 	private final DiagramFacet diagramFacet;
 	
-	private final DefaultDiagramModel diagramModel;
+	private final SimpleJmDiagram diagramModel;
 	
 	/** 削除されるノード */
-	private final NodeModel nodeModel;
+	private final JmNode nodeModel;
 	
 	/** 削除されるコネクション */
-	private final Collection<ConnectionModel> connectionModels;
+	private final Collection<JmConnection> connectionModels;
 	
 	/** （主ノードではないノードに属する）削除される外部キー */
 	private final Collection<Entry> outerForeingKeys;
 	
 	private final JiemamyContext context;
 	
-	private DatabaseObjectModel deletedCore;
+	private DbObject deletedCore;
 	
 
 	/**
@@ -73,7 +73,7 @@ public class DeleteNodeCommand extends Command {
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 * @throws IllegalArgumentException 引数{@code context}が {@link DiagramFacet} を持っていない場合
 	 */
-	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, NodeModel nodeModel) {
+	public DeleteNodeCommand(JiemamyContext context, int diagramIndex, JmNode nodeModel) {
 		Validate.notNull(context);
 		Validate.notNull(nodeModel);
 		Validate.isTrue(context.hasFacet(DiagramFacet.class));
@@ -81,22 +81,22 @@ public class DeleteNodeCommand extends Command {
 		this.context = context;
 		this.nodeModel = nodeModel;
 		diagramFacet = context.getFacet(DiagramFacet.class);
-		diagramModel = (DefaultDiagramModel) diagramFacet.getDiagrams().get(diagramIndex);
+		diagramModel = (SimpleJmDiagram) diagramFacet.getDiagrams().get(diagramIndex);
 		
-		Set<TableModel> tables = context.getTables();
+		Set<JmTable> tables = context.getTables();
 		
-		Collection<ConnectionModel> connectionModels = Sets.newHashSet();
+		Collection<JmConnection> connectionModels = Sets.newHashSet();
 		Collection<Entry> outerForeingKeys = Sets.newHashSet();
-		for (ConnectionModel connectionModel : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
+		for (JmConnection connectionModel : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
 			connectionModels.add(connectionModel);
 		}
-		for (ConnectionModel connectionModel : diagramModel.getTargetConnections(nodeModel.toReference())) {
+		for (JmConnection connectionModel : diagramModel.getTargetConnectionsFor(nodeModel.toReference())) {
 			connectionModels.add(connectionModel);
 			
-			ForeignKeyConstraintModel fk = context.resolve(connectionModel.getCoreModelRef());
-			TableModel table = fk.findDeclaringTable(tables);
-			if (table instanceof DefaultTableModel) {
-				DefaultTableModel t = (DefaultTableModel) table;
+			JmForeignKeyConstraint fk = context.resolve(connectionModel.getCoreModelRef());
+			JmTable table = fk.findDeclaringTable(tables);
+			if (table instanceof SimpleJmTable) {
+				SimpleJmTable t = (SimpleJmTable) table;
 				outerForeingKeys.add(new Entry(t, fk));
 			}
 		}
@@ -106,7 +106,7 @@ public class DeleteNodeCommand extends Command {
 	
 	@Override
 	public void execute() {
-		for (ConnectionModel connectionModel : connectionModels) {
+		for (JmConnection connectionModel : connectionModels) {
 			diagramModel.deleteConnection(connectionModel.toReference());
 		}
 		diagramFacet.store(diagramModel);
@@ -114,11 +114,11 @@ public class DeleteNodeCommand extends Command {
 		diagramModel.deleteNode(nodeModel.toReference());
 		diagramFacet.store(diagramModel);
 		
-		if (nodeModel instanceof DatabaseObjectNodeModel) {
-			DatabaseObjectNodeModel databaseObjectNodeModel = (DatabaseObjectNodeModel) nodeModel;
-			EntityRef<? extends DatabaseObjectModel> coreRef = databaseObjectNodeModel.getCoreModelRef();
+		if (nodeModel instanceof DbObjectNode) {
+			DbObjectNode databaseObjectJmNode = (DbObjectNode) nodeModel;
+			EntityRef<? extends DbObject> coreRef = databaseObjectJmNode.getCoreModelRef();
 			deletedCore = context.resolve(coreRef);
-			context.deleteDatabaseObject(coreRef);
+			context.deleteDbObject(coreRef);
 			
 			for (Entry e : outerForeingKeys) {
 				e.table.deleteConstraint(e.fk.toReference());
@@ -138,7 +138,7 @@ public class DeleteNodeCommand extends Command {
 		
 		diagramModel.store(nodeModel);
 		
-		for (ConnectionModel connectionModel : connectionModels) {
+		for (JmConnection connectionModel : connectionModels) {
 			diagramModel.store(connectionModel);
 		}
 		
@@ -148,12 +148,12 @@ public class DeleteNodeCommand extends Command {
 
 	private static class Entry {
 		
-		DefaultTableModel table;
+		SimpleJmTable table;
 		
-		ForeignKeyConstraintModel fk;
+		JmForeignKeyConstraint fk;
 		
 
-		Entry(DefaultTableModel table, ForeignKeyConstraintModel fk) {
+		Entry(SimpleJmTable table, JmForeignKeyConstraint fk) {
 			this.table = table;
 			this.fk = fk;
 		}

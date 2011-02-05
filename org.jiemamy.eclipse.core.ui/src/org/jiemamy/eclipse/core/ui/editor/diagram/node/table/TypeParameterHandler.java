@@ -21,7 +21,7 @@ package org.jiemamy.eclipse.core.ui.editor.diagram.node.table;
 import org.eclipse.swt.widgets.Composite;
 
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
-import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.column.JmColumn;
 
 /**
  * 型オプションのUIをコントロールするインターフェイス。
@@ -39,7 +39,7 @@ public interface TypeParameterHandler {
 	 * @param composite オプションコントロール描画対象の親
 	 * @param editListener コントロールの操作を検知するリスナ
 	 */
-	void createControl(ColumnModel columnModel, Composite composite, EditListener editListener);
+	void createControl(JmColumn columnModel, Composite composite, EditListener editListener);
 	
 	/**
 	 * コントロールを無効にする。

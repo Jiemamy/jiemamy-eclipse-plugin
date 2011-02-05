@@ -51,8 +51,8 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.dataset.DataSetEditDialog;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.dataset.DataSetModel;
-import org.jiemamy.model.dataset.DefaultDataSetModel;
+import org.jiemamy.model.dataset.JmDataSet;
+import org.jiemamy.model.dataset.SimpleJmDataSet;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
@@ -145,7 +145,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			DataSetModel dataSet = (DataSetModel) element;
+			JmDataSet dataSet = (JmDataSet) element;
 			switch (columnIndex) {
 				case 0:
 					return dataSet.getName();
@@ -190,7 +190,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				public void widgetSelected(SelectionEvent e) {
 					logger.info("edit data set");
 					int selectionIndex = dataSetTableEditor.getTableViewer().getTable().getSelectionIndex();
-					DefaultDataSetModel dataSetModel = (DefaultDataSetModel) context.getDataSets().get(selectionIndex);
+					SimpleJmDataSet dataSetModel = (SimpleJmDataSet) context.getDataSets().get(selectionIndex);
 					DataSetEditDialog dataSetEditDialog = new DataSetEditDialog(getShell(), context, dataSetModel);
 					if (dataSetEditDialog.open() == Window.OK) {
 						context.store(dataSetModel);
@@ -257,7 +257,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			DefaultDataSetModel dataSet = (DefaultDataSetModel) getTableViewer().getElementAt(index);
+			SimpleJmDataSet dataSet = (SimpleJmDataSet) getTableViewer().getElementAt(index);
 			
 			txtDataSetName.setEnabled(true);
 			btnEdit.setEnabled(true);
@@ -270,7 +270,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		protected void performAddItem() {
 			Table table = getTableViewer().getTable();
 			
-			DefaultDataSetModel dataSetModel = new DefaultDataSetModel(UUID.randomUUID());
+			SimpleJmDataSet dataSetModel = new SimpleJmDataSet(UUID.randomUUID());
 			
 			String newName = "DATASET_" + (context.getDataSets().size() + 1);
 			dataSetModel.setName(newName);
@@ -288,7 +288,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 			Table table = getTableViewer().getTable();
 			int index = table.getSelectionIndex();
 			
-			DefaultDataSetModel dataSetModel = new DefaultDataSetModel(UUID.randomUUID());
+			SimpleJmDataSet dataSetModel = new SimpleJmDataSet(UUID.randomUUID());
 			
 			String newName = "DATASET_" + (context.getDataSets().size() + 1);
 			dataSetModel.setName(newName);
@@ -339,7 +339,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				return;
 			}
 			
-			DataSetModel subject = (DataSetModel) getTableViewer().getElementAt(index);
+			JmDataSet subject = (JmDataSet) getTableViewer().getElementAt(index);
 			context.deleteDataSet(subject.toReference());
 			
 			tableViewer.remove(subject);
@@ -359,7 +359,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 				return;
 			}
 			
-			DefaultDataSetModel dataSetModel = (DefaultDataSetModel) context.getDataSets().get(editIndex);
+			SimpleJmDataSet dataSetModel = (SimpleJmDataSet) context.getDataSets().get(editIndex);
 			dataSetModel.setName(StringUtils.defaultString(txtDataSetName.getText()));
 		}
 		

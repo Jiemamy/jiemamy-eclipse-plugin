@@ -25,7 +25,7 @@ import org.eclipse.gef.requests.GroupRequest;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyDiagramEditor;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.JmNode;
 
 /**
  * {@link JiemamyDiagramEditor}用の{@link ComponentEditPolicy}実装クラス。
@@ -37,7 +37,7 @@ public class JmComponentEditPolicy extends ComponentEditPolicy {
 	@Override
 	protected Command createDeleteCommand(GroupRequest deleteRequest) {
 		JiemamyContext context = (JiemamyContext) getHost().getParent().getModel();
-		NodeModel nodeModel = (NodeModel) getHost().getModel();
+		JmNode nodeModel = (JmNode) getHost().getModel();
 		
 		return new DeleteNodeCommand(context, TODO.DIAGRAM_INDEX, nodeModel);
 	}

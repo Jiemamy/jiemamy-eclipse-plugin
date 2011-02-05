@@ -36,22 +36,22 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractJmNodeEditPart;
-import org.jiemamy.eclipse.core.ui.editor.diagram.node.EditDatabaseObjectCommand;
+import org.jiemamy.eclipse.core.ui.editor.diagram.node.EditDbObjectCommand;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.ColumnFigure;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
-import org.jiemamy.model.DatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DiagramModel;
+import org.jiemamy.model.DbObjectNode;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.JmDiagram;
 import org.jiemamy.model.Level;
-import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.geometory.JmColor;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.table.SimpleJmTable;
+import org.jiemamy.model.table.JmTable;
 import org.jiemamy.utils.LogMarker;
 
 /**
- * {@link TableModel}に対するDiagram用{@link EditPart}（コントローラ）。
+ * {@link JmTable}に対するDiagram用{@link EditPart}（コントローラ）。
  * 
  * @author daisuke
  */
@@ -66,7 +66,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	 * @param nodeModel コントロール対象のノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TableEditPart(DefaultDatabaseObjectNodeModel nodeModel) {
+	public TableEditPart(SimpleDbObjectNode nodeModel) {
 		super(nodeModel);
 	}
 	
@@ -78,22 +78,22 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 //	}
 	
 	@Override
-	public DefaultDatabaseObjectNodeModel getModel() {
-		return (DefaultDatabaseObjectNodeModel) super.getModel();
+	public SimpleDbObjectNode getModel() {
+		return (SimpleDbObjectNode) super.getModel();
 	}
 	
 	public void openEditDialog() {
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog");
 		
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		DefaultDatabaseObjectNodeModel nodeModel = getModel();
-		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(nodeModel.getCoreModelRef());
+		SimpleDbObjectNode nodeModel = getModel();
+		SimpleJmTable tableModel = (SimpleJmTable) context.resolve(nodeModel.getCoreModelRef());
 		
 		Shell shell = getViewer().getControl().getShell();
 		TableEditDialog dialog = new TableEditDialog(shell, context, tableModel, nodeModel);
 		
 		if (dialog.open() == Dialog.OK) {
-			Command command = new EditDatabaseObjectCommand(context, tableModel, nodeModel, TODO.DIAGRAM_INDEX);
+			Command command = new EditDbObjectCommand(context, tableModel, nodeModel, TODO.DIAGRAM_INDEX);
 			GraphicalViewer viewer = (GraphicalViewer) getViewer();
 			viewer.getEditDomain().getCommandStack().execute(command);
 		}
@@ -110,9 +110,9 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		logger.debug(LogMarker.LIFECYCLE, "createFigure");
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
 		TableFigure figure = new TableFigure();
-		DatabaseObjectNodeModel node = getModel();
+		DbObjectNode node = getModel();
 		
-		TableModel tableModel = (TableModel) context.resolve(node.getCoreModelRef());
+		JmTable tableModel = (JmTable) context.resolve(node.getCoreModelRef());
 		String description = tableModel.getDescription();
 		
 		if (StringUtils.isEmpty(description) == false) {
@@ -134,28 +134,28 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 		
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		
-		DatabaseObjectNodeModel node = getModel();
-		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(node.getCoreModelRef());
+		DbObjectNode node = getModel();
+		SimpleJmTable tableModel = (SimpleJmTable) context.resolve(node.getCoreModelRef());
 		TableFigure tableFigure = (TableFigure) figure;
 		
-		tableFigure.setDatabaseObjectName(tableModel.getName());
+		tableFigure.setDbObjectName(tableModel.getName());
 		
 		JmColor color = node.getColor();
 		tableFigure.setBgColor(ConvertUtil.convert(color));
 		
 		tableFigure.removeAllColumns();
 		
-		for (ColumnModel columnModel : tableModel.getColumns()) {
+		for (JmColumn columnModel : tableModel.getColumns()) {
 			ColumnFigure[] columnFigure = createColumnFigure(columnModel);
 			tableFigure.add(columnFigure[0], columnFigure[1]);
 		}
 	}
 	
-	private ColumnFigure[] createColumnFigure(ColumnModel columnModel) {
+	private ColumnFigure[] createColumnFigure(JmColumn columnModel) {
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DiagramModel diagramModel = facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		DefaultTableModel tableModel = (DefaultTableModel) context.resolve(getModel().getCoreModelRef());
+		JmDiagram diagramModel = facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmTable tableModel = (SimpleJmTable) context.resolve(getModel().getCoreModelRef());
 		
 		if (diagramModel.getLevel() == Level.ENTITY) {
 			return new ColumnFigure[0];
@@ -169,7 +169,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 			typeLabel.setText(LabelStringUtil.toString(context.findDialect(), columnModel.getDataType()));
 		} catch (ClassNotFoundException e) {
 			logger.error("lost dialect", e);
-			typeLabel.setText(columnModel.getDataType().getTypeReference().getTypeName());
+			typeLabel.setText(columnModel.getDataType().getRawTypeDescriptor().getTypeName());
 		}
 		
 		if (tableModel.isPrimaryKeyColumn(columnModel.toReference())) {

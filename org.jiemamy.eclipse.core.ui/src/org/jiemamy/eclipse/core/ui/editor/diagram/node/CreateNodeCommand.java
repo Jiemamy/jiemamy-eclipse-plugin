@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -61,16 +61,16 @@ public class CreateNodeCommand extends Command {
 	public void execute() {
 		logger.debug(LogMarker.LIFECYCLE, "execute");
 		
-		DefaultDiagramModel diagramModel =
-				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel =
+				(SimpleJmDiagram) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
 		creation.execute(context, diagramModel);
 	}
 	
 	@Override
 	public void undo() {
 		logger.debug(LogMarker.LIFECYCLE, "undo");
-		DefaultDiagramModel diagramModel =
-				(DefaultDiagramModel) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel =
+				(SimpleJmDiagram) context.getFacet(DiagramFacet.class).getDiagrams().get(diagramIndex);
 		creation.undo(context, diagramModel);
 	}
 }

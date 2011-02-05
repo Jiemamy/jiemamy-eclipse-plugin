@@ -42,21 +42,21 @@ import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.editor.diagram.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmStickyNode;
 
 /** 
- * {@link StickyNodeModel}の詳細編集ダイアログクラス。
+ * {@link JmStickyNode}の詳細編集ダイアログクラス。
  * 
  * @author daisuke
  */
-public class StickyEditDialog extends JiemamyEditDialog0<StickyNodeModel> {
+public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 	
 	private static final Point DEFAULT_SIZE = new Point((int) (370 * 1.618), 370);
 	
 	private TextEditTab tabContents;
 	
-	private DefaultDiagramModel diagramModel;
+	private SimpleJmDiagram diagramModel;
 	
 
 	/**
@@ -68,9 +68,9 @@ public class StickyEditDialog extends JiemamyEditDialog0<StickyNodeModel> {
 	 * @param diagramModel ダイアグラム
 	 * @throws IllegalArgumentException 引数stickyModel, jiemamyFacadeに{@code null}を与えた場合
 	 */
-	public StickyEditDialog(Shell parentShell, JiemamyContext context, StickyNodeModel stickyModel,
-			DefaultDiagramModel diagramModel) {
-		super(parentShell, context, stickyModel, StickyNodeModel.class);
+	public StickyEditDialog(Shell parentShell, JiemamyContext context, JmStickyNode stickyModel,
+			SimpleJmDiagram diagramModel) {
+		super(parentShell, context, stickyModel, JmStickyNode.class);
 		
 		Validate.notNull(stickyModel);
 		
@@ -80,7 +80,7 @@ public class StickyEditDialog extends JiemamyEditDialog0<StickyNodeModel> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final StickyNodeModel stickyModel = getTargetCoreModel();
+		final JmStickyNode stickyModel = getTargetCoreModel();
 		getShell().setText(Messages.Dialog_Title);
 		
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -105,9 +105,9 @@ public class StickyEditDialog extends JiemamyEditDialog0<StickyNodeModel> {
 			}
 		});
 		
-		Button btnDefaultColor = new Button(composite, SWT.PUSH);
-		btnDefaultColor.setText("default color"); // RESOURCE
-		btnDefaultColor.addSelectionListener(new SelectionAdapter() {
+		Button btnSimpleColor = new Button(composite, SWT.PUSH);
+		btnSimpleColor.setText("default color"); // RESOURCE
+		btnSimpleColor.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
@@ -141,7 +141,7 @@ public class StickyEditDialog extends JiemamyEditDialog0<StickyNodeModel> {
 	
 	@Override
 	protected boolean performOk() {
-		StickyNodeModel stickyModel = getTargetCoreModel();
+		JmStickyNode stickyModel = getTargetCoreModel();
 		
 		String contents = StringUtils.defaultString(tabContents.getTextWidget().getText());
 		stickyModel.setContents(contents);

@@ -60,8 +60,8 @@ import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.utils.EditorUtil;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DiagramModel;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmDiagram;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -126,7 +126,7 @@ public class JmActionBarContributor extends ActionBarContributor {
 		}
 		
 		DiagramFacet diagramFacet = rootModel.getFacet(DiagramFacet.class);
-		DiagramModel presentation = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		JmDiagram presentation = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		for (DisplayStatus displayStatus : DisplayStatus.values()) {
 			if (presentation.getMode() == displayStatus.getMode()
 					&& presentation.getLevel() == displayStatus.getLevel()) {
@@ -241,8 +241,8 @@ public class JmActionBarContributor extends ActionBarContributor {
 				}
 				JiemamyContext context = ((JiemamyEditor) editor).getJiemamyContext();
 				DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-				DefaultDiagramModel presentation =
-						(DefaultDiagramModel) diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+				SimpleJmDiagram presentation =
+						(SimpleJmDiagram) diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 				for (DisplayStatus displayStatus : DisplayStatus.values()) {
 					if (displayStatus.ordinal() == index) {
 						presentation.setMode(displayStatus.getMode());

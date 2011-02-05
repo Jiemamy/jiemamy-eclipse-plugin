@@ -29,10 +29,10 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.JmStickyNode;
 
 /**
- * {@link StickyNodeModel}用Figure（ビュー）。
+ * {@link JmStickyNode}用Figure（ビュー）。
  * 
  * @author daisuke
  */

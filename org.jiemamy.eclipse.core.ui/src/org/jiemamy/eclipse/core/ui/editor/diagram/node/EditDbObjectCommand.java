@@ -23,27 +23,27 @@ import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmNode;
 
 /**
- * {@link DatabaseObjectModel}を編集するコマンド。
+ * {@link DbObject}を編集するコマンド。
  * 
  * @version $Id$
  * @author daisuke
  */
-public class EditDatabaseObjectCommand extends Command {
+public class EditDbObjectCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final DatabaseObjectModel dom;
+	private final DbObject dom;
 	
-	private final DatabaseObjectModel oldDom;
+	private final DbObject oldDom;
 	
-	private final NodeModel nodeModel;
+	private final JmNode nodeModel;
 	
-	private final NodeModel oldNodeModel;
+	private final JmNode oldJmNode;
 	
 	private final int diagramIndex;
 	
@@ -52,12 +52,12 @@ public class EditDatabaseObjectCommand extends Command {
 	 * インスタンスを生成する。
 	 * 
 	 * @param context コンテキスト
-	 * @param dom 編集対象{@link DatabaseObjectModel}
+	 * @param dom 編集対象{@link DbObject}
 	 * @param nodeModel ノード
 	 * @param diagramIndex
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public EditDatabaseObjectCommand(JiemamyContext context, DatabaseObjectModel dom, NodeModel nodeModel,
+	public EditDbObjectCommand(JiemamyContext context, DbObject dom, JmNode nodeModel,
 			int diagramIndex) {
 		Validate.notNull(context);
 		Validate.notNull(dom);
@@ -67,7 +67,7 @@ public class EditDatabaseObjectCommand extends Command {
 		this.dom = dom;
 		this.nodeModel = nodeModel;
 		this.diagramIndex = diagramIndex;
-		oldNodeModel = context.resolve(nodeModel.toReference());
+		oldJmNode = context.resolve(nodeModel.toReference());
 		oldDom = context.resolve(dom.toReference());
 	}
 	
@@ -76,7 +76,7 @@ public class EditDatabaseObjectCommand extends Command {
 		context.store(dom);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(nodeModel);
 		facet.store(diagramModel);
 	}
@@ -86,8 +86,8 @@ public class EditDatabaseObjectCommand extends Command {
 		context.store(oldDom);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
-		diagramModel.store(oldNodeModel);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+		diagramModel.store(oldJmNode);
 		facet.store(diagramModel);
 	}
 }

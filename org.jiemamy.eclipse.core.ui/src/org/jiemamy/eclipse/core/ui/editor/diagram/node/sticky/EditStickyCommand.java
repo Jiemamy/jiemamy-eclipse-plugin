@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.SimpleJmDiagram;
 
 /**
- * {@link StickyNodeModel}を編集するコマンド。
+ * {@link JmStickyNode}を編集するコマンド。
  * 
  * @version $Id$
  * @author daisuke
@@ -40,11 +40,11 @@ public class EditStickyCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final DefaultDiagramModel diagramModel;
+	private final SimpleJmDiagram diagramModel;
 	
-	private final StickyNodeModel stickyModel;
+	private final JmStickyNode stickyModel;
 	
-	private final StickyNodeModel oldStickyModel;
+	private final JmStickyNode oldStickyModel;
 	
 
 	/**
@@ -55,7 +55,7 @@ public class EditStickyCommand extends Command {
 	 * @param stickyModel メモ
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public EditStickyCommand(JiemamyContext context, DefaultDiagramModel diagramModel, StickyNodeModel stickyModel) {
+	public EditStickyCommand(JiemamyContext context, SimpleJmDiagram diagramModel, JmStickyNode stickyModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		Validate.notNull(stickyModel);

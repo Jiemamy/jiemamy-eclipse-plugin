@@ -33,13 +33,13 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.connection.ForeignKeyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.sticky.StickyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.TableEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.view.ViewEditPart;
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.StickyNodeModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.table.TableModel;
-import org.jiemamy.model.view.ViewModel;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint;
+import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.view.JmView;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -79,24 +79,24 @@ public class DiagramEditPartFactory implements EditPartFactory {
 		
 		if (model instanceof JiemamyContext) {
 			part = new JiemamyContextEditPart((JiemamyContext) model);
-		} else if (model instanceof DefaultDatabaseObjectNodeModel) {
-			DefaultDatabaseObjectNodeModel node = (DefaultDatabaseObjectNodeModel) model;
+		} else if (model instanceof SimpleDbObjectNode) {
+			SimpleDbObjectNode node = (SimpleDbObjectNode) model;
 			try {
-				DatabaseObjectModel core = context.resolve(node.getCoreModelRef());
-				if (core instanceof TableModel) {
+				DbObject core = context.resolve(node.getCoreModelRef());
+				if (core instanceof JmTable) {
 					part = new TableEditPart(node);
-				} else if (core instanceof ViewModel) {
+				} else if (core instanceof JmView) {
 					part = new ViewEditPart(node);
 				}
 			} catch (EntityNotFoundException e) {
 				String message = "Cannot resolve core model: " + node.getCoreModelRef();
 				JiemamyUIPlugin.log(message, Status.ERROR);
 			}
-		} else if (model instanceof StickyNodeModel) {
-			part = new StickyEditPart((StickyNodeModel) model);
-		} else if (model instanceof ConnectionModel) {
-			ConnectionModel connectionModel = (ConnectionModel) model;
-			ForeignKeyConstraintModel foreignKey = context.resolve(connectionModel.getCoreModelRef());
+		} else if (model instanceof JmStickyNode) {
+			part = new StickyEditPart((JmStickyNode) model);
+		} else if (model instanceof JmConnection) {
+			JmConnection connectionModel = (JmConnection) model;
+			JmForeignKeyConstraint foreignKey = context.resolve(connectionModel.getCoreModelRef());
 			if (foreignKey != null) {
 				part = new ForeignKeyEditPart(connectionModel);
 			}

@@ -22,8 +22,8 @@ import org.apache.commons.lang.Validate;
 import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint;
+import org.jiemamy.model.table.SimpleJmTable;
 
 /**
  * TODO for daisuke
@@ -35,9 +35,9 @@ public class EditForeignKeyCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-	private final DefaultTableModel tableModel;
+	private final SimpleJmTable tableModel;
 	
-	private final DefaultTableModel oldTableModel;
+	private final SimpleJmTable oldJmTable;
 	
 
 	/**
@@ -47,12 +47,12 @@ public class EditForeignKeyCommand extends Command {
 	 * @param foreignKey 新しい外部キーモデル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public EditForeignKeyCommand(JiemamyContext context, ForeignKeyConstraintModel foreignKey) {
+	public EditForeignKeyCommand(JiemamyContext context, JmForeignKeyConstraint foreignKey) {
 		Validate.notNull(context);
 		Validate.notNull(foreignKey);
 		this.context = context;
-		tableModel = (DefaultTableModel) DefaultTableModel.findDeclaringTable(context.getTables(), foreignKey);
-		oldTableModel = context.resolve(tableModel.toReference());
+		tableModel = (SimpleJmTable) foreignKey.findDeclaringTable(context.getTables());
+		oldJmTable = context.resolve(tableModel.toReference());
 		
 		tableModel.store(foreignKey);
 	}
@@ -64,6 +64,6 @@ public class EditForeignKeyCommand extends Command {
 	
 	@Override
 	public void undo() {
-		context.store(oldTableModel);
+		context.store(oldJmTable);
 	}
 }

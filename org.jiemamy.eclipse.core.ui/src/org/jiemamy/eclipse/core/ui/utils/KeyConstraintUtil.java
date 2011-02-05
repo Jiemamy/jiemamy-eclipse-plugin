@@ -28,8 +28,8 @@ import org.apache.commons.lang.Validate;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.dddbase.EntityRef;
-import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.constraint.KeyConstraintModel;
+import org.jiemamy.model.column.JmColumn;
+import org.jiemamy.model.constraint.JmKeyConstraint;
 
 /**
  * TODO for daisuke
@@ -43,19 +43,19 @@ public final class KeyConstraintUtil {
 	 * キーカラム名のカンマ区切りの文字列に変換する。
 	 * 
 	 * @param context コンテキスト
-	 * @param keyConstraintModel 変換対象キー
+	 * @param keyConstraint 変換対象キー
 	 * @return キーカラム名のカンマ区切りの文字列
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public static String toStringKeyColumns(JiemamyContext context, KeyConstraintModel keyConstraintModel) {
+	public static String toStringKeyColumns(JiemamyContext context, JmKeyConstraint keyConstraint) {
 		Validate.notNull(context);
-		Validate.notNull(keyConstraintModel);
+		Validate.notNull(keyConstraint);
 		
-		List<EntityRef<? extends ColumnModel>> keyColumns = keyConstraintModel.getKeyColumns();
+		List<EntityRef<? extends JmColumn>> keyColumns = keyConstraint.getKeyColumns();
 		List<String> columnNames = Lists.newArrayListWithCapacity(keyColumns.size());
-		for (EntityRef<? extends ColumnModel> columnRef : keyColumns) {
+		for (EntityRef<? extends JmColumn> columnRef : keyColumns) {
 			try {
-				ColumnModel col = context.resolve(columnRef);
+				JmColumn col = context.resolve(columnRef);
 				columnNames.add(col.getName());
 			} catch (EntityNotFoundException e) {
 				// FIXME tableにaddしたが、そのtableをstoreしていない状態では、

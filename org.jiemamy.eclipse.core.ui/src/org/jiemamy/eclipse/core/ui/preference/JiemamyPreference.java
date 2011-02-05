@@ -50,7 +50,7 @@ public interface JiemamyPreference {
 	/**
 	 * Preference Storeをデフォルト値で初期化する。
 	 */
-	void loadDefaultValues();
+	void loadSimpleValues();
 	
 	/**
 	 * コネクションルータの種類を設定する。

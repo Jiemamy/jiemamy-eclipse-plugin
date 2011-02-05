@@ -46,14 +46,14 @@ public class LabelStringUtil {
 	public static String toString(Dialect dialect, DataType dataType) {
 		Validate.notNull(dialect);
 		Validate.notNull(dataType);
-		StringBuilder typeName = new StringBuilder(dataType.getTypeReference().getTypeName());
+		StringBuilder typeName = new StringBuilder(dataType.getRawTypeDescriptor().getTypeName());
 		String suffix = "";
 		
 		Integer size = null;
 		Integer precision = null;
 		Integer scale = null;
 		
-		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
+		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
 		for (TypeParameterSpec spec : specs) {
 			if (spec.getNecessity() == Necessity.REQUIRED) {
 				if (spec.getKey().equals(TypeParameterKey.SERIAL)) {

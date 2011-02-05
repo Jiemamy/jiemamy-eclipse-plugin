@@ -37,14 +37,14 @@ import org.eclipse.swt.widgets.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.DefaultContextMetadata;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.script.DefaultAroundScriptModel;
 import org.jiemamy.model.script.Position;
+import org.jiemamy.model.script.SimpleJmAroundScript;
 
 /**
  * {@link JiemamyContext}設定ダイアログクラス。
@@ -75,9 +75,9 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	/** 説明文入力欄 */
 	private TextEditTab tabDescription;
 	
-	private DefaultContextMetadata metadata;
+	private SimpleJmMetadata metadata;
 	
-	private DefaultAroundScriptModel universalAroundScript;
+	private SimpleJmAroundScript universalAroundScript;
 	
 
 	/**
@@ -97,20 +97,20 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	}
 	
 	/**
-	 * 編集済みの{@link DefaultContextMetadata}を取得する。
+	 * 編集済みの{@link SimpleJmMetadata}を取得する。
 	 * 
-	 * @return 編集済みの{@link DefaultContextMetadata}
+	 * @return 編集済みの{@link SimpleJmMetadata}
 	 */
-	public DefaultContextMetadata getMetadata() {
+	public SimpleJmMetadata getMetadata() {
 		return metadata;
 	}
 	
 	/**
 	 * 編集済みの UniversalAroundScript を取得する。
 	 * 
-	 * @return 編集済みの DefaultContextMetadata
+	 * @return 編集済みの SimpleJmMetadata
 	 */
-	public DefaultAroundScriptModel getUniversalAroundScript() {
+	public SimpleJmAroundScript getUniversalAroundScript() {
 		return universalAroundScript;
 	}
 	
@@ -173,7 +173,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		String beginScript = "";
 		String endScript = "";
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		DefaultAroundScriptModel aroundScript = (DefaultAroundScriptModel) facet.getUniversalAroundScript();
+		SimpleJmAroundScript aroundScript = (SimpleJmAroundScript) facet.getUniversalAroundScript();
 		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));
@@ -204,7 +204,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	
 	@Override
 	protected boolean performOk() {
-		metadata = new DefaultContextMetadata();
+		metadata = new SimpleJmMetadata();
 		
 		int selectionIndex = cmbDialect.getSelectionIndex();
 		String dialectClassName = dialects.get(selectionIndex).getClass().getName();
@@ -221,9 +221,9 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 		
 		if (StringUtils.isEmpty(beginScript) == false || StringUtils.isEmpty(endScript) == false) {
 			SqlFacet facet = getContext().getFacet(SqlFacet.class);
-			universalAroundScript = (DefaultAroundScriptModel) facet.getUniversalAroundScript();
+			universalAroundScript = (SimpleJmAroundScript) facet.getUniversalAroundScript();
 			if (universalAroundScript == null) {
-				universalAroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+				universalAroundScript = new SimpleJmAroundScript(UUID.randomUUID());
 			}
 			universalAroundScript.setScript(Position.BEGIN, beginScript);
 			universalAroundScript.setScript(Position.END, endScript);

@@ -18,7 +18,7 @@
  */
 package org.jiemamy.eclipse.core.ui.editor;
 
-import org.jiemamy.model.DiagramModel;
+import org.jiemamy.model.JmDiagram;
 import org.jiemamy.model.Level;
 import org.jiemamy.model.Mode;
 
@@ -59,7 +59,7 @@ enum DisplayStatus {
 	 * @param presentationModel ダイアグラム表現
 	 * @return ステータス. 見つからなかった場合は{@code null}
 	 */
-	public static DisplayStatus find(DiagramModel presentationModel) {
+	public static DisplayStatus find(JmDiagram presentationModel) {
 		for (DisplayStatus status : values()) {
 			if (presentationModel.getMode() == status.mode && presentationModel.getLevel() == status.level) {
 				return status;

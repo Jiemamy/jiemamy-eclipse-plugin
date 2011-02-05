@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.table.JmTable;
 
 /**
  * テーブルを選択するダイアログ。
@@ -48,7 +48,7 @@ public class TableSelectDialog extends Dialog {
 	
 	private int selectIndex = -1;
 	
-	private List<TableModel> tables;
+	private List<JmTable> tables;
 	
 	private Table tblColumns;
 	
@@ -59,7 +59,7 @@ public class TableSelectDialog extends Dialog {
 	 * @param shell シェルオブジェクト
 	 * @param tables テーブルのリスト
 	 */
-	public TableSelectDialog(Shell shell, List<TableModel> tables) {
+	public TableSelectDialog(Shell shell, List<JmTable> tables) {
 		super(shell);
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 		
@@ -71,7 +71,7 @@ public class TableSelectDialog extends Dialog {
 	* 
 	* @return 選択されたカラム
 	*/
-	public TableModel getResult() {
+	public JmTable getResult() {
 		if (selectIndex >= 0 && selectIndex < tables.size()) {
 			return tables.get(selectIndex);
 		}
@@ -116,13 +116,13 @@ public class TableSelectDialog extends Dialog {
 	 */
 	protected void refreshTable() {
 		tblColumns.removeAll();
-		for (TableModel model : tables) {
+		for (JmTable model : tables) {
 			TableItem item = new TableItem(tblColumns, SWT.NULL);
 			updateColumnTableItem(item, model);
 		}
 	}
 	
-	private void updateColumnTableItem(TableItem item, TableModel tableModel) {
+	private void updateColumnTableItem(TableItem item, JmTable tableModel) {
 		item.setText(0, "");
 		item.setText(1, tableModel.getName());
 	}

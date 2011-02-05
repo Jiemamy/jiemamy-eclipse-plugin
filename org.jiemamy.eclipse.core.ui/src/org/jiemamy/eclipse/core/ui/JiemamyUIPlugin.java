@@ -34,7 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.seasar.eclipse.common.util.ImageManager;
 import org.seasar.eclipse.common.util.StatusUtil;
 
-import org.jiemamy.DefaultServiceLocator;
+import org.jiemamy.SimpleServiceLocator;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreferenceImpl;
@@ -114,7 +114,7 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 		
 		// FORMAT-OFF
 		JiemamyContext.setServiceLocator(new CompositeServiceLocator(
-				new DefaultServiceLocator(),
+				new SimpleServiceLocator(),
 				new EclipseDialectServiceLocator(),
 				new EclipseImporterServiceLocator(),
 				new EclipseExporterServiceLocator()

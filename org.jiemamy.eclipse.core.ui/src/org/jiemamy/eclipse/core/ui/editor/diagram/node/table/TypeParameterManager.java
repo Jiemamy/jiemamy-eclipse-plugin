@@ -44,11 +44,11 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
 import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.column.DefaultColumnModel;
+import org.jiemamy.model.column.SimpleJmColumn;
 import org.jiemamy.model.datatype.DataType;
-import org.jiemamy.model.datatype.DefaultDataType;
+import org.jiemamy.model.datatype.SimpleDataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
-import org.jiemamy.model.domain.DefaultDomainModel.DomainType;
+import org.jiemamy.model.domain.SimpleJmDomain.DomainType;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -130,14 +130,14 @@ class TypeParameterManager {
 	 * @param keys データ型パラメータキー集合
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void createTypeOptionControl(DefaultColumnModel columnModel, Collection<TypeParameterKey<?>> keys) {
+	public void createTypeOptionControl(SimpleJmColumn columnModel, Collection<TypeParameterKey<?>> keys) {
 		Validate.notNull(columnModel);
 		Validate.noNullElements(keys);
 		
 		clearTypeOptionControl();
 		
 		DataType dataType = columnModel.getDataType();
-		if (dataType.getTypeReference() instanceof DomainType) {
+		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 			return;
 		}
 		
@@ -243,10 +243,10 @@ class TypeParameterManager {
 	 * @param columnModel カラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void setValue(DefaultColumnModel columnModel) {
+	public void setValue(SimpleJmColumn columnModel) {
 		Validate.notNull(columnModel);
 		DataType dataType = columnModel.getDataType();
-		if (dataType.getTypeReference() instanceof DomainType) {
+		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 			return;
 		}
 		
@@ -283,14 +283,14 @@ class TypeParameterManager {
 	 * @param columnModel カラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void writeBackToAdapter(DefaultColumnModel columnModel) {
+	public void writeBackToAdapter(SimpleJmColumn columnModel) {
 		Validate.notNull(columnModel);
-		DefaultDataType dataType = (DefaultDataType) columnModel.getDataType();
-		if (dataType.getTypeReference() instanceof DomainType) {
+		SimpleDataType dataType = (SimpleDataType) columnModel.getDataType();
+		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
 			return;
 		}
 		
-		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getTypeReference());
+		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
 		Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
 		
 		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SIZE)) {

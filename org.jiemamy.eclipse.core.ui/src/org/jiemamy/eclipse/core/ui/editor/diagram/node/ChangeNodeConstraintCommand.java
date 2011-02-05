@@ -35,10 +35,10 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.Entity;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DefaultConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.SimpleJmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmPointUtil;
 import org.jiemamy.model.geometory.JmRectangle;
@@ -58,7 +58,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
 	private final int diagramIndex;
 	
-	private final DefaultNodeModel nodeModel;
+	private final SimpleJmNode nodeModel;
 	
 	private final JmRectangle boundary;
 	
@@ -77,7 +77,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	 * @param viewer ビューア
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, DefaultNodeModel nodeModel,
+	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, SimpleJmNode nodeModel,
 			JmRectangle boundary, EditPartViewer viewer) {
 		Validate.notNull(context);
 		Validate.notNull(nodeModel);
@@ -107,7 +107,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	 * @param viewer ビューア
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, DefaultNodeModel nodeModel,
+	public ChangeNodeConstraintCommand(JiemamyContext context, int diagramIndex, SimpleJmNode nodeModel,
 			Rectangle rectangle, EditPartViewer viewer) {
 		this(context, diagramIndex, nodeModel, ConvertUtil.convert(rectangle), viewer);
 	}
@@ -118,7 +118,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		nodeModel.setBoundary(boundary);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(nodeModel);
 		
 		// ベンドポイントの移動
@@ -133,7 +133,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	@Override
 	public void undo() {
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		
 		nodeModel.setBoundary(oldBoundary);
 		
@@ -144,7 +144,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		facet.store(diagramModel);
 	}
 	
-	private void shiftBendpoints(boolean positive, DefaultDiagramModel diagramModel) {
+	private void shiftBendpoints(boolean positive, SimpleJmDiagram diagramModel) {
 		JmPoint delta = JmPointUtil.delta(oldBoundary, boundary);
 		
 		// 選択しているノードに対応するモデルのリストを得る
@@ -156,7 +156,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 		}
 		
 		// ベンドポイントも同時に移動させる（必要なもののみ）
-		for (ConnectionModel connection : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
+		for (JmConnection connection : diagramModel.getSourceConnectionsFor(nodeModel.toReference())) {
 			if (selectedModels.contains(connection.getSource()) && selectedModels.contains(connection.getTarget())) {
 				List<JmPoint> bendpoints = connection.getBendpoints();
 				for (int i = 0; i < bendpoints.size(); i++) {
@@ -167,7 +167,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 					} else {
 						newLocation = JmPointUtil.shiftNegative(bendpoint, delta);
 					}
-					((DefaultConnectionModel) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
+					((SimpleJmConnection) connection).breachEncapsulationOfBendpoints().set(i, newLocation);
 				}
 				diagramModel.store(connection);
 			}

@@ -43,19 +43,19 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditDialogSupport;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.JmNode;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.geometory.JmRectangle;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 
 /**
- * {@link NodeModel}に対するDiagram用EditPart（コントローラ）の抽象クラス。
+ * {@link JmNode}に対するDiagram用EditPart（コントローラ）の抽象クラス。
  * 
  * @author daisuke
  */
@@ -73,7 +73,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	 * @param nodeModel コントロール対象のノード
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public AbstractJmNodeEditPart(NodeModel nodeModel) {
+	public AbstractJmNodeEditPart(JmNode nodeModel) {
 		Validate.notNull(nodeModel);
 		setModel(nodeModel);
 	}
@@ -101,12 +101,12 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 //	// Java1.4対応APIのため、Classに型パラメータをつけることができない
 //	public Object getAdapter(@SuppressWarnings("rawtypes") Class key) {
 //		logger.debug(key.getName());
-//		NodeModel node = getModel();
+//		JmNode node = getModel();
 //		
 //		JiemamyContext context = getJiemamyContext();
 //		
 //		if (node.getCoreModelRef() != null) {
-//			DatabaseObjectModel entityModel = context.resolve(node.getCoreModelRef());
+//			DbObject entityModel = context.resolve(node.getCoreModelRef());
 //			if (entityModel.hasAdapter(key)) {
 //				return entityModel.getAdapter(key);
 //			}
@@ -115,8 +115,8 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 //	}
 	
 	@Override
-	public NodeModel getModel() {
-		return (NodeModel) super.getModel();
+	public JmNode getModel() {
+		return (JmNode) super.getModel();
 	}
 	
 	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
@@ -151,7 +151,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	
 	@Override
 	public void setModel(Object model) {
-		if (model instanceof DefaultNodeModel) {
+		if (model instanceof SimpleJmNode) {
 			super.setModel(model);
 		} else {
 			throw new IllegalArgumentException();
@@ -185,26 +185,25 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	}
 	
 	@Override
-	protected List<ConnectionModel> getModelSourceConnections() {
+	protected List<JmConnection> getModelSourceConnections() {
 		if (getParent() == null) {
 			return Collections.emptyList();
 		}
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
 		if (diagramModel.contains(getModel().toReference()) == false) {
 			return Collections.emptyList();
 		}
 		
-		List<ConnectionModel> result =
-				Lists.newArrayList(diagramModel.getSourceConnectionsFor(getModel().toReference()));
+		List<JmConnection> result = Lists.newArrayList(diagramModel.getSourceConnectionsFor(getModel().toReference()));
 		
 		// 以下ログのためのロジック
-		NodeModel model = getModel();
-		if (model instanceof DefaultDatabaseObjectNodeModel) {
-			DefaultDatabaseObjectNodeModel databaseObjectNodeModel = (DefaultDatabaseObjectNodeModel) model;
-			DatabaseObjectModel core = context.resolve(databaseObjectNodeModel.getCoreModelRef());
+		JmNode model = getModel();
+		if (model instanceof SimpleDbObjectNode) {
+			SimpleDbObjectNode databaseObjectJmNode = (SimpleDbObjectNode) model;
+			DbObject core = context.resolve(databaseObjectJmNode.getCoreModelRef());
 			logger.debug(core + " sourceConnections = " + result);
 		} else {
 			logger.debug(model + " sourceConnections = " + result);
@@ -213,25 +212,25 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	}
 	
 	@Override
-	protected List<ConnectionModel> getModelTargetConnections() {
+	protected List<JmConnection> getModelTargetConnections() {
 		if (getParent() == null) {
 			return Collections.emptyList();
 		}
 		JiemamyContext context = (JiemamyContext) getRoot().getContents().getModel();
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
 		if (diagramModel.contains(getModel().toReference()) == false) {
 			return Collections.emptyList();
 		}
 		
-		List<ConnectionModel> result = Lists.newArrayList(diagramModel.getTargetConnections(getModel().toReference()));
+		List<JmConnection> result = Lists.newArrayList(diagramModel.getTargetConnectionsFor(getModel().toReference()));
 		
 		// 以下ログのためのロジック
-		NodeModel model = getModel();
-		if (model instanceof DefaultDatabaseObjectNodeModel) {
-			DefaultDatabaseObjectNodeModel databaseObjectNodeModel = (DefaultDatabaseObjectNodeModel) model;
-			DatabaseObjectModel core = context.resolve(databaseObjectNodeModel.getCoreModelRef());
+		JmNode model = getModel();
+		if (model instanceof SimpleDbObjectNode) {
+			SimpleDbObjectNode databaseObjectJmNode = (SimpleDbObjectNode) model;
+			DbObject core = context.resolve(databaseObjectJmNode.getCoreModelRef());
 			logger.debug(core + " sourceConnections = " + result);
 		} else {
 			logger.debug(model + " sourceConnections = " + result);
@@ -249,7 +248,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 			return;
 		}
 		
-		NodeModel node = getModel();
+		JmNode node = getModel();
 		JmRectangle boundary = node.getBoundary();
 		editPart.setLayoutConstraint(this, getFigure(), ConvertUtil.convert(boundary));
 		updateFigure(getFigure());

@@ -35,8 +35,8 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.StickyNodeModel;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmStickyNode;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -55,22 +55,22 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	 * @param stickyModel コントロール対象の付箋モデル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public StickyEditPart(StickyNodeModel stickyModel) {
+	public StickyEditPart(JmStickyNode stickyModel) {
 		super(stickyModel);
 	}
 	
 	@Override
-	public StickyNodeModel getModel() {
-		return (StickyNodeModel) super.getModel();
+	public JmStickyNode getModel() {
+		return (JmStickyNode) super.getModel();
 	}
 	
 	public void openEditDialog() {
 		JiemamyContext context = (JiemamyContext) getParent().getModel();
-		StickyNodeModel stickyModel = getModel();
+		JmStickyNode stickyModel = getModel();
 		logger.debug(LogMarker.LIFECYCLE, "openEditDialog: {}", stickyModel);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		
 		Shell shell = getViewer().getControl().getShell();
 		StickyEditDialog dialog = new StickyEditDialog(shell, context, stickyModel, diagramModel);
@@ -116,7 +116,7 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	protected void updateFigure(IFigure figure) {
 		logger.debug(LogMarker.LIFECYCLE, "updateFigure");
 		
-		StickyNodeModel stickyModel = getModel();
+		JmStickyNode stickyModel = getModel();
 		StickyFigure stickyFigure = (StickyFigure) figure;
 		
 		stickyFigure.setContents(stickyModel.getContents());

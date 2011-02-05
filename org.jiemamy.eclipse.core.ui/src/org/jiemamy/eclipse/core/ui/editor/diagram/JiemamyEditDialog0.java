@@ -145,7 +145,7 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	 * @return 有効であれば{@code true}
 	 */
 	protected boolean canExecuteOk() {
-		// Default implementation is to check if all tabs are complete.
+		// Simple implementation is to check if all tabs are complete.
 		for (AbstractTab tab : tabs) {
 			if (tab.isTabComplete() == false) {
 				return false;

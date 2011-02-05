@@ -68,7 +68,7 @@ import org.jiemamy.utils.sql.DriverUtil;
  * 
  * @author daisuke
  */
-class DatabaseImportWizardPage extends WizardPage {
+class DbImportWizardPage extends WizardPage {
 	
 	protected static final String[] JAR_EXTENSIONS = new String[] {
 		"*.jar",
@@ -106,8 +106,8 @@ class DatabaseImportWizardPage extends WizardPage {
 	 * インスタンスを生成する。
 	 * @param settings ダイアログセッティング
 	 */
-	DatabaseImportWizardPage(IDialogSettings settings) {
-		super(Messages.DatabaseImportWizardPage_title, Messages.DatabaseImportWizardPage_title, (ImageDescriptor) null);
+	DbImportWizardPage(IDialogSettings settings) {
+		super(Messages.DbImportWizardPage_title, Messages.DbImportWizardPage_title, (ImageDescriptor) null);
 		dialectResolver = JiemamyCorePlugin.getDialectResolver();
 		setPageComplete(false);
 		this.settings = settings;
@@ -122,7 +122,7 @@ class DatabaseImportWizardPage extends WizardPage {
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		label = new Label(composite, SWT.NONE);
-		label.setText(Messages.DatabaseImportWizardPage_label_dbType);
+		label.setText(Messages.DbImportWizardPage_label_dbType);
 		
 		cmbDialect = new Combo(composite, SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -330,11 +330,11 @@ class DatabaseImportWizardPage extends WizardPage {
 		txtSchema.setEnabled(true);
 //		btnImportDataSet.setEnabled(true);
 		
-		btnTest.setText(Messages.DatabaseImportWizardPage_btn_connectionTest);
+		btnTest.setText(Messages.DbImportWizardPage_btn_connectionTest);
 	}
 	
 	private void connectionSucceeded() {
-		btnTest.setText(Messages.DatabaseImportWizardPage_btn_reconfigure);
+		btnTest.setText(Messages.DbImportWizardPage_btn_reconfigure);
 		
 		cmbDialect.setEnabled(false);
 		lstDriverJars.setEnabled(false);
@@ -411,12 +411,12 @@ class DatabaseImportWizardPage extends WizardPage {
 	 */
 	private void createTestButton(Composite composite) {
 		btnTest = new Button(composite, SWT.PUSH);
-		btnTest.setText(Messages.DatabaseImportWizardPage_btn_connectionTest);
+		btnTest.setText(Messages.DbImportWizardPage_btn_connectionTest);
 		btnTest.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnTest.getText().equals(Messages.DatabaseImportWizardPage_btn_reconfigure)) {
+				if (btnTest.getText().equals(Messages.DbImportWizardPage_btn_reconfigure)) {
 					connectionSettingReconfigure();
 				} else {
 					testConnection();

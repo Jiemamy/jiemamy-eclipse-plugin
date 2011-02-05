@@ -72,23 +72,23 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
 import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.constraint.CheckConstraintModel;
-import org.jiemamy.model.constraint.ConstraintModel;
-import org.jiemamy.model.constraint.DefaultCheckConstraintModel;
-import org.jiemamy.model.constraint.DefaultConstraintModel;
-import org.jiemamy.model.constraint.DefaultLocalKeyConstraintModel;
-import org.jiemamy.model.constraint.DefaultNotNullConstraintModel;
-import org.jiemamy.model.constraint.DefaultPrimaryKeyConstraintModel;
-import org.jiemamy.model.constraint.DefaultUniqueKeyConstraintModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.constraint.KeyConstraintModel;
-import org.jiemamy.model.constraint.LocalKeyConstraintModel;
-import org.jiemamy.model.constraint.NotNullConstraintModel;
-import org.jiemamy.model.constraint.PrimaryKeyConstraintModel;
-import org.jiemamy.model.constraint.UniqueKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.column.JmColumn;
+import org.jiemamy.model.constraint.JmCheckConstraint;
+import org.jiemamy.model.constraint.JmConstraint;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint;
+import org.jiemamy.model.constraint.JmKeyConstraint;
+import org.jiemamy.model.constraint.JmLocalKeyConstraint;
+import org.jiemamy.model.constraint.JmNotNullConstraint;
+import org.jiemamy.model.constraint.JmPrimaryKeyConstraint;
+import org.jiemamy.model.constraint.JmUniqueKeyConstraint;
+import org.jiemamy.model.constraint.SimpleJmCheckConstraint;
+import org.jiemamy.model.constraint.SimpleJmConstraint;
+import org.jiemamy.model.constraint.SimpleJmLocalKeyConstraint;
+import org.jiemamy.model.constraint.SimpleJmNotNullConstraint;
+import org.jiemamy.model.constraint.SimpleJmPrimaryKeyConstraint;
+import org.jiemamy.model.constraint.SimpleJmUniqueKeyConstraint;
+import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.transaction.EventBroker;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
@@ -106,7 +106,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	
 	private final JiemamyContext context;
 	
-	private final DefaultTableModel tableModel;
+	private final SimpleJmTable tableModel;
 	
 	private AbstractTableEditor constraintTableEditor;
 	
@@ -117,10 +117,10 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
 	 * @param context コンテキスト
-	 * @param tableModel 編集対象{@link TableModel}
+	 * @param tableModel 編集対象{@link JmTable}
 	 */
 	public TableEditDialogConstraintTab(TabFolder parentTabFolder, int style, JiemamyContext context,
-			DefaultTableModel tableModel) {
+			SimpleJmTable tableModel) {
 		super(parentTabFolder, style, Messages.Tab_Table_Constraints);
 		
 		this.context = context;
@@ -130,7 +130,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		composite.setLayout(new GridLayout(1, false));
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		constraintTableEditor = new ConstraintTableEditor(composite, SWT.NULL);
+		constraintTableEditor = new JmConstraintTableEditor(composite, SWT.NULL);
 		constraintTableEditor.configure();
 		constraintTableEditor.disableEditControls();
 		
@@ -148,7 +148,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ConstraintContentProvider implements IStructuredContentProvider, StoredEventListener {
+	private class JmConstraintContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
 		public void commandExecuted(StoredEvent<?> command) {
 			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
@@ -160,10 +160,10 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		}
 		
 		public Object[] getElements(Object inputElement) {
-			if (inputElement instanceof TableModel) {
-				Set<? extends ConstraintModel> constraints = ((TableModel) inputElement).getConstraints();
-				List<ConstraintModel> constraintList = Lists.newArrayList(constraints);
-				Collections.sort(constraintList, new ConstraintComparator());
+			if (inputElement instanceof JmTable) {
+				Set<? extends JmConstraint> constraints = ((JmTable) inputElement).getConstraints();
+				List<JmConstraint> constraintList = Lists.newArrayList(constraints);
+				Collections.sort(constraintList, ConstraintComparator.INSTANCE);
 				return constraintList.toArray();
 			}
 			logger.error("unknown input: " + inputElement.getClass().getName());
@@ -182,17 +182,17 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	 * 
 	 * @author daisuke
 	 */
-	private class ConstraintLabelProvider extends BaseLabelProvider implements ITableLabelProvider {
+	private class JmConstraintLabelProvider extends BaseLabelProvider implements ITableLabelProvider {
 		
 		public Image getColumnImage(Object element, int columnIndex) {
-			if ((element instanceof ConstraintModel) == false) {
+			if ((element instanceof JmConstraint) == false) {
 				logger.error("unknown element: " + element.getClass().getName());
 				return null;
 			}
 			
-			if (element instanceof LocalKeyConstraintModel) {
-				LocalKeyConstraintModel localKey = (LocalKeyConstraintModel) element;
-				if (columnIndex == 0 && localKey instanceof PrimaryKeyConstraintModel) {
+			if (element instanceof JmLocalKeyConstraint) {
+				JmLocalKeyConstraint localKey = (JmLocalKeyConstraint) element;
+				if (columnIndex == 0 && localKey instanceof JmPrimaryKeyConstraint) {
 					ImageRegistry ir = JiemamyUIPlugin.getDefault().getImageRegistry();
 					return ir.get(Images.ICON_PK);
 				}
@@ -201,11 +201,11 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		}
 		
 		public String getColumnText(Object element, int columnIndex) {
-			if ((element instanceof ConstraintModel) == false) {
+			if ((element instanceof JmCheckConstraint) == false) {
 				logger.error("unknown element: " + element.getClass().getName());
 				return StringUtils.EMPTY;
 			}
-			ConstraintModel constraintModel = (ConstraintModel) element;
+			JmConstraint constraintModel = (JmConstraint) element;
 			switch (columnIndex) {
 				case 0:
 					return constraintToString(constraintModel);
@@ -214,17 +214,16 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 					return constraintModel.getName();
 					
 				case 2:
-					if (constraintModel instanceof KeyConstraintModel) {
-						KeyConstraintModel keyConstraintModel = (KeyConstraintModel) constraintModel;
-						return KeyConstraintUtil.toStringKeyColumns(context, keyConstraintModel);
-					} else if (constraintModel instanceof CheckConstraintModel) {
-						return ((CheckConstraintModel) constraintModel).getExpression();
-					} else if (constraintModel instanceof NotNullConstraintModel) {
-						EntityRef<? extends ColumnModel> ref =
-								((NotNullConstraintModel) constraintModel).getColumnRef();
+					if (constraintModel instanceof JmKeyConstraint) {
+						JmKeyConstraint keyConstraint = (JmKeyConstraint) constraintModel;
+						return KeyConstraintUtil.toStringKeyColumns(context, keyConstraint);
+					} else if (constraintModel instanceof JmCheckConstraint) {
+						return ((JmCheckConstraint) constraintModel).getExpression();
+					} else if (constraintModel instanceof JmNotNullConstraint) {
+						EntityRef<? extends JmColumn> ref = ((JmNotNullConstraint) constraintModel).getColumn();
 						if (ref != null) {
 							try {
-								ColumnModel targetColumn = tableModel.resolve(ref);
+								JmColumn targetColumn = tableModel.resolve(ref);
 								return targetColumn.getName();
 							} catch (EntityNotFoundException e) {
 								// ignore
@@ -239,16 +238,16 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		}
 		
 		// TODO utilじゃね？
-		private String constraintToString(ConstraintModel constraintModel) {
-			if (constraintModel instanceof PrimaryKeyConstraintModel) {
+		private String constraintToString(JmConstraint constraintModel) {
+			if (constraintModel instanceof JmPrimaryKeyConstraint) {
 				return "PK";
-			} else if (constraintModel instanceof UniqueKeyConstraintModel) {
+			} else if (constraintModel instanceof JmUniqueKeyConstraint) {
 				return "UK";
-			} else if (constraintModel instanceof ForeignKeyConstraintModel) {
+			} else if (constraintModel instanceof JmForeignKeyConstraint) {
 				return "FK";
-			} else if (constraintModel instanceof NotNullConstraintModel) {
+			} else if (constraintModel instanceof JmNotNullConstraint) {
 				return "NN";
-			} else if (constraintModel instanceof CheckConstraintModel) {
+			} else if (constraintModel instanceof JmCheckConstraint) {
 				return "CC";
 			} else {
 				return StringUtils.EMPTY;
@@ -256,7 +255,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		}
 	}
 	
-	private class ConstraintTableEditor extends AbstractTableEditor {
+	private class JmConstraintTableEditor extends AbstractTableEditor {
 		
 		private static final int COL_WIDTH_CATEGORY = 50;
 		
@@ -283,7 +282,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		 * @param parent 親コンポーネント
 		 * @param style SWTスタイル値
 		 */
-		public ConstraintTableEditor(Composite parent, int style) {
+		public JmConstraintTableEditor(Composite parent, int style) {
 			super(parent, style, new DefaultTableEditorConfig("制約情報") { // RESOURCE
 					
 						@Override
@@ -305,53 +304,52 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			addMenu = new Menu(getBtnAdd());
 			
 			MenuItem menuItemAddPk = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddPk.setText("Primary Key Constraint"); // RESOURCE
+			menuItemAddPk.setText("Primary Key JmConstraint"); // RESOURCE
 			menuItemAddPk.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
-				public ConstraintModel getModel() {
-					DefaultPrimaryKeyConstraintModel constraint =
-							new DefaultPrimaryKeyConstraintModel(UUID.randomUUID());
+				public JmConstraint getModel() {
+					SimpleJmPrimaryKeyConstraint constraint = new SimpleJmPrimaryKeyConstraint(UUID.randomUUID());
 					constraint.addKeyColumn(tableModel.getColumns().get(0).toReference());
 					return constraint;
 				}
 			});
 			
 			MenuItem menuItemAddUk = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddUk.setText("Unique Key Constraint"); // RESOURCE
+			menuItemAddUk.setText("Unique Key JmConstraint"); // RESOURCE
 			menuItemAddUk.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
-				public ConstraintModel getModel() {
-					DefaultUniqueKeyConstraintModel constraint = new DefaultUniqueKeyConstraintModel(UUID.randomUUID());
+				public JmConstraint getModel() {
+					SimpleJmUniqueKeyConstraint constraint = new SimpleJmUniqueKeyConstraint(UUID.randomUUID());
 					constraint.addKeyColumn(tableModel.getColumns().get(0).toReference());
 					return constraint;
 				}
 			});
 			
 			MenuItem menuItemAddFk = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddFk.setText("Foreign Key Constraint"); // RESOURCE
+			menuItemAddFk.setText("Foreign Key JmConstraint"); // RESOURCE
 			menuItemAddFk.setEnabled(false);
 			// 今は常に無効だが、いつかmenuからFKを追加できるようにするといいかも。
 			
 			MenuItem menuItemAddCc = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddCc.setText("Check Constraint"); // RESOURCE
+			menuItemAddCc.setText("Check JmConstraint"); // RESOURCE
 			menuItemAddCc.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
-				public ConstraintModel getModel() {
-					DefaultCheckConstraintModel constraint = new DefaultCheckConstraintModel(UUID.randomUUID());
+				public JmConstraint getModel() {
+					SimpleJmCheckConstraint constraint = new SimpleJmCheckConstraint(UUID.randomUUID());
 					return constraint;
 				}
 			});
 			
 			MenuItem menuItemAddNn = new MenuItem(addMenu, SWT.PUSH);
-			menuItemAddNn.setText("Not-null Constraint"); // RESOURCE
+			menuItemAddNn.setText("Not-null JmConstraint"); // RESOURCE
 			menuItemAddNn.addSelectionListener(new SelectionAdapterExtension() {
 				
 				@Override
-				public ConstraintModel getModel() {
-					DefaultNotNullConstraintModel constraint = new DefaultNotNullConstraintModel(UUID.randomUUID());
+				public JmConstraint getModel() {
+					SimpleJmNotNullConstraint constraint = new SimpleJmNotNullConstraint(UUID.randomUUID());
 					constraint.setColumn(tableModel.getColumns().get(0).toReference());
 					return constraint;
 				}
@@ -375,8 +373,8 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		
 		@Override
 		protected void configureTableViewer(TableViewer tableViewer) {
-			tableViewer.setLabelProvider(new ConstraintLabelProvider());
-			final ConstraintContentProvider contentProvider = new ConstraintContentProvider();
+			tableViewer.setLabelProvider(new JmConstraintLabelProvider());
+			final JmConstraintContentProvider contentProvider = new JmConstraintContentProvider();
 			tableViewer.setContentProvider(contentProvider);
 			tableViewer.setInput(tableModel);
 			
@@ -459,7 +457,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		
 		@Override
 		protected void enableEditorControls(int index) {
-			ConstraintModel constraintModel = (ConstraintModel) getTableViewer().getElementAt(index);
+			JmConstraint constraintModel = (JmConstraint) getTableViewer().getElementAt(index);
 			
 			txtConstraintName.setEnabled(true);
 			txtConstraintName.setText(StringUtils.EMPTY);
@@ -470,31 +468,31 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			lstTargetColumn.setEnabled(true);
 			lstTargetColumn.removeAll();
 			
-			if (constraintModel instanceof CheckConstraintModel == false) {
+			if (constraintModel instanceof JmCheckConstraint == false) {
 				txtCheckExpression.setEnabled(false);
 			}
 			
-			if (constraintModel instanceof KeyConstraintModel == false) {
+			if (constraintModel instanceof JmKeyConstraint == false) {
 				lstKeyColumns.setEnabled(false);
 			}
 			
-			if (constraintModel instanceof NotNullConstraintModel == false) {
+			if (constraintModel instanceof JmNotNullConstraint == false) {
 				lstTargetColumn.setEnabled(false);
 			}
 			
 			// 現在値の設定
 			txtConstraintName.setText(StringUtils.defaultString(constraintModel.getName()));
-			if (constraintModel instanceof CheckConstraintModel) {
-				CheckConstraintModel check = (CheckConstraintModel) constraintModel;
+			if (constraintModel instanceof JmCheckConstraint) {
+				JmCheckConstraint check = (JmCheckConstraint) constraintModel;
 				txtCheckExpression.setText(StringUtils.defaultString(check.getExpression()));
-			} else if (constraintModel instanceof KeyConstraintModel) {
-				KeyConstraintModel key = (KeyConstraintModel) constraintModel;
-				List<EntityRef<? extends ColumnModel>> keyColumns = key.getKeyColumns();
-				List<ColumnModel> columns = tableModel.getColumns();
-				for (ColumnModel columnModel : columns) {
+			} else if (constraintModel instanceof JmKeyConstraint) {
+				JmKeyConstraint key = (JmKeyConstraint) constraintModel;
+				List<EntityRef<? extends JmColumn>> keyColumns = key.getKeyColumns();
+				List<JmColumn> columns = tableModel.getColumns();
+				for (JmColumn columnModel : columns) {
 					lstKeyColumns.add(columnModel.getName());
 					boolean found = false;
-					for (EntityRef<? extends ColumnModel> columnRef : keyColumns) {
+					for (EntityRef<? extends JmColumn> columnRef : keyColumns) {
 						if (columnRef.isReferenceOf(columnModel)) {
 							found = true;
 							break;
@@ -506,12 +504,12 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 						lstKeyColumns.setSelection(newIndices);
 					}
 				}
-			} else if (constraintModel instanceof NotNullConstraintModel) {
-				NotNullConstraintModel nn = (NotNullConstraintModel) constraintModel;
-				EntityRef<? extends ColumnModel> columnRef = nn.getColumnRef();
-				List<ColumnModel> columns = tableModel.getColumns();
+			} else if (constraintModel instanceof JmNotNullConstraint) {
+				JmNotNullConstraint nn = (JmNotNullConstraint) constraintModel;
+				EntityRef<? extends JmColumn> columnRef = nn.getColumn();
+				List<JmColumn> columns = tableModel.getColumns();
 				for (int i = 0; i < columns.size(); i++) {
-					ColumnModel columnModel = columns.get(i);
+					JmColumn columnModel = columns.get(i);
 					lstTargetColumn.add(columnModel.getName());
 					if (columnRef != null && columnRef.isReferenceOf(columnModel)) {
 						lstTargetColumn.setSelection(i);
@@ -559,7 +557,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				return;
 			}
 			
-			ConstraintModel subject = (ConstraintModel) getTableViewer().getElementAt(index);
+			JmConstraint subject = (JmConstraint) getTableViewer().getElementAt(index);
 			tableModel.deleteConstraint(subject.toReference());
 			
 			tableViewer.remove(subject);
@@ -580,27 +578,27 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				return;
 			}
 			
-			DefaultConstraintModel constraintModel = (DefaultConstraintModel) getTableViewer().getElementAt(editIndex);
+			SimpleJmConstraint constraintModel = (SimpleJmConstraint) getTableViewer().getElementAt(editIndex);
 			
 			String constraintName = StringUtils.defaultString(txtConstraintName.getText());
 			constraintModel.setName(constraintName);
 			
-			if (constraintModel instanceof DefaultCheckConstraintModel) {
-				DefaultCheckConstraintModel checkConstraintModel = (DefaultCheckConstraintModel) constraintModel;
+			if (constraintModel instanceof SimpleJmCheckConstraint) {
+				SimpleJmCheckConstraint checkConstraint = (SimpleJmCheckConstraint) constraintModel;
 				String expression = StringUtils.defaultString(txtCheckExpression.getText());
-				checkConstraintModel.setExpression(expression);
-			} else if (constraintModel instanceof DefaultLocalKeyConstraintModel) {
-				DefaultLocalKeyConstraintModel localKeyConstraint = (DefaultLocalKeyConstraintModel) constraintModel;
-				localKeyConstraint.clearKeyColumns();
+				checkConstraint.setExpression(expression);
+			} else if (constraintModel instanceof SimpleJmLocalKeyConstraint) {
+				SimpleJmLocalKeyConstraint localJmKeyConstraint = (SimpleJmLocalKeyConstraint) constraintModel;
+				localJmKeyConstraint.clearKeyColumns();
 				for (int selectionIndex : lstKeyColumns.getSelectionIndices()) {
-					ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);
-					localKeyConstraint.addKeyColumn(columnModel.toReference());
+					JmColumn columnModel = tableModel.getColumns().get(selectionIndex);
+					localJmKeyConstraint.addKeyColumn(columnModel.toReference());
 				}
-			} else if (constraintModel instanceof DefaultNotNullConstraintModel) {
-				DefaultNotNullConstraintModel nn = (DefaultNotNullConstraintModel) constraintModel;
+			} else if (constraintModel instanceof SimpleJmNotNullConstraint) {
+				SimpleJmNotNullConstraint nn = (SimpleJmNotNullConstraint) constraintModel;
 				int selectionIndex = lstTargetColumn.getSelectionIndex();
 				if (selectionIndex >= 0) {
-					ColumnModel columnModel = tableModel.getColumns().get(selectionIndex);
+					JmColumn columnModel = tableModel.getColumns().get(selectionIndex);
 					nn.setColumn(columnModel.toReference());
 				}
 			}
@@ -610,6 +608,12 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		
 
 		private class EditListenerImpl extends AbstractEditListener {
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
 			
 			@Override
 			protected void process(TypedEvent e) {
@@ -623,7 +627,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			public void widgetSelected(SelectionEvent e) {
 				Table table = getTableViewer().getTable();
 				
-				ConstraintModel constraintModel = getModel();
+				JmConstraint constraintModel = getModel();
 				tableModel.store(constraintModel);
 				
 				int addedIndex = Lists.transform(Arrays.asList(table.getItems()), new Function<TableItem, Object>() {
@@ -640,7 +644,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 				txtConstraintName.setFocus();
 			}
 			
-			abstract ConstraintModel getModel();
+			abstract JmConstraint getModel();
 		}
 	}
 }

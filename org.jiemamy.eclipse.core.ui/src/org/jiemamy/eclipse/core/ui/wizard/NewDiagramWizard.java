@@ -33,7 +33,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.ide.IDE;
 
-import org.jiemamy.DefaultContextMetadata;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.SqlFacet;
@@ -133,7 +133,7 @@ public final class NewDiagramWizard extends Wizard implements INewWizard {
 		@Override
 		protected InputStream getInitialContents() {
 			JiemamyContext context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
-			DefaultContextMetadata metadata = new DefaultContextMetadata();
+			SimpleJmMetadata metadata = new SimpleJmMetadata();
 			metadata.setDialectClassName(GenericDialect.class.getName());
 			context.setMetadata(metadata);
 			

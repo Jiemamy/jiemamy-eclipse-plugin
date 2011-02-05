@@ -33,13 +33,13 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.composer.exporter.DefaultSqlExportConfig;
+import org.jiemamy.composer.exporter.SimpleSqlExportConfig;
 import org.jiemamy.composer.exporter.SqlExportConfig;
 import org.jiemamy.composer.exporter.SqlExporter;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
 import org.jiemamy.eclipse.core.ui.utils.EditorUtil;
-import org.jiemamy.model.dataset.DataSetModel;
+import org.jiemamy.model.dataset.JmDataSet;
 
 /**
  * {@link SqlExporter}の設定取得ウィザード。
@@ -52,7 +52,7 @@ public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporte
 	
 	private SqlExportWizardPage page2;
 	
-	private DefaultSqlExportConfig config;
+	private SimpleSqlExportConfig config;
 	
 
 	/**
@@ -74,8 +74,8 @@ public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporte
 		if (activeEditor instanceof JiemamyEditor) {
 			JiemamyEditor jiemamyEditor = (JiemamyEditor) activeEditor;
 			JiemamyContext rootModel = jiemamyEditor.getJiemamyContext();
-			List<DataSetModel> dataSets = rootModel.getDataSets();
-			for (DataSetModel dataSetModel : dataSets) {
+			List<JmDataSet> dataSets = rootModel.getDataSets();
+			for (JmDataSet dataSetModel : dataSets) {
 				dataSetNames.add(dataSetModel.getName());
 			}
 		}
@@ -107,7 +107,7 @@ public class SqlExportWizard extends Wizard implements ExporterWizard<SqlExporte
 	
 	@Override
 	public boolean performFinish() {
-		config = new DefaultSqlExportConfig();
+		config = new SimpleSqlExportConfig();
 		config.setOutputFile(new File(page1.getPath()));
 		config.setOverwrite(page1.getOverwrite());
 		config.setDataSetIndex(page2.getDataSetIndex());

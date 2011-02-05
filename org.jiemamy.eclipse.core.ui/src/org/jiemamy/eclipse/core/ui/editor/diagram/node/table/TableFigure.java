@@ -29,19 +29,19 @@ import org.eclipse.swt.graphics.Color;
 
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.editor.diagram.node.DatabaseObjectFigure;
+import org.jiemamy.eclipse.core.ui.editor.diagram.node.DbObjectFigure;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.ColumnFigure;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.CompartmentFigure;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.CompartmentFigureBorder;
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.table.JmTable;
 
 /**
- * {@link TableModel}の{@link IFigure}（ビュー）。
+ * {@link JmTable}の{@link IFigure}（ビュー）。
  * 
  * @author daisuke
  */
-public class TableFigure extends DatabaseObjectFigure {
+public class TableFigure extends DbObjectFigure {
 	
 	private ColumnLayoutFigure columnFigure = new ColumnLayoutFigure();
 	

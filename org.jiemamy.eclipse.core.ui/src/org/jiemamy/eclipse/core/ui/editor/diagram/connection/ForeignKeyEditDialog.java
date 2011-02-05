@@ -47,17 +47,17 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.utils.KeyConstraintUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.ModelConsistencyException;
-import org.jiemamy.model.column.ColumnModel;
-import org.jiemamy.model.constraint.DefaultDeferrabilityModel;
-import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
-import org.jiemamy.model.constraint.DeferrabilityModel;
-import org.jiemamy.model.constraint.DeferrabilityModel.InitiallyCheckTime;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel.MatchType;
-import org.jiemamy.model.constraint.ForeignKeyConstraintModel.ReferentialAction;
-import org.jiemamy.model.constraint.KeyConstraintModel;
-import org.jiemamy.model.constraint.LocalKeyConstraintModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.column.JmColumn;
+import org.jiemamy.model.constraint.JmDeferrability;
+import org.jiemamy.model.constraint.JmDeferrability.InitiallyCheckTime;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint.MatchType;
+import org.jiemamy.model.constraint.JmForeignKeyConstraint.ReferentialAction;
+import org.jiemamy.model.constraint.JmKeyConstraint;
+import org.jiemamy.model.constraint.JmLocalKeyConstraint;
+import org.jiemamy.model.constraint.SimpleJmDeferrability;
+import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
+import org.jiemamy.model.table.JmTable;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -65,7 +65,7 @@ import org.jiemamy.utils.LogMarker;
  * 
  * @author daisuke
  */
-public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyConstraintModel> {
+public class ForeignKeyEditDialog extends JiemamyEditDialog0<SimpleJmForeignKeyConstraint> {
 	
 	private static Logger logger = LoggerFactory.getLogger(ForeignKeyEditDialog.class);
 	
@@ -73,10 +73,10 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 	private static final Point DEFAULT_SIZE = new Point((int) (250 * 1.618), 250);
 	
 	/** 制約を受けるテーブルのカラムのリスト */
-	private List<ColumnModel> sourceColumns;
+	private List<JmColumn> sourceColumns;
 	
 	/** 参照キー（制約をするテーブルのキー）の候補リスト */
-	private List<LocalKeyConstraintModel> referenceKeys;
+	private List<JmLocalKeyConstraint> referenceKeys;
 	
 	/** 制約を受けるカラムを選択するコンボボックスのリスト */
 	private List<Combo> keyColumnCombos;
@@ -124,24 +124,24 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 	 * @throws IllegalArgumentException 引数foreignKey, jiemamyFacadeに{@code null}を与えた場合
 	 * @throws ModelConsistencyException
 	 */
-	public ForeignKeyEditDialog(Shell shell, JiemamyContext context, DefaultForeignKeyConstraintModel foreignKey) {
-		super(shell, context, foreignKey, DefaultForeignKeyConstraintModel.class);
+	public ForeignKeyEditDialog(Shell shell, JiemamyContext context, SimpleJmForeignKeyConstraint foreignKey) {
+		super(shell, context, foreignKey, SimpleJmForeignKeyConstraint.class);
 		
 		Validate.notNull(foreignKey);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		TableModel sourceTableModel = foreignKey.findDeclaringTable(context.getTables());
-		if (sourceTableModel == null) {
+		JmTable sourceJmTable = foreignKey.findDeclaringTable(context.getTables());
+		if (sourceJmTable == null) {
 			throw new ModelConsistencyException("source table not found");
 		}
 		
-		TableModel targetTableModel = foreignKey.findReferenceTable(context.getTables());
-		if (targetTableModel == null) {
+		JmTable targetJmTable = foreignKey.findReferenceTable(context.getTables());
+		if (targetJmTable == null) {
 			throw new ModelConsistencyException("target table not found");
 		}
 		
-		sourceColumns = sourceTableModel.getColumns();
-		referenceKeys = Lists.newArrayList(targetTableModel.getConstraints(LocalKeyConstraintModel.class));
+		sourceColumns = sourceJmTable.getColumns();
+		referenceKeys = Lists.newArrayList(targetJmTable.getConstraints(JmLocalKeyConstraint.class));
 		
 		keyColumnCombos = Lists.newArrayListWithCapacity(referenceKeys.size());
 		referenceColumnLabels = Lists.newArrayListWithCapacity(referenceKeys.size());
@@ -151,7 +151,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 	@Override
 	public int open() {
 		logger.debug(LogMarker.LIFECYCLE, "open");
-		ForeignKeyConstraintModel foreignKey = getTargetCoreModel();
+		JmForeignKeyConstraint foreignKey = getTargetCoreModel();
 		
 		// 本来 super.open() 内でコントロール生成が行われるのだが、事前に値をセットする為に、このタイミングでコントロール生成を行う。
 		// ここで生成を行ってしまっても、二度コントロール生成されることはない。 {@link org.eclipse.jface.window.Window#open()}の実装を参照。
@@ -169,7 +169,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		ReferentialAction onUpdate = foreignKey.getOnUpdate();
 		cmbOnUpdate.setText(onUpdate == null ? StringUtils.EMPTY : onUpdate.name());
 		
-		DeferrabilityModel deferrability = foreignKey.getDeferrability();
+		JmDeferrability deferrability = foreignKey.getDeferrability();
 		
 		if (deferrability == null) {
 			radImmediate.setSelection(true);
@@ -190,12 +190,12 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		}
 		
 		JiemamyContext context = getContext();
-		KeyConstraintModel referenceKeyConstraint = foreignKey.findReferencedKeyConstraint(context.getTables());
-		if (referenceKeyConstraint == null) {
+		JmKeyConstraint referenceJmKeyConstraint = foreignKey.findReferencedKeyConstraint(context.getTables());
+		if (referenceJmKeyConstraint == null) {
 			cmbReferenceKey.setText(cmbReferenceKey.getItem(0));
 		} else {
 			
-			cmbReferenceKey.setText(toReferenceKeyLabel(referenceKeyConstraint));
+			cmbReferenceKey.setText(toReferenceKeyLabel(referenceJmKeyConstraint));
 		}
 		
 		assert dialogArea != null;
@@ -239,7 +239,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		
 		cmbReferenceKey = new Combo(dialogArea, SWT.READ_ONLY); // TODO CComboにしてPKラベルを表示
 		cmbReferenceKey.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		for (LocalKeyConstraintModel referenceKey : referenceKeys) {
+		for (JmLocalKeyConstraint referenceKey : referenceKeys) {
 			cmbReferenceKey.add(toReferenceKeyLabel(referenceKey));
 		}
 		
@@ -285,7 +285,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 	@Override
 	protected boolean performOk() {
 		logger.debug(LogMarker.LIFECYCLE, "performOk");
-		DefaultForeignKeyConstraintModel foreignKey = getTargetCoreModel();
+		SimpleJmForeignKeyConstraint foreignKey = getTargetCoreModel();
 		
 		String name = StringUtils.defaultString(txtKeyName.getText());
 		foreignKey.setName(name);
@@ -321,21 +321,21 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 			} else if (radDeferred.getSelection()) {
 				initiallyCheckTime = InitiallyCheckTime.DEFERRED;
 			}
-			foreignKey.setDeferrability(DefaultDeferrabilityModel.valueOf(true, initiallyCheckTime));
+			foreignKey.setDeferrability(SimpleJmDeferrability.valueOf(true, initiallyCheckTime));
 		} else {
 			foreignKey.setDeferrability(null);
 		}
 		
 		foreignKey.clearKeyColumns();
 		int selectionIndex = cmbReferenceKey.getSelectionIndex();
-		LocalKeyConstraintModel referenceKeyConstraint = referenceKeys.get(selectionIndex);
-		for (EntityRef<? extends ColumnModel> referenceColumnRef : referenceKeyConstraint.getKeyColumns()) {
+		JmLocalKeyConstraint referenceJmKeyConstraint = referenceKeys.get(selectionIndex);
+		for (EntityRef<? extends JmColumn> referenceColumnRef : referenceJmKeyConstraint.getKeyColumns()) {
 			foreignKey.addReferenceColumn(referenceColumnRef);
 		}
 		
 		for (int i = 0; i < keyColumnCombos.size(); i++) {
 			int index = keyColumnCombos.get(i).getSelectionIndex();
-			ColumnModel keyColumn = sourceColumns.get(index);
+			JmColumn keyColumn = sourceColumns.get(index);
 			foreignKey.addKeyColumn(keyColumn.toReference());
 		}
 		
@@ -383,9 +383,9 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		}
 		
 		int selectionIndex = cmbReferenceKey.getSelectionIndex();
-		LocalKeyConstraintModel referenceKeyConstraint = referenceKeys.get(selectionIndex);
+		JmLocalKeyConstraint referenceJmKeyConstraint = referenceKeys.get(selectionIndex);
 		
-		if (referenceKeyConstraint.getKeyColumns().size() == 0) {
+		if (referenceJmKeyConstraint.getKeyColumns().size() == 0) {
 			label = new Label(grpMapping, SWT.NULL);
 			gd = new GridData(GridData.FILL_HORIZONTAL);
 			gd.horizontalSpan = 3;
@@ -412,19 +412,19 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 			
 			JiemamyContext context = getContext();
 			
-			ForeignKeyConstraintModel foreignKey = getTargetCoreModel();
-			for (EntityRef<? extends ColumnModel> referenceColumnRef : referenceKeyConstraint.getKeyColumns()) {
+			JmForeignKeyConstraint foreignKey = getTargetCoreModel();
+			for (EntityRef<? extends JmColumn> referenceColumnRef : referenceJmKeyConstraint.getKeyColumns()) {
 				Combo cmbKeyColumn = new Combo(grpMapping, SWT.READ_ONLY);
 				cmbKeyColumn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-				for (ColumnModel col : sourceColumns) {
+				for (JmColumn col : sourceColumns) {
 					cmbKeyColumn.add(col.getName());
 				}
 				
 				int index = foreignKey.getReferenceColumns().indexOf(referenceColumnRef);
 				if (index != -1) {
-					EntityRef<? extends ColumnModel> keyColumnRef = foreignKey.getKeyColumns().get(index);
-					ColumnModel keyColumnModel = context.resolve(keyColumnRef);
-					cmbKeyColumn.setText(keyColumnModel.getName());
+					EntityRef<? extends JmColumn> keyColumnRef = foreignKey.getKeyColumns().get(index);
+					JmColumn keyJmColumn = context.resolve(keyColumnRef);
+					cmbKeyColumn.setText(keyJmColumn.getName());
 				} else {
 					cmbKeyColumn.setText(cmbKeyColumn.getItem(0));
 				}
@@ -434,9 +434,9 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 				label = new Label(grpMapping, SWT.NULL);
 				label.setText("=>"); // $NON-NLS-1$
 				
-				ColumnModel referenceColumnModel = context.resolve(referenceColumnRef);
+				JmColumn referenceJmColumn = context.resolve(referenceColumnRef);
 				Label lblReferenceColumn = new Label(grpMapping, SWT.BORDER);
-				lblReferenceColumn.setText(referenceColumnModel.getName());
+				lblReferenceColumn.setText(referenceJmColumn.getName());
 				lblReferenceColumn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 				referenceColumnLabels.add(lblReferenceColumn);
 			}
@@ -467,7 +467,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<DefaultForeignKeyCo
 		}
 	}
 	
-	private String toReferenceKeyLabel(KeyConstraintModel referenceKey) {
+	private String toReferenceKeyLabel(JmKeyConstraint referenceKey) {
 		StringBuilder sb = new StringBuilder();
 		if (StringUtils.isEmpty(referenceKey.getName()) == false) {
 			sb.append(referenceKey.getName());

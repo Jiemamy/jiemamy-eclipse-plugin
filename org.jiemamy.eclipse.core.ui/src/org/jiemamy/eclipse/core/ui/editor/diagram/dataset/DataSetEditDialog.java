@@ -65,10 +65,10 @@ import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.CommonMessages;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
-import org.jiemamy.model.dataset.DataSetModel;
-import org.jiemamy.model.dataset.DefaultDataSetModel;
-import org.jiemamy.model.dataset.RecordModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.dataset.JmDataSet;
+import org.jiemamy.model.dataset.SimpleJmDataSet;
+import org.jiemamy.model.dataset.JmRecord;
+import org.jiemamy.model.table.JmTable;
 import org.jiemamy.utils.DataSetUtil;
 
 /**
@@ -76,7 +76,7 @@ import org.jiemamy.utils.DataSetUtil;
  * 
  * @author daisuke
  */
-public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
+public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 	
 	private static final Point DEFAULT_SIZE = new Point((int) (400 * 1.618), 400);
 	
@@ -102,8 +102,8 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 	 * @param dataSetModel 編集対象{@link JiemamyContext}
 	 * @throws IllegalArgumentException 引数rootModel, jiemamyFacadeに{@code null}を与えた場合
 	 */
-	public DataSetEditDialog(Shell shell, JiemamyContext context, DefaultDataSetModel dataSetModel) {
-		super(shell, context, dataSetModel, DataSetModel.class);
+	public DataSetEditDialog(Shell shell, JiemamyContext context, SimpleJmDataSet dataSetModel) {
+		super(shell, context, dataSetModel, JmDataSet.class);
 		
 		Validate.notNull(dataSetModel);
 		
@@ -112,7 +112,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final DefaultDataSetModel dataSetModel = getTargetCoreModel();
+		final SimpleJmDataSet dataSetModel = getTargetCoreModel();
 		getShell().setText(Messages.DataSetEditDialog_title);
 		
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -130,10 +130,10 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		menu.addMenuListener(new TabMenuListener(dataSetModel, menu));
 		
 		JiemamyContext context = getContext();
-		Set<EntityRef<? extends TableModel>> tableRefs = dataSetModel.getRecords().keySet();
-		for (EntityRef<? extends TableModel> tableRef : tableRefs) {
+		Set<EntityRef<? extends JmTable>> tableRefs = dataSetModel.getRecords().keySet();
+		for (EntityRef<? extends JmTable> tableRef : tableRefs) {
 			try {
-				TableModel tableModel = context.resolve(tableRef);
+				JmTable tableModel = context.resolve(tableRef);
 				addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
 			} catch (EntityNotFoundException e) {
 				logger.warn("table unresolvable");
@@ -209,7 +209,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 			}
 		}
 		
-		DataSetModel dataSetModel = getTargetCoreModel();
+		JmDataSet dataSetModel = getTargetCoreModel();
 		int tabIndex = tabFolder.getSelectionIndex();
 		if (tabIndex <= 0) {
 			MessageDialog.openInformation(getShell(), "テーブル未選択", "エクスポートするテーブルのタブを選択してください。"); // RESOURCE
@@ -217,7 +217,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		}
 		
 		TabItem item = tabFolder.getItem(tabIndex);
-		TableModel tableModel = (TableModel) item.getData();
+		JmTable tableModel = (JmTable) item.getData();
 		
 		OutputStream out = null;
 		try {
@@ -283,9 +283,9 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 			return;
 		}
 		TabItem item = tabFolder.getItem(tabIndex);
-		TableModel tableModel = (TableModel) item.getData();
+		JmTable tableModel = (JmTable) item.getData();
 		
-		DataSetModel dataSetModel = getTargetCoreModel();
+		JmDataSet dataSetModel = getTargetCoreModel();
 		
 		try {
 			DataSetUtil.importFromCsv(dataSetModel, tableModel, new FileInputStream(csv));
@@ -310,7 +310,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 	 */
 	private final class TabMenuListener extends MenuAdapter {
 		
-		private final DefaultDataSetModel dataSetModel;
+		private final SimpleJmDataSet dataSetModel;
 		
 		private final Menu menu;
 		
@@ -321,7 +321,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 		 * @param dataSetModel データセット
 		 * @param menu コンテキストメニュー
 		 */
-		private TabMenuListener(DefaultDataSetModel dataSetModel, Menu menu) {
+		private TabMenuListener(SimpleJmDataSet dataSetModel, Menu menu) {
 			this.dataSetModel = dataSetModel;
 			this.menu = menu;
 		}
@@ -339,13 +339,13 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					// TODO 同じテーブルに対するタブを複数作られてしまう心配は？
-					Collection<TableModel> tables = getContext().getTables();
-					List<TableModel> list = Lists.newArrayList(tables);
+					Collection<JmTable> tables = getContext().getTables();
+					List<JmTable> list = Lists.newArrayList(tables);
 					TableSelectDialog dialog = new TableSelectDialog(getShell(), list);
 					dialog.open();
-					TableModel tableModel = dialog.getResult();
+					JmTable tableModel = dialog.getResult();
 					if (tableModel != null) {
-						dataSetModel.putRecord(tableModel.toReference(), new ArrayList<RecordModel>());
+						dataSetModel.putRecord(tableModel.toReference(), new ArrayList<JmRecord>());
 						addTab(new DataSetEditDialogTableTab(tabFolder, SWT.NONE, dataSetModel, tableModel));
 					}
 				}
@@ -358,7 +358,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<DefaultDataSetModel> {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					TabItem item = tabFolder.getItem(tabFolder.getSelectionIndex());
-					TableModel tableModel = (TableModel) item.getData();
+					JmTable tableModel = (JmTable) item.getData();
 					if (tableModel == null) {
 						return;
 					}

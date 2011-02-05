@@ -25,22 +25,22 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
-import org.jiemamy.composer.importer.DatabaseImportConfig;
-import org.jiemamy.composer.importer.DatabaseImporter;
-import org.jiemamy.composer.importer.DefaultDatabaseImportConfig;
+import org.jiemamy.composer.importer.DbImportConfig;
+import org.jiemamy.composer.importer.DbImporter;
+import org.jiemamy.composer.importer.SimpleDbImportConfig;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 
 /**
- * {@link DatabaseImporter}の設定取得ウィザード。
+ * {@link DbImporter}の設定取得ウィザード。
  * 
  * @author daisuke
  */
-public class DatabaseImportWizard extends Wizard implements ImporterWizard<DatabaseImporter, DatabaseImportConfig>,
+public class DbImportWizard extends Wizard implements ImporterWizard<DbImporter, DbImportConfig>,
 		IWorkbenchWizard {
 	
-	private DatabaseImportWizardPage page;
+	private DbImportWizardPage page;
 	
-	private DefaultDatabaseImportConfig config;
+	private SimpleDbImportConfig config;
 	
 	private IDialogSettings settings;
 	
@@ -48,7 +48,7 @@ public class DatabaseImportWizard extends Wizard implements ImporterWizard<Datab
 	/**
 	 * Creates a wizard for exporting SQL to the local file system.
 	 */
-	public DatabaseImportWizard() {
+	public DbImportWizard() {
 		IDialogSettings workbenchSettings = JiemamyUIPlugin.getDefault().getDialogSettings();
 		settings = workbenchSettings.getSection("ImportWizard");
 		if (settings == null) {
@@ -60,23 +60,23 @@ public class DatabaseImportWizard extends Wizard implements ImporterWizard<Datab
 	@Override
 	public void addPages() {
 		super.addPages();
-		page = new DatabaseImportWizardPage(settings);
+		page = new DbImportWizardPage(settings);
 		addPage(page);
 	}
 	
-	public DatabaseImportConfig getConfig() {
+	public DbImportConfig getConfig() {
 		return config;
 	}
 	
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
-		setWindowTitle(Messages.DatabaseImportWizard_title);
+		setWindowTitle(Messages.DbImportWizard_title);
 //		setDefaultPageImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/exportdir_wiz.png"));
 		setNeedsProgressMonitor(true);
 	}
 	
 	@Override
 	public boolean performFinish() {
-		config = new DefaultDatabaseImportConfig();
+		config = new SimpleDbImportConfig();
 		
 		config.setDriverJarPaths(page.getDriverJarPaths());
 		config.setDriverClassName(page.getDriverClassName());

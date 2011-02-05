@@ -53,24 +53,24 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog;
 import org.jiemamy.eclipse.core.ui.editor.diagram.TextEditTab;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.column.ColumnModel;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
+import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.column.ColumnParameterKey;
-import org.jiemamy.model.constraint.KeyConstraintModel;
-import org.jiemamy.model.script.DefaultAroundScriptModel;
+import org.jiemamy.model.constraint.JmKeyConstraint;
+import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.model.script.Position;
-import org.jiemamy.model.table.DefaultTableModel;
-import org.jiemamy.model.table.TableModel;
+import org.jiemamy.model.table.SimpleJmTable;
+import org.jiemamy.model.table.JmTable;
 
 /**
- * {@link DefaultTableModel}の詳細編集ダイアログクラス。
+ * {@link SimpleJmTable}の詳細編集ダイアログクラス。
  * 
  * @author daisuke
  */
-public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
+public class TableEditDialog extends JiemamyEditDialog<SimpleJmTable> {
 	
 	private static final Point DEFAULT_SIZE = new Point(700, 500);
 	
@@ -97,12 +97,12 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	 * @param parentShell 親シェルオブジェクト
 	 * @param context コンテキスト
 	 * @param tableModel 編集対象モデル
-	 * @param nodeModel {@link DefaultDiagramModel}
+	 * @param nodeModel {@link SimpleJmDiagram}
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public TableEditDialog(Shell parentShell, JiemamyContext context, DefaultTableModel tableModel,
-			DefaultDatabaseObjectNodeModel nodeModel) {
-		super(parentShell, context, tableModel, DefaultTableModel.class, nodeModel);
+	public TableEditDialog(Shell parentShell, JiemamyContext context, SimpleJmTable tableModel,
+			SimpleDbObjectNode nodeModel) {
+		super(parentShell, context, tableModel, SimpleJmTable.class, nodeModel);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -115,7 +115,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	
 	@Override
 	protected Control createDialogArea(Composite parent) {
-		final DefaultTableModel tableModel = getTargetCoreModel();
+		final SimpleJmTable tableModel = getTargetCoreModel();
 		getShell().setText("テーブル情報編集"); // RESOURCE
 		
 		// ---- A. 最上段名称欄
@@ -154,19 +154,19 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 				ColorDialog colorDialog = new ColorDialog(getShell(), SWT.NULL);
 				RGB rgb = colorDialog.open();
 				if (rgb != null) {
-					DefaultNodeModel nodeModel = getNodeModel();
+					SimpleJmNode nodeModel = getJmNode();
 					nodeModel.setColor(ConvertUtil.convert(rgb));
 				}
 			}
 		});
 		
-		Button btnDefaultColor = new Button(composite, SWT.PUSH);
-		btnDefaultColor.setText("default color"); // RESOURCE
-		btnDefaultColor.addSelectionListener(new SelectionAdapter() {
+		Button btnSimpleColor = new Button(composite, SWT.PUSH);
+		btnSimpleColor.setText("default color"); // RESOURCE
+		btnSimpleColor.addSelectionListener(new SelectionAdapter() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				DefaultNodeModel nodeModel = getNodeModel();
+				SimpleJmNode nodeModel = getJmNode();
 				nodeModel.setColor(null);
 			}
 		});
@@ -213,7 +213,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	
 	@Override
 	protected boolean performOk() {
-		DefaultTableModel tableModel = getTargetCoreModel();
+		SimpleJmTable tableModel = getTargetCoreModel();
 		
 		if (confirmConsistency(tableModel) == false) {
 			return false;
@@ -229,10 +229,10 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		String beginScript = StringUtils.defaultString(tabBeginScript.getTextWidget().getText());
 		String endScript = StringUtils.defaultString(tabEndScript.getTextWidget().getText());
 		
-		DefaultAroundScriptModel aroundScript =
-				(DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+		SimpleJmAroundScript aroundScript =
+				(SimpleJmAroundScript) facet.getAroundScriptFor(tableModel.toReference());
 		if (aroundScript == null) {
-			aroundScript = new DefaultAroundScriptModel(UUID.randomUUID());
+			aroundScript = new SimpleJmAroundScript(UUID.randomUUID());
 			aroundScript.setCoreModelRef(tableModel.toReference());
 		}
 		
@@ -251,10 +251,10 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		String description = StringUtils.defaultString(tabDescription.getTextWidget().getText());
 		tableModel.setDescription(description);
 		
-		Set<KeyConstraintModel> constraints = tableModel.getConstraints(KeyConstraintModel.class);
-		for (KeyConstraintModel keyConstraintModel : constraints) {
-			if (keyConstraintModel.getKeyColumns().isEmpty()) {
-				tableModel.deleteConstraint(keyConstraintModel.toReference());
+		Set<JmKeyConstraint> constraints = tableModel.getConstraints(JmKeyConstraint.class);
+		for (JmKeyConstraint keyConstraint : constraints) {
+			if (keyConstraint.getKeyColumns().isEmpty()) {
+				tableModel.deleteConstraint(keyConstraint.toReference());
 			}
 		}
 		
@@ -267,12 +267,12 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 	 * @param tableModel テーブル
 	 * @return 警告を無視する場合は{@code true}、そうでない場合は{@code false}
 	 */
-	private boolean confirmConsistency(TableModel tableModel) {
+	private boolean confirmConsistency(JmTable tableModel) {
 		boolean result = true;
 		
-		Set<DatabaseObjectModel> doms = getContext().getDatabaseObjects();
+		Set<DbObject> doms = getContext().getDbObjects();
 		Set<String> domNames = Sets.newHashSetWithExpectedSize(doms.size());
-		for (DatabaseObjectModel dom : doms) {
+		for (DbObject dom : doms) {
 			if (dom.equals(tableModel) == false) {
 				domNames.add(dom.getName());
 			}
@@ -286,9 +286,9 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 			}
 		}
 		
-		List<ColumnModel> columns = tableModel.getColumns();
+		List<JmColumn> columns = tableModel.getColumns();
 		Set<String> columnNames = Sets.newHashSetWithExpectedSize(columns.size());
-		for (ColumnModel column : columns) {
+		for (JmColumn column : columns) {
 			columnNames.add(column.getName());
 		}
 		
@@ -302,7 +302,7 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		return result;
 	}
 	
-	private void createTabs(final DefaultTableModel tableModel, TabFolder tabFolder) {
+	private void createTabs(final SimpleJmTable tableModel, TabFolder tabFolder) {
 		// ---- B-1. カラム
 		AbstractTab tabColumn = new TableEditDialogColumnTab(tabFolder, SWT.NULL, getContext(), tableModel);
 		tabColumn.addKeyListener(editListener);
@@ -321,8 +321,8 @@ public class TableEditDialog extends JiemamyEditDialog<DefaultTableModel> {
 		String beginScript = "";
 		String endScript = "";
 		SqlFacet facet = getContext().getFacet(SqlFacet.class);
-		DefaultAroundScriptModel aroundScript =
-				(DefaultAroundScriptModel) facet.getAroundScriptFor(tableModel.toReference());
+		SimpleJmAroundScript aroundScript =
+				(SimpleJmAroundScript) facet.getAroundScriptFor(tableModel.toReference());
 		if (aroundScript != null) {
 			beginScript = StringUtils.defaultString(aroundScript.getScript(Position.BEGIN));
 			endScript = StringUtils.defaultString(aroundScript.getScript(Position.END));

@@ -26,7 +26,7 @@ import org.eclipse.gef.requests.BendpointRequest;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
-import org.jiemamy.model.DefaultConnectionModel;
+import org.jiemamy.model.SimpleJmConnection;
 
 /**
  * Bendpoint の {@link EditPolicy}。
@@ -40,7 +40,7 @@ public final class JmBendpointEditPolicy extends BendpointEditPolicy {
 		Point point = request.getLocation();
 		getConnection().translateToRelative(point);
 		
-		DefaultConnectionModel connection = (DefaultConnectionModel) getHost().getModel();
+		SimpleJmConnection connection = (SimpleJmConnection) getHost().getModel();
 		
 		return new CreateBendpointCommand(getJiemamyContext(), TODO.DIAGRAM_INDEX, connection, point,
 				request.getIndex());
@@ -49,7 +49,7 @@ public final class JmBendpointEditPolicy extends BendpointEditPolicy {
 	
 	@Override
 	protected Command getDeleteBendpointCommand(BendpointRequest request) {
-		DefaultConnectionModel connection = (DefaultConnectionModel) getHost().getModel();
+		SimpleJmConnection connection = (SimpleJmConnection) getHost().getModel();
 		return new DeleteBendpointCommand(getJiemamyContext(), TODO.DIAGRAM_INDEX, connection, request.getIndex());
 	}
 	
@@ -58,7 +58,7 @@ public final class JmBendpointEditPolicy extends BendpointEditPolicy {
 		Point location = request.getLocation();
 		getConnection().translateToRelative(location);
 		
-		DefaultConnectionModel connection = (DefaultConnectionModel) getHost().getModel();
+		SimpleJmConnection connection = (SimpleJmConnection) getHost().getModel();
 		return new MoveBendpointCommand(getJiemamyContext(), TODO.DIAGRAM_INDEX, connection, request.getIndex(),
 				location);
 	}

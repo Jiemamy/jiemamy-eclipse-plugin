@@ -47,10 +47,10 @@ import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyContextEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractJmNodeEditPart;
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
+import org.jiemamy.model.JmNode;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmRectangle;
 
@@ -63,7 +63,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 	private static final int PADDING = 40;
 	
 
-	private static Node getNode(List<Node> list, EntityRef<? extends NodeModel> ref) {
+	private static Node getNode(List<Node> list, EntityRef<? extends JmNode> ref) {
 		for (Node obj : list) {
 			EntityNode node = (EntityNode) obj;
 			if (ref.isReferenceOf(node.model)) {
@@ -98,7 +98,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 
 	private static class ConnectionEdge extends Edge {
 		
-		private ConnectionModel model;
+		private JmConnection model;
 		
 
 		/**
@@ -108,7 +108,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		 * @param target 接続先ノード
 		 * @param model コネクションを表すモデル
 		 */
-		public ConnectionEdge(Node source, Node target, ConnectionModel model) {
+		public ConnectionEdge(Node source, Node target, JmConnection model) {
 			super(source, target);
 			this.model = model;
 		}
@@ -116,7 +116,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 	
 	private static class EntityNode extends Node {
 		
-		private DefaultNodeModel model;
+		private SimpleJmNode model;
 		
 	}
 	
@@ -130,7 +130,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		private final int diagramIndex;
 		
-		private DefaultNodeModel target;
+		private SimpleJmNode target;
 		
 		private int x;
 		
@@ -140,7 +140,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		private int oldY;
 		
-		private Map<ConnectionModel, List<JmPoint>> oldBendpoints = new HashMap<ConnectionModel, List<JmPoint>>();
+		private Map<JmConnection, List<JmPoint>> oldBendpoints = new HashMap<JmConnection, List<JmPoint>>();
 		
 
 		/**
@@ -152,7 +152,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		 * @param x X座標
 		 * @param y Y座標
 		 */
-		public LayoutCommand(JiemamyContext context, int diagramIndex, DefaultNodeModel target, int x, int y) {
+		public LayoutCommand(JiemamyContext context, int diagramIndex, SimpleJmNode target, int x, int y) {
 			this.context = context;
 			this.diagramIndex = diagramIndex;
 			this.target = target;
@@ -166,11 +166,11 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void execute() {
 			DiagramFacet facet = context.getFacet(DiagramFacet.class);
-			DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+			SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 			target.setBoundary(new JmRectangle(x, y, -1, -1));
 			diagramModel.store(target);
 			oldBendpoints.clear();
-			for (ConnectionModel conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
+			for (JmConnection conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				oldBendpoints.put(conn, new ArrayList<JmPoint>(bendpoints));
 				bendpoints.clear();
@@ -180,8 +180,8 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		@Override
 		public void undo() {
 			DiagramFacet facet = context.getFacet(DiagramFacet.class);
-			DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
-			for (ConnectionModel conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
+			SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+			for (JmConnection conn : diagramModel.getSourceConnectionsFor(target.toReference())) {
 				List<JmPoint> bendpoints = conn.getBendpoints();
 				bendpoints.clear();
 				for (JmPoint bendpoint : oldBendpoints.get(conn)) {
@@ -264,13 +264,13 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		private void assembleEdges(List<Node> graphNodes, List<Edge> graphEdges) {
 			JiemamyContext context = ((JiemamyContextEditPart) viewer.getContents()).getModel();
 			DiagramFacet facet = context.getFacet(DiagramFacet.class);
-			DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+			SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 			for (Object obj : graphNodes) {
 				EntityNode node = (EntityNode) obj;
 				
-				Collection<? extends ConnectionModel> conns =
+				Collection<? extends JmConnection> conns =
 						diagramModel.getSourceConnectionsFor(node.model.toReference());
-				CONN_LOOP: for (ConnectionModel conn : conns) {
+				CONN_LOOP: for (JmConnection conn : conns) {
 					if (conn.isSelfConnection()) {
 						continue;
 					}
@@ -295,7 +295,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 			for (EditPart obj : editParts) {
 				if (obj instanceof AbstractJmNodeEditPart) {
 					AbstractJmNodeEditPart editPart = (AbstractJmNodeEditPart) obj;
-					DefaultNodeModel model = (DefaultNodeModel) editPart.getModel();
+					SimpleJmNode model = (SimpleJmNode) editPart.getModel();
 					EntityNode node = new EntityNode();
 					node.model = model;
 					node.width = editPart.getFigure().getSize().width;

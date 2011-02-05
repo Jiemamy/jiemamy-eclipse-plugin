@@ -32,7 +32,7 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.node.ChangeNodeConstraintComma
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.CreateNodeCommand;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.NodeCreation;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.SimpleJmNode;
 
 /**
  * Jiemamy用 {@link XYLayoutEditPolicy}実装クラス。
@@ -49,7 +49,7 @@ public class JmXYLayoutEditPolicy extends XYLayoutEditPolicy {
 	@Override
 	protected Command createChangeConstraintCommand(EditPart child, Object constraint) {
 		JiemamyContext context = (JiemamyContext) getHost().getModel();
-		DefaultNodeModel nodeModel = (DefaultNodeModel) child.getModel();
+		SimpleJmNode nodeModel = (SimpleJmNode) child.getModel();
 		EditPartViewer viewer = child.getViewer();
 		Rectangle rectangle = (Rectangle) constraint;
 		return new ChangeNodeConstraintCommand(context, TODO.DIAGRAM_INDEX, nodeModel, rectangle, viewer);

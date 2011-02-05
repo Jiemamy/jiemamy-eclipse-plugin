@@ -19,7 +19,7 @@
 package org.jiemamy.eclipse.core.ui.editor.diagram;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.SimpleJmDiagram;
 
 /**
  * 一連のモデルの生成を表すインターフェイス。
@@ -36,7 +36,7 @@ public interface Creation {
 	 * @param diagramModel ダイアグラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	void execute(JiemamyContext context, DefaultDiagramModel diagramModel);
+	void execute(JiemamyContext context, SimpleJmDiagram diagramModel);
 	
 	/**
 	 * TODO for daisuke
@@ -45,6 +45,6 @@ public interface Creation {
 	 * @param diagramModel ダイアグラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	void undo(JiemamyContext context, DefaultDiagramModel diagramModel);
+	void undo(JiemamyContext context, SimpleJmDiagram diagramModel);
 	
 }

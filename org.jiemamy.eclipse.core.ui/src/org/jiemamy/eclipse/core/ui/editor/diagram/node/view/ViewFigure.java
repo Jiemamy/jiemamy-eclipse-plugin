@@ -28,17 +28,17 @@ import org.eclipse.swt.graphics.Color;
 
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
-import org.jiemamy.eclipse.core.ui.editor.diagram.node.DatabaseObjectFigure;
+import org.jiemamy.eclipse.core.ui.editor.diagram.node.DbObjectFigure;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.column.ColumnFigure;
 import org.jiemamy.eclipse.core.ui.utils.SwtColorUtil;
-import org.jiemamy.model.view.ViewModel;
+import org.jiemamy.model.view.JmView;
 
 /**
- * {@link ViewModel}の{@link IFigure}（ビュー）。
+ * {@link JmView}の{@link IFigure}（ビュー）。
  * 
  * @author daisuke
  */
-public class ViewFigure extends DatabaseObjectFigure {
+public class ViewFigure extends DbObjectFigure {
 	
 	private static final Color DEFAULT = new Color(null, 240, 250, 255);
 	

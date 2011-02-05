@@ -25,7 +25,7 @@ import org.eclipse.gef.commands.CommandStack;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.ChangeNodeConstraintCommand;
-import org.jiemamy.model.DefaultNodeModel;
+import org.jiemamy.model.SimpleJmNode;
 import org.jiemamy.model.geometory.JmRectangle;
 
 /**
@@ -51,8 +51,8 @@ public class FitNodeConstraintAction extends AbstractJiemamyAction {
 		JiemamyContext context = (JiemamyContext) getViewer().getContents().getModel();
 		Object model = getViewer().getFocusEditPart().getModel();
 		
-		if (model instanceof DefaultNodeModel) {
-			DefaultNodeModel node = (DefaultNodeModel) model;
+		if (model instanceof SimpleJmNode) {
+			SimpleJmNode node = (SimpleJmNode) model;
 			CommandStack stack = getViewer().getEditDomain().getCommandStack();
 			
 			JmRectangle boundary = node.getBoundary();

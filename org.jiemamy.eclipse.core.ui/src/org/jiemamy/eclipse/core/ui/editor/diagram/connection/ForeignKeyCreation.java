@@ -26,11 +26,11 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.editor.diagram.Creation;
-import org.jiemamy.model.DefaultConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.constraint.DefaultForeignKeyConstraintModel;
-import org.jiemamy.model.table.DefaultTableModel;
+import org.jiemamy.model.SimpleJmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.JmNode;
+import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
+import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.utils.ForeignKeyFactory;
 
 /**
@@ -41,24 +41,24 @@ import org.jiemamy.utils.ForeignKeyFactory;
  */
 public class ForeignKeyCreation implements Creation {
 	
-	private final DefaultForeignKeyConstraintModel foreignKey;
+	private final SimpleJmForeignKeyConstraint foreignKey;
 	
-	private final DefaultConnectionModel connection;
+	private final SimpleJmConnection connection;
 	
-	private DefaultTableModel sourceTable;
+	private SimpleJmTable sourceTable;
 	
-	private DefaultTableModel targetTable;
+	private SimpleJmTable targetTable;
 	
 
 	/**
 	 * インスタンスを生成する。
 	 */
 	public ForeignKeyCreation() {
-		foreignKey = new DefaultForeignKeyConstraintModel(UUID.randomUUID());
-		connection = new DefaultConnectionModel(UUID.randomUUID(), foreignKey.toReference());
+		foreignKey = new SimpleJmForeignKeyConstraint(UUID.randomUUID());
+		connection = new SimpleJmConnection(UUID.randomUUID(), foreignKey.toReference());
 	}
 	
-	public void execute(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public void execute(JiemamyContext context, SimpleJmDiagram diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		
@@ -77,7 +77,7 @@ public class ForeignKeyCreation implements Creation {
 	 * @param sourceRef 起点ノードの参照
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void setSource(EntityRef<? extends NodeModel> sourceRef) {
+	public void setSource(EntityRef<? extends JmNode> sourceRef) {
 		Validate.notNull(sourceRef);
 		connection.setSource(sourceRef);
 	}
@@ -88,7 +88,7 @@ public class ForeignKeyCreation implements Creation {
 	 * @param sourceTable 外部キーを作成する対象のテーブル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void setSourceTable(DefaultTableModel sourceTable) {
+	public void setSourceTable(SimpleJmTable sourceTable) {
 		Validate.notNull(sourceTable);
 		this.sourceTable = sourceTable;
 	}
@@ -99,7 +99,7 @@ public class ForeignKeyCreation implements Creation {
 	 * @param targetRef 終点ノードの参照
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void setTarget(EntityRef<? extends NodeModel> targetRef) {
+	public void setTarget(EntityRef<? extends JmNode> targetRef) {
 		Validate.notNull(targetRef);
 		connection.setTarget(targetRef);
 	}
@@ -110,12 +110,12 @@ public class ForeignKeyCreation implements Creation {
 	 * @param targetTable 外部キーが参照するテーブル
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void setTargetTable(DefaultTableModel targetTable) {
+	public void setTargetTable(SimpleJmTable targetTable) {
 		Validate.notNull(targetTable);
 		this.targetTable = targetTable;
 	}
 	
-	public void undo(JiemamyContext context, DefaultDiagramModel diagramModel) {
+	public void undo(JiemamyContext context, SimpleJmDiagram diagramModel) {
 		Validate.notNull(context);
 		Validate.notNull(diagramModel);
 		

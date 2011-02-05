@@ -93,7 +93,7 @@ public class JiemamyPreferencePage extends PreferencePage implements IWorkbenchP
 	@Override
 	protected void performDefaults() {
 		super.performDefaults();
-		pref.loadDefaultValues();
+		pref.loadSimpleValues();
 		setCurrentValueToControls();
 	}
 	

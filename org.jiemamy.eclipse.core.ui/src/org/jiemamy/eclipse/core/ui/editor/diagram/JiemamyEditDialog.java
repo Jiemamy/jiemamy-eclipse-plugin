@@ -21,8 +21,8 @@ package org.jiemamy.eclipse.core.ui.editor.diagram;
 import org.eclipse.swt.widgets.Shell;
 
 import org.jiemamy.JiemamyContext;
-import org.jiemamy.model.DatabaseObjectModel;
-import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
+import org.jiemamy.model.DbObject;
+import org.jiemamy.model.SimpleDbObjectNode;
 
 /**
  * Jiemamyのモデル編集ダイアログ抽象クラス。
@@ -30,9 +30,9 @@ import org.jiemamy.model.DefaultDatabaseObjectNodeModel;
  * @param <T> 編集対象Coreモデルの型
  * @author daisuke
  */
-public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends JiemamyEditDialog0<T> {
+public abstract class JiemamyEditDialog<T extends DbObject> extends JiemamyEditDialog0<T> {
 	
-	private final DefaultDatabaseObjectNodeModel nodeModel;
+	private final SimpleDbObjectNode nodeModel;
 	
 
 	/**
@@ -46,7 +46,7 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	 * @throws IllegalArgumentException 引数targetModel, typeに{@code null}を与えた場合
 	 */
 	protected JiemamyEditDialog(Shell parentShell, JiemamyContext context, T targetCoreModel, Class<?> type,
-			DefaultDatabaseObjectNodeModel nodeModel) {
+			SimpleDbObjectNode nodeModel) {
 		super(parentShell, context, targetCoreModel, type);
 		
 		this.nodeModel = nodeModel;
@@ -57,7 +57,7 @@ public abstract class JiemamyEditDialog<T extends DatabaseObjectModel> extends J
 	 * 
 	 * @return ノード
 	 */
-	public DefaultDatabaseObjectNodeModel getNodeModel() {
+	public SimpleDbObjectNode getJmNode() {
 		return nodeModel;
 	}
 }

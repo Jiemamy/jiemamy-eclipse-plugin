@@ -24,11 +24,11 @@ import java.util.List;
 import org.apache.commons.lang.Validate;
 import org.eclipse.gef.commands.Command;
 
-import org.jiemamy.model.ConnectionModel;
-import org.jiemamy.model.DefaultConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
-import org.jiemamy.model.DefaultNodeModel;
-import org.jiemamy.model.NodeModel;
+import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.SimpleJmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
+import org.jiemamy.model.SimpleJmNode;
+import org.jiemamy.model.JmNode;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmRectangle;
 
@@ -69,13 +69,13 @@ public abstract class AbstractMovePositionCommand extends Command {
 	 * @param diagramModel 操作対象ダイアグラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	protected void shiftPosition(boolean negative, DefaultDiagramModel diagramModel) {
+	protected void shiftPosition(boolean negative, SimpleJmDiagram diagramModel) {
 		Validate.notNull(diagramModel);
-		for (NodeModel node : diagramModel.getNodes()) {
-			if (node instanceof DefaultNodeModel == false) {
+		for (JmNode node : diagramModel.getNodes()) {
+			if (node instanceof SimpleJmNode == false) {
 				continue;
 			}
-			DefaultNodeModel nodeModel = (DefaultNodeModel) node;
+			SimpleJmNode nodeModel = (SimpleJmNode) node;
 			
 			// ノードの移動
 			JmRectangle old = nodeModel.getBoundary();
@@ -88,13 +88,13 @@ public abstract class AbstractMovePositionCommand extends Command {
 			nodeModel.setBoundary(newBoundary);
 			
 			// ベンドポイントの移動
-			Collection<? extends ConnectionModel> sourceConnections =
+			Collection<? extends JmConnection> sourceConnections =
 					diagramModel.getSourceConnectionsFor(nodeModel.toReference());
-			for (ConnectionModel connection : sourceConnections) {
-				if (connection instanceof DefaultConnectionModel == false) {
+			for (JmConnection connection : sourceConnections) {
+				if (connection instanceof SimpleJmConnection == false) {
 					continue;
 				}
-				DefaultConnectionModel connectionModel = (DefaultConnectionModel) connection;
+				SimpleJmConnection connectionModel = (SimpleJmConnection) connection;
 				List<JmPoint> bendpoints = connectionModel.getBendpoints();
 				for (int bendpointIndex = 0; bendpointIndex < connectionModel.getBendpoints().size(); bendpointIndex++) {
 					JmPoint bendpoint = bendpoints.get(bendpointIndex);

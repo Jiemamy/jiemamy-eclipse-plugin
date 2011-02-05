@@ -43,15 +43,15 @@ import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.DefaultContextMetadata;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
-import org.jiemamy.model.DiagramModel;
-import org.jiemamy.model.NodeModel;
-import org.jiemamy.model.script.DefaultAroundScriptModel;
+import org.jiemamy.model.JmDiagram;
+import org.jiemamy.model.JmNode;
+import org.jiemamy.model.script.SimpleJmAroundScript;
 import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
@@ -124,8 +124,8 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		JiemamyContextEditDialog dialog = new JiemamyContextEditDialog(shell, context);
 		
 		if (dialog.open() == Dialog.OK) {
-			DefaultContextMetadata metadata = dialog.getMetadata();
-			DefaultAroundScriptModel universalAroundScript = dialog.getUniversalAroundScript();
+			SimpleJmMetadata metadata = dialog.getMetadata();
+			SimpleJmAroundScript universalAroundScript = dialog.getUniversalAroundScript();
 			if (metadata != null) {
 				Command command = new EditJiemamyContextCommand(context, metadata, universalAroundScript);
 				GraphicalViewer viewer = (GraphicalViewer) getViewer();
@@ -181,11 +181,11 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 	}
 	
 	@Override
-	protected List<NodeModel> getModelChildren() {
+	protected List<JmNode> getModelChildren() {
 		JiemamyContext context = getModel();
 		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
-		DiagramModel diagramModel = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
-		Collection<? extends NodeModel> nodes = diagramModel.getNodes();
+		JmDiagram diagramModel = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
+		Collection<? extends JmNode> nodes = diagramModel.getNodes();
 		return Lists.newArrayList(nodes);
 	}
 	

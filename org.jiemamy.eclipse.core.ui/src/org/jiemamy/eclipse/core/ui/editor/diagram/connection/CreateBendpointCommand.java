@@ -25,8 +25,8 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractMovePositionCommand;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.DefaultConnectionModel;
-import org.jiemamy.model.DefaultDiagramModel;
+import org.jiemamy.model.SimpleJmConnection;
+import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.geometory.JmPoint;
 
 /**
@@ -38,7 +38,7 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 	
 	private final JiemamyContext context;
 	
-	private final DefaultConnectionModel connectionModel;
+	private final SimpleJmConnection connectionModel;
 	
 	private final Point location;
 	
@@ -58,7 +58,7 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 	 * @param location ベンドポイントの座標
 	 * @param bendpointIndex source側からtarget側に向かって数えたベンドポイントのインデックス
 	 */
-	public CreateBendpointCommand(JiemamyContext context, int diagramIndex, DefaultConnectionModel connectionModel,
+	public CreateBendpointCommand(JiemamyContext context, int diagramIndex, SimpleJmConnection connectionModel,
 			Point location, int bendpointIndex) {
 		Validate.notNull(context);
 		Validate.notNull(connectionModel);
@@ -81,7 +81,7 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 		connectionModel.breachEncapsulationOfBendpoints().add(bendpointIndex, ConvertUtil.convert(location));
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(connectionModel);
 		shiftPosition(false, diagramModel);
 		facet.store(diagramModel);
@@ -92,7 +92,7 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 		connectionModel.breachEncapsulationOfBendpoints().remove(bendpointIndex);
 		
 		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		DefaultDiagramModel diagramModel = (DefaultDiagramModel) facet.getDiagrams().get(diagramIndex);
+		SimpleJmDiagram diagramModel = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
 		diagramModel.store(connectionModel);
 		shiftPosition(true, diagramModel);
 		facet.store(diagramModel);

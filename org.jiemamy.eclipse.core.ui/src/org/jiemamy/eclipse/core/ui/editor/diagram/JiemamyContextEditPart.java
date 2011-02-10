@@ -43,9 +43,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
@@ -91,11 +91,6 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 		logger.trace(LogMarker.LIFECYCLE, "activated");
 	}
 	
-	public void commandExecuted(StoredEvent<?> command) {
-		refresh();
-//		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
-	}
-	
 	@Override
 	public void deactivate() {
 		JiemamyContext context = getModel();
@@ -111,6 +106,11 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 	@Override
 	public JiemamyContext getModel() {
 		return (JiemamyContext) super.getModel();
+	}
+	
+	public void handleStoredEvent(StoredEvent<?> event) {
+		refresh();
+//		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}
 	
 	/**

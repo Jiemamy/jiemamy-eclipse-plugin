@@ -173,11 +173,6 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 */
 	private class ColumnContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent<?> command) {
-			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
-			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
-		}
-		
 		public void dispose() {
 			logger.debug(LogMarker.LIFECYCLE, "disposed");
 		}
@@ -188,6 +183,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			logger.error("unknown input: " + inputElement.getClass().getName());
 			return new Object[0];
+		}
+		
+		public void handleStoredEvent(StoredEvent<?> event) {
+			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
+			columnTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {

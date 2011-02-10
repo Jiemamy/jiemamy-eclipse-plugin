@@ -107,10 +107,6 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 	 */
 	private class DataSetContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent<?> command) {
-			dataSetTableEditor.refreshTable(); // レコードの変更を反映させる。
-		}
-		
 		public void dispose() {
 			// nothing to do
 		}
@@ -122,6 +118,10 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 			}
 			logger.error("unknown input: " + inputElement.getClass().getName());
 			return new Object[0];
+		}
+		
+		public void handleStoredEvent(StoredEvent<?> event) {
+			dataSetTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {

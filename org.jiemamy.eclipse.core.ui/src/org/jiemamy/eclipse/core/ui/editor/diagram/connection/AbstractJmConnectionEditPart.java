@@ -65,11 +65,6 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 		logger.trace("activated");
 	}
 	
-	public void commandExecuted(StoredEvent<?> event) {
-		// TODO ↓適当です
-		refresh();
-	}
-	
 	@Override
 	public void deactivate() {
 		getJiemamyContext().getEventBroker().removeListener(this);
@@ -80,6 +75,11 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	@Override
 	public JmConnection getModel() {
 		return (JmConnection) super.getModel();
+	}
+	
+	public void handleStoredEvent(StoredEvent<?> event) {
+		// TODO ↓適当です
+		refresh();
 	}
 	
 	@Override

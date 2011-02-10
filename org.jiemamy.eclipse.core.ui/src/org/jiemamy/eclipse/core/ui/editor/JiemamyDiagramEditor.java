@@ -185,34 +185,6 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		logger.debug(LogMarker.LIFECYCLE, "constructed - multi");
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * <p>この実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
-	 */
-	public void commandExecuted(StoredEvent<?> command) {
-		Validator validator;
-		try {
-			Dialect dialect = context.findDialect();
-			validator = dialect.getValidator();
-		} catch (IllegalStateException e) {
-			configureSimpleDialect();
-			validator = new AllValidator();
-		} catch (ClassNotFoundException e) {
-			configureSimpleDialect();
-			validator = new AllValidator();
-		}
-		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
-		MarkerUtil.deleteAllMarkers();
-		for (Problem problem : validator.validate(context)) {
-			Severity severity = problem.getSeverity();
-			String message =
-					MessageFormat.format("{0}:{1} - {2}", problem.getErrorCode(), problem.getMessage(),
-							UUIDUtil.toShortString(problem.getTargetId()));
-			MarkerUtil.createMarker(resource, IMarker.PRIORITY_NORMAL, findSeverity(severity), message);
-		}
-	}
-	
 	@Override
 	public void commandStackChanged(EventObject event) {
 		if (isDirty()) {
@@ -337,6 +309,34 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	 */
 	public int getTabIndex() {
 		return tabIndex;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>この実装では、モデルの変更を検知して、{@link IMarker} (problem marker) の更新を行う。</p>
+	 */
+	public void handleStoredEvent(StoredEvent<?> event) {
+		Validator validator;
+		try {
+			Dialect dialect = context.findDialect();
+			validator = dialect.getValidator();
+		} catch (IllegalStateException e) {
+			configureSimpleDialect();
+			validator = new AllValidator();
+		} catch (ClassNotFoundException e) {
+			configureSimpleDialect();
+			validator = new AllValidator();
+		}
+		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
+		MarkerUtil.deleteAllMarkers();
+		for (Problem problem : validator.validate(context)) {
+			Severity severity = problem.getSeverity();
+			String message =
+					MessageFormat.format("{0}:{1} - {2}", problem.getErrorCode(), problem.getMessage(),
+							UUIDUtil.toShortString(problem.getTargetId()));
+			MarkerUtil.createMarker(resource, IMarker.PRIORITY_NORMAL, findSeverity(severity), message);
+		}
 	}
 	
 	@Override
@@ -576,7 +576,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		}
 		
 		// 初回のバリデータ起動
-		commandExecuted(null);
+		handleStoredEvent(null);
 		
 		viewer.setContents(context);
 		

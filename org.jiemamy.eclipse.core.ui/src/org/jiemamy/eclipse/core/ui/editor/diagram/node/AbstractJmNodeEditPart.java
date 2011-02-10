@@ -85,16 +85,16 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 		logger.trace(LogMarker.LIFECYCLE, "activated");
 	}
 	
-	public void commandExecuted(StoredEvent<?> event) {
-		// THINK どのメソッドを呼ばなければならないのか精査
-		refresh();
-	}
-	
 	@Override
 	public void deactivate() {
 		getJiemamyContext().getEventBroker().removeListener(this);
 		super.deactivate();
 		logger.trace(LogMarker.LIFECYCLE, "deactivated");
+	}
+	
+	@Override
+	public JmNode getModel() {
+		return (JmNode) super.getModel();
 	}
 	
 //	@Override
@@ -114,11 +114,6 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 //		return super.getAdapter(key);
 //	}
 	
-	@Override
-	public JmNode getModel() {
-		return (JmNode) super.getModel();
-	}
-	
 	public ConnectionAnchor getSourceConnectionAnchor(ConnectionEditPart connection) {
 		return new ChopboxAnchor(getFigure());
 	}
@@ -133,6 +128,11 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	
 	public ConnectionAnchor getTargetConnectionAnchor(Request connection) {
 		return new ChopboxAnchor(getFigure());
+	}
+	
+	public void handleStoredEvent(StoredEvent<?> event) {
+		// THINK どのメソッドを呼ばなければならないのか精査
+		refresh();
 	}
 	
 	@Override

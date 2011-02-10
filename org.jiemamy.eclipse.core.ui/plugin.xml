@@ -16,7 +16,7 @@
    <extension point="org.jiemamy.eclipse.core.importers">
 	  <importer
 	        name="Database"
-            class="org.jiemamy.composer.importer.DbImporter"
+            class="org.jiemamy.composer.importer.DbDiagramImporter"
             wizard="org.jiemamy.eclipse.core.ui.composer.DbImporterWizard"/>
    </extension>
 

@@ -149,11 +149,6 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	 */
 	private class JmConstraintContentProvider implements IStructuredContentProvider, StoredEventListener {
 		
-		public void commandExecuted(StoredEvent<?> command) {
-			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
-			constraintTableEditor.refreshTable(); // レコードの変更を反映させる。
-		}
-		
 		public void dispose() {
 			logger.debug(LogMarker.LIFECYCLE, "disposed");
 		}
@@ -167,6 +162,11 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			}
 			logger.error("unknown input: " + inputElement.getClass().getName());
 			return new Object[0];
+		}
+		
+		public void handleStoredEvent(StoredEvent<?> event) {
+			logger.debug(LogMarker.LIFECYCLE, "commandExecuted");
+			constraintTableEditor.refreshTable(); // レコードの変更を反映させる。
 		}
 		
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {

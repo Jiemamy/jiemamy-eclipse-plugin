@@ -608,12 +608,6 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		private class EditListenerImpl extends AbstractEditListener {
 			
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
 			protected void process(TypedEvent e) {
 				updateModel();
 			}

@@ -31,8 +31,6 @@ import org.jiemamy.model.geometory.JmRectangle;
 /**
  * ノードのサイズをフィット（デフォルトサイズに変更）させるアクション。
  * 
- * TODO GEFコマンド化し、undo可能にする。
- * 
  * @author daisuke
  */
 public class FitNodeConstraintAction extends AbstractJiemamyAction {

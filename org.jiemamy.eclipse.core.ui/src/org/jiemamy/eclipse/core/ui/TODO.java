@@ -19,9 +19,8 @@
 package org.jiemamy.eclipse.core.ui;
 
 /**
- * TODO for daisuke
+ * タスクメモ用クラス。
  * 
- * @version $Id$
  * @author daisuke
  */
 //@Deprecated

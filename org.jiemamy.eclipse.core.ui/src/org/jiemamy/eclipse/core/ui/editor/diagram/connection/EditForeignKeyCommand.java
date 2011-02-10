@@ -26,7 +26,7 @@ import org.jiemamy.model.constraint.JmForeignKeyConstraint;
 import org.jiemamy.model.table.SimpleJmTable;
 
 /**
- * TODO for daisuke
+ * 外部キー編集コマンド。
  * 
  * @version $Id$
  * @author daisuke

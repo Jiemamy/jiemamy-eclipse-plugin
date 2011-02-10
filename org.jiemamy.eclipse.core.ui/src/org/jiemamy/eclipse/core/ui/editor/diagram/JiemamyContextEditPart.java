@@ -109,7 +109,11 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 	}
 	
 	public void handleStoredEvent(StoredEvent<?> event) {
-		refresh();
+		try {
+			refresh();
+		} catch (Exception e) {
+			// FIXME こんなtry-catch要らない…
+		}
 //		JiemamyValidatorUtil.validate(getResource(), (JiemamyContext) getModel());
 	}
 	

@@ -64,11 +64,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -201,13 +199,15 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	
 	@Override
 	public void dispose() {
-		context.getEventBroker().removeListener(this);
+		if (context != null) {
+			context.getEventBroker().removeListener(this);
+		}
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 		super.dispose();
 		logger.debug(LogMarker.LIFECYCLE, "disposed");
 		
 		// 以下debugコード
-		if (JiemamyContext.isDebug()) {
+		if (JiemamyContext.isDebug() && context != null) {
 			List<StoredEventListener> listeners = ((EventBrokerImpl) context.getEventBroker()).getListeners();
 			for (StoredEventListener listener : listeners) {
 				logger.warn(listener + " is not removed from EventBroker.");
@@ -339,24 +339,11 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		}
 	}
 	
-	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		super.init(site, input);
-		
-//		context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
-//		
-//		// FIXME 無差別ディスパッチになってる。
-//		context.getEventBroker().setDefaultStrategy(new DispatchStrategy() {
-//			
-//			public boolean needToDispatch(StoredEventListener listener, StoredEvent<?> command) {
-//				return true;
-//			}
-//			
-//		});
-//		context.getEventBroker().addListener(this);
-		
-		logger.debug(LogMarker.LIFECYCLE, "initialized");
-	}
+//	@Override
+//	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+//		super.init(site, input);
+//		logger.debug(LogMarker.LIFECYCLE, "initialized");
+//	}
 	
 	@Override
 	public boolean isSaveAsAllowed() {
@@ -567,13 +554,17 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e);
 		} finally {
-			DiagramFacet diagramPresentations = context.getFacet(DiagramFacet.class);
-			if (diagramPresentations.getDiagrams().size() < 1) {
+			if (context == null) {
+				context = new JiemamyContext(DiagramFacet.PROVIDER, SqlFacet.PROVIDER);
+			}
+			DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
+			if (diagramFacet.getDiagrams().size() < 1) {
 				SimpleJmDiagram diagram = new SimpleJmDiagram();
 				diagram.setName("default");
-				diagramPresentations.store(diagram);
+				diagramFacet.store(diagram);
 			}
 		}
+		assert context != null;
 		
 		// 初回のバリデータ起動
 		handleStoredEvent(null);

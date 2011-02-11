@@ -56,6 +56,7 @@ public class ViewCreation implements NodeCreation {
 		Validate.notNull(diagram);
 		
 		NamingUtil.autoName(view, context);
+		view.setDefinition("");
 		context.store(view);
 		diagram.store(node);
 		context.getFacet(DiagramFacet.class).store(diagram);

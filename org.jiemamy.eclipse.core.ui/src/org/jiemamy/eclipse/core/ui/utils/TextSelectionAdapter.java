@@ -23,7 +23,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Textコンポーネントフォーカス時にコンポーネント内の文字列を選択状態にするアダプタ。
+ * {@link Text}コンポーネントに対するフォーカス時に、コンポーネント内の文字列を選択状態にするアダプタ。
  * 
  * @author daisuke
  */

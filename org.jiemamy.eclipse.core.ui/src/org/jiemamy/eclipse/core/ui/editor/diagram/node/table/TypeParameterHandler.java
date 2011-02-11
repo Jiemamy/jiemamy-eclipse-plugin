@@ -54,11 +54,11 @@ public interface TypeParameterHandler {
 	/**
 	 * アダプタからコントロールに値を格納する。
 	 */
-	void setValue();
+	void setParametersToControl();
 	
 	/**
 	 * コントロールからアダプタに値を格納する。
 	 */
-	void writeBackToAdapter();
+	void setParametersFromControl();
 	
 }

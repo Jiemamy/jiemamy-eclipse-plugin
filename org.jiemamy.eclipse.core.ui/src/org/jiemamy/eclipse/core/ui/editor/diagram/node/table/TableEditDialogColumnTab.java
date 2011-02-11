@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -138,12 +140,16 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		this.dialect = dialect;
 		
 		int size = context.getDomains().size() + dialect.getAllRawTypeDescriptors().size();
-		allTypes = Lists.newArrayListWithExpectedSize(size);
-		
-		allTypes.addAll(dialect.getAllRawTypeDescriptors());
-		for (JmDomain domain : context.getDomains()) {
-			allTypes.add(domain.asType());
-		}
+		List<RawTypeDescriptor> rawTypes = Lists.newArrayListWithExpectedSize(size);
+		rawTypes.addAll(dialect.getAllRawTypeDescriptors());
+		rawTypes.addAll(Lists.transform(Lists.newArrayList(context.getDomains()),
+				new Function<JmDomain, RawTypeDescriptor>() {
+					
+					public RawTypeDescriptor apply(JmDomain domain) {
+						return domain.asType();
+					}
+				}));
+		allTypes = ImmutableList.copyOf(rawTypes);
 		
 		Composite composite = new Composite(parentTabFolder, SWT.NULL);
 		composite.setLayout(new GridLayout(1, false));
@@ -262,7 +268,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Combo cmbDataType;
 		
-		private Text txtSimpleValue;
+		private Text txtDefaultValue;
 		
 		private Button chkIsNotNull;
 		
@@ -274,7 +280,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private Composite cmpTypeOption;
 		
-		private Map<EntityRef<? extends JmColumn>, TypeParameterManager> typeOptionManagers = Maps.newHashMap();
+		private Map<EntityRef<? extends JmColumn>, TypeParameterManager> typeParameterManagers = Maps.newHashMap();
 		
 		private TypeParameterHandler typeOptionHandler;
 		
@@ -293,17 +299,27 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		protected void configureEditorControls() {
 			super.configureEditorControls();
 			
-			for (RawTypeDescriptor reference : allTypes) {
-				cmbDataType.add(reference.getTypeName());
+			for (RawTypeDescriptor typeDesc : allTypes) {
+				cmbDataType.add(typeDesc.getTypeName());
 			}
 			
-			txtColumnName.addFocusListener(new TextSelectionAdapter(txtColumnName));
+			// 各コントロールに大して、操作した時にモデルにを更新するリスナを仕掛ける
 			txtColumnName.addKeyListener(editListener);
-			
-			txtColumnLogicalName.addFocusListener(new TextSelectionAdapter(txtColumnLogicalName));
 			txtColumnLogicalName.addKeyListener(editListener);
-			
 			cmbDataType.addSelectionListener(editListener);
+			chkIsPK.addSelectionListener(editListener);
+			chkIsNotNull.addSelectionListener(editListener);
+			chkIsDisabled.addSelectionListener(editListener);
+			txtDefaultValue.addKeyListener(editListener);
+			txtDescription.addKeyListener(editListener);
+			
+			// テキスト入力widgetに対して、フォーカスした時に内部のテキストを全選択状態にするリスナを仕掛ける
+			txtColumnName.addFocusListener(new TextSelectionAdapter(txtColumnName));
+			txtColumnLogicalName.addFocusListener(new TextSelectionAdapter(txtColumnLogicalName));
+			txtDefaultValue.addFocusListener(new TextSelectionAdapter(txtDefaultValue));
+			txtDescription.addFocusListener(new TextSelectionAdapter(txtDefaultValue));
+			
+			// データ型選択コンボに対して、操作した時に、その型に必要なオプションwidgetを制御するリスナを仕掛ける
 			cmbDataType.addSelectionListener(new SelectionAdapter() {
 				
 				@Override
@@ -315,24 +331,12 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					}
 					
 					SimpleJmColumn column = (SimpleJmColumn) getTableViewer().getElementAt(index);
-					TypeParameterManager typeOptionManager = typeOptionManagers.get(column.toReference());
-					RawTypeDescriptor dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
-					Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(dataTypeMold).keySet();
-					typeOptionManager.createTypeOptionControl(column, keys);
+					TypeParameterManager typeOptionManager = typeParameterManagers.get(column.toReference());
+					RawTypeDescriptor typeDesc = allTypes.get(cmbDataType.getSelectionIndex());
+					Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(typeDesc).keySet();
+					typeOptionManager.createTypeParameterControls(column, keys);
 				}
 			});
-			
-			chkIsPK.addSelectionListener(editListener);
-			
-			chkIsNotNull.addSelectionListener(editListener);
-			
-			chkIsDisabled.addSelectionListener(editListener);
-			
-			txtSimpleValue.addFocusListener(new TextSelectionAdapter(txtSimpleValue));
-			txtSimpleValue.addKeyListener(editListener);
-			
-			txtDescription.addFocusListener(new TextSelectionAdapter(txtSimpleValue));
-			txtDescription.addKeyListener(editListener);
 		}
 		
 		@Override
@@ -369,11 +373,11 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				}
 			}
 			
-			typeOptionManagers.clear();
+			typeParameterManagers.clear();
 			for (JmColumn column : table.getColumns()) {
 				TypeParameterManager typeOptionManager =
 						new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
-				typeOptionManagers.put(column.toReference(), typeOptionManager);
+				typeParameterManagers.put(column.toReference(), typeOptionManager);
 			}
 		}
 		
@@ -473,7 +477,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setSelection(false);
 			chkIsNotNull.setSelection(false);
 			chkIsDisabled.setSelection(false);
-			txtSimpleValue.setText(StringUtils.EMPTY);
+			txtDefaultValue.setText(StringUtils.EMPTY);
 			txtDescription.setText(StringUtils.EMPTY);
 			
 			txtColumnName.setEnabled(false);
@@ -482,7 +486,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsPK.setEnabled(false);
 			chkIsNotNull.setEnabled(false);
 			chkIsDisabled.setEnabled(false);
-			txtSimpleValue.setEnabled(false);
+			txtDefaultValue.setEnabled(false);
 			txtDescription.setEnabled(false);
 			
 			for (Control control : cmpTypeOption.getChildren()) {
@@ -497,7 +501,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			txtColumnName.setEnabled(true);
 			txtColumnLogicalName.setEnabled(true);
 			cmbDataType.setEnabled(true);
-			txtSimpleValue.setEnabled(true);
+			txtDefaultValue.setEnabled(true);
 			txtDescription.setEnabled(true);
 			chkIsPK.setEnabled(true);
 			chkIsNotNull.setEnabled(true);
@@ -505,24 +509,23 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			DataType dataType = column.getDataType();
 			Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor()).keySet();
-			TypeParameterManager manager = typeOptionManagers.get(column.toReference());
-			manager.createTypeOptionControl(column, keys);
+			TypeParameterManager manager = typeParameterManagers.get(column.toReference());
+			manager.createTypeParameterControls(column, keys);
 			
 			// 現在値の設定
 			txtColumnName.setText(column.getName());
 			txtColumnLogicalName.setText(StringUtils.defaultString(column.getLogicalName()));
-			
 			chkIsNotNull.setSelection(table.isNotNullColumn(column.toReference()));
 			
 			if (dataType.getRawTypeDescriptor() instanceof DomainType) {
-				DomainType domainRef = (DomainType) dataType.getRawTypeDescriptor();
-				JmDomain domain = context.resolve(domainRef);
+				DomainType domainType = (DomainType) dataType.getRawTypeDescriptor();
+				JmDomain domain = context.resolve(domainType);
 				cmbDataType.setText(domain.getName());
 			} else {
 				cmbDataType.setText(dataType.getRawTypeDescriptor().getTypeName());
-				typeOptionManagers.get(column.toReference()).setValue(column);
+				typeParameterManagers.get(column.toReference()).setParametersToControl(column.getDataType());
 			}
-			txtSimpleValue.setText(StringUtils.defaultString(column.getDefaultValue()));
+			txtDefaultValue.setText(StringUtils.defaultString(column.getDefaultValue()));
 			txtDescription.setText(StringUtils.defaultString(column.getDescription()));
 			
 			chkIsPK.setSelection(table.isPrimaryKeyColumn(column.toReference()));
@@ -549,7 +552,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			TypeParameterManager typeOptionManager =
 					new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
-			typeOptionManagers.put(column.toReference(), typeOptionManager);
+			typeParameterManagers.put(column.toReference(), typeOptionManager);
 			
 			int addedIndex = column.getIndex();
 			swtTable.setSelection(addedIndex);
@@ -574,7 +577,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			
 			TypeParameterManager typeOptionManager =
 					new TypeParameterManager(dialect, cmpTypeOption, editListener, typeOptionHandler);
-			typeOptionManagers.put(column.toReference(), typeOptionManager);
+			typeParameterManagers.put(column.toReference(), typeOptionManager);
 			
 			int addedIndex = table.getColumns().indexOf(column);
 			swtTable.setSelection(addedIndex);
@@ -650,7 +653,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			}
 			swtTable.setFocus();
 			
-			typeOptionManagers.remove(subject.toReference());
+			typeParameterManagers.remove(subject.toReference());
 		}
 		
 		/**
@@ -670,8 +673,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			label = new Label(cmpAdvanced, SWT.NULL);
 			label.setText("デフォルト値(&F)"); // RESOURCE
 			
-			txtSimpleValue = new Text(cmpAdvanced, SWT.BORDER);
-			txtSimpleValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			txtDefaultValue = new Text(cmpAdvanced, SWT.BORDER);
+			txtDefaultValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			
 			label = new Label(cmpAdvanced, SWT.NULL);
 			label.setText("説明(&D)"); // RESOURCE
@@ -700,7 +703,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				column.setDataType(dataType);
 			}
 			
-			String defaultValue = StringUtils.defaultString(txtSimpleValue.getText());
+			String defaultValue = StringUtils.defaultString(txtDefaultValue.getText());
 			column.setDefaultValue(defaultValue);
 			
 			String description = StringUtils.defaultString(txtDescription.getText());
@@ -747,8 +750,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				}
 			}
 			
-			TypeParameterManager manager = typeOptionManagers.get(column.toReference());
-			manager.writeBackToAdapter(column);
+			TypeParameterManager manager = typeParameterManagers.get(column.toReference());
+			manager.setParametersFromControl(column);
 			
 			table.store(column);
 		}

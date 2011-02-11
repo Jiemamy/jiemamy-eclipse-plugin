@@ -111,16 +111,6 @@ class TypeParameterManager {
 	}
 	
 	/**
-	 * オプションコントロールを全て破棄する。
-	 */
-	public void clearTypeOptionControl() {
-		Control[] children = composite.getChildren();
-		for (Control control : children) {
-			control.dispose();
-		}
-	}
-	
-	/**
 	 * データ型装飾アダプタに適したコントロールを生成する。
 	 * 
 	 * <p>元から存在したコントロールはすべて破棄される。</p>
@@ -129,11 +119,11 @@ class TypeParameterManager {
 	 * @param keys データ型パラメータキー集合
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void createTypeOptionControl(SimpleJmColumn column, Collection<TypeParameterKey<?>> keys) {
+	public void createTypeParameterControls(SimpleJmColumn column, Collection<TypeParameterKey<?>> keys) {
 		Validate.notNull(column);
 		Validate.noNullElements(keys);
 		
-		clearTypeOptionControl();
+		disposeTypeParameterControls();
 		
 		DataType dataType = column.getDataType();
 		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
@@ -167,7 +157,7 @@ class TypeParameterManager {
 		if (keys.contains(TypeParameterKey.WITH_TIMEZONE)) {
 			chkWithTimezone = new Button(composite, SWT.CHECK);
 			chkWithTimezone.setText("WITH TIMEZONE"); // RESOURCE
-			chkWithTimezone.addKeyListener(editListener);
+			chkWithTimezone.addSelectionListener(editListener);
 		}
 		if (keys.contains(TypeParameterKey.SERIAL)) {
 			chkSerial = new Button(composite, SWT.CHECK);
@@ -223,6 +213,16 @@ class TypeParameterManager {
 	}
 	
 	/**
+	 * オプションコントロールを全て破棄する。
+	 */
+	public void disposeTypeParameterControls() {
+		Control[] children = composite.getChildren();
+		for (Control control : children) {
+			control.dispose();
+		}
+	}
+	
+	/**
 	 * オプションコントロールをすべて有効にする。
 	 */
 	public void enable() {
@@ -237,52 +237,12 @@ class TypeParameterManager {
 	}
 	
 	/**
-	 * アダプタからコントロールに値を格納する。
-	 * 
-	 * @param column カラム
-	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
-	 */
-	public void setValue(SimpleJmColumn column) {
-		Validate.notNull(column);
-		DataType dataType = column.getDataType();
-		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
-			return;
-		}
-		
-		for (Entry<String, String> entry : dataType.getParams()) {
-			if (entry.getKey().equals(TypeParameterKey.SIZE.getKeyString())) {
-				Integer size = dataType.getParam(TypeParameterKey.SIZE);
-				txtSize.setText(StringUtils.defaultString(ObjectUtils.toString(size)));
-			}
-			if (entry.getKey().equals(TypeParameterKey.PRECISION.getKeyString())) {
-				Integer precision = dataType.getParam(TypeParameterKey.PRECISION);
-				txtPrecision.setText(StringUtils.defaultString(ObjectUtils.toString(precision)));
-			}
-			if (entry.getKey().equals(TypeParameterKey.SCALE.getKeyString())) {
-				Integer scale = dataType.getParam(TypeParameterKey.SCALE);
-				txtScale.setText(StringUtils.defaultString(ObjectUtils.toString(scale)));
-			}
-			if (entry.getKey().equals(TypeParameterKey.WITH_TIMEZONE.getKeyString())) {
-				Boolean withTimeZone = dataType.getParam(TypeParameterKey.WITH_TIMEZONE);
-				chkWithTimezone.setSelection(BooleanUtils.isTrue(withTimeZone));
-			}
-			if (entry.getKey().equals(TypeParameterKey.SERIAL.getKeyString())) {
-				Boolean serial = dataType.getParam(TypeParameterKey.SERIAL);
-				chkSerial.setSelection(BooleanUtils.isTrue(serial));
-			}
-			if (handler != null) {
-				handler.setValue();
-			}
-		}
-	}
-	
-	/**
 	 * コントロールからアダプタにデータを書き戻す。
 	 * 
 	 * @param column カラム
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
-	public void writeBackToAdapter(SimpleJmColumn column) {
+	public void setParametersFromControl(SimpleJmColumn column) {
 		Validate.notNull(column);
 		SimpleDataType dataType = (SimpleDataType) column.getDataType();
 		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
@@ -360,23 +320,62 @@ class TypeParameterManager {
 		}
 		if (SwtUtil.isAlive(chkWithTimezone) && keys.contains(TypeParameterKey.WITH_TIMEZONE)) {
 			boolean value = chkWithTimezone.getSelection();
-			if (specs.get(TypeParameterKey.WITH_TIMEZONE) == Necessity.REQUIRED) {
+			if (specs.get(TypeParameterKey.WITH_TIMEZONE) == Necessity.REQUIRED || value == true) {
 				dataType.putParam(TypeParameterKey.WITH_TIMEZONE, value);
-			} else if (value == false) {
+			} else {
 				dataType.removeParam(TypeParameterKey.WITH_TIMEZONE);
 			}
 		}
 		if (SwtUtil.isAlive(chkSerial) && keys.contains(TypeParameterKey.SERIAL)) {
 			boolean value = chkSerial.getSelection();
-			if (specs.get(TypeParameterKey.SERIAL) == Necessity.REQUIRED) {
+			if (specs.get(TypeParameterKey.SERIAL) == Necessity.REQUIRED || value == true) {
 				dataType.putParam(TypeParameterKey.SERIAL, value);
-			} else if (value == false) {
-				dataType.removeParam(TypeParameterKey.WITH_TIMEZONE);
+			} else {
+				dataType.removeParam(TypeParameterKey.SERIAL);
 			}
 		}
 		if (handler != null) {
-			handler.writeBackToAdapter();
+			handler.setParametersFromControl();
 		}
 		column.setDataType(dataType);
+	}
+	
+	/**
+	 * データ型からパラメータを読み出し、widgetに値を設定する。
+	 * 
+	 * @param dataType データ型
+	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
+	 */
+	public void setParametersToControl(DataType dataType) {
+		Validate.notNull(dataType);
+		if (dataType.getRawTypeDescriptor() instanceof DomainType) {
+			return;
+		}
+		
+		for (Entry<String, String> entry : dataType.getParams()) {
+			if (entry.getKey().equals(TypeParameterKey.SIZE.getKeyString())) {
+				Integer size = dataType.getParam(TypeParameterKey.SIZE);
+				txtSize.setText(StringUtils.defaultString(ObjectUtils.toString(size)));
+			}
+			if (entry.getKey().equals(TypeParameterKey.PRECISION.getKeyString())) {
+				Integer precision = dataType.getParam(TypeParameterKey.PRECISION);
+				txtPrecision.setText(StringUtils.defaultString(ObjectUtils.toString(precision)));
+			}
+			if (entry.getKey().equals(TypeParameterKey.SCALE.getKeyString())) {
+				Integer scale = dataType.getParam(TypeParameterKey.SCALE);
+				txtScale.setText(StringUtils.defaultString(ObjectUtils.toString(scale)));
+			}
+			if (entry.getKey().equals(TypeParameterKey.WITH_TIMEZONE.getKeyString())) {
+				Boolean withTimeZone = dataType.getParam(TypeParameterKey.WITH_TIMEZONE);
+				chkWithTimezone.setSelection(BooleanUtils.isTrue(withTimeZone));
+			}
+			if (entry.getKey().equals(TypeParameterKey.SERIAL.getKeyString())) {
+				Boolean serial = dataType.getParam(TypeParameterKey.SERIAL);
+				chkSerial.setSelection(BooleanUtils.isTrue(serial));
+			}
+			if (handler != null) {
+				handler.setParametersToControl();
+			}
+		}
 	}
 }

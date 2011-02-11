@@ -54,18 +54,22 @@ public class LabelStringUtil {
 		
 		Map<TypeParameterKey<?>, Necessity> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
 		for (Map.Entry<TypeParameterKey<?>, Necessity> entry : specs.entrySet()) {
-			if (entry.getValue() == Necessity.REQUIRED) {
-				if (entry.getKey().equals(TypeParameterKey.SERIAL)) {
+			if (entry.getKey().equals(TypeParameterKey.SERIAL)) {
+				Boolean serial = dataType.getParam(TypeParameterKey.SERIAL);
+				if (serial != null && serial) {
 					typeName.insert(0, "SERIAL ");
-				} else if (entry.getKey().equals(TypeParameterKey.WITH_TIMEZONE)) {
-					suffix = " WITH TIMEZONE";
-				} else if (entry.getKey().equals(TypeParameterKey.SIZE)) {
-					size = dataType.getParam(TypeParameterKey.SIZE);
-				} else if (entry.getKey().equals(TypeParameterKey.PRECISION)) {
-					precision = dataType.getParam(TypeParameterKey.PRECISION);
-				} else if (entry.getKey().equals(TypeParameterKey.SCALE)) {
-					scale = dataType.getParam(TypeParameterKey.SCALE);
 				}
+			} else if (entry.getKey().equals(TypeParameterKey.WITH_TIMEZONE)) {
+				Boolean withTimeZone = dataType.getParam(TypeParameterKey.WITH_TIMEZONE);
+				if (withTimeZone != null && withTimeZone) {
+					suffix = " WITH TIMEZONE";
+				}
+			} else if (entry.getKey().equals(TypeParameterKey.SIZE)) {
+				size = dataType.getParam(TypeParameterKey.SIZE);
+			} else if (entry.getKey().equals(TypeParameterKey.PRECISION)) {
+				precision = dataType.getParam(TypeParameterKey.PRECISION);
+			} else if (entry.getKey().equals(TypeParameterKey.SCALE)) {
+				scale = dataType.getParam(TypeParameterKey.SCALE);
 			}
 		}
 		

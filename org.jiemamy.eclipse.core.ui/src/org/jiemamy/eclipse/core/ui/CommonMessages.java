@@ -43,7 +43,7 @@ public class CommonMessages extends NLS {
 	
 	// CHECKSTYLE:ON
 	
-	private static final String BUNDLE_NAME = "common_messages";
+	private static final String BUNDLE_NAME = "org.jiemamy.eclipse.core.ui.common_messages";
 	
 	static {
 		reloadMessages();

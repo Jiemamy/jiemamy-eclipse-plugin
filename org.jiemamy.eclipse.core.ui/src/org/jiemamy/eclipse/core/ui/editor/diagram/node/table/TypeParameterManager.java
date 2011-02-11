@@ -295,7 +295,7 @@ class TypeParameterManager {
 		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SIZE)) {
 			String text = txtSize.getText();
 			if (StringUtils.isEmpty(text) == false) {
-				Integer value = 0;
+				Integer value = 1;
 				try {
 					value = Integer.valueOf(text);
 					txtSize.setBackground(null);
@@ -317,7 +317,7 @@ class TypeParameterManager {
 		if (SwtUtil.isAlive(txtPrecision) && keys.contains(TypeParameterKey.PRECISION)) {
 			String text = txtPrecision.getText();
 			if (StringUtils.isEmpty(text) == false) {
-				Integer value = 0;
+				Integer value = 1;
 				try {
 					value = Integer.valueOf(text);
 					txtPrecision.setBackground(null);

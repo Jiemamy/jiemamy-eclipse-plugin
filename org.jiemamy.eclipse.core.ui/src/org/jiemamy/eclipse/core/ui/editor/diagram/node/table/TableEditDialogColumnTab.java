@@ -18,12 +18,10 @@
  */
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.table;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -63,7 +61,6 @@ import org.slf4j.LoggerFactory;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.dialect.Dialect;
-import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.eclipse.JiemamyCorePlugin;
 import org.jiemamy.eclipse.core.ui.Images;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -74,7 +71,6 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.DefaultTableEditorConfig;
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.LabelStringUtil;
-import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
 import org.jiemamy.model.column.ColumnParameterKey;
@@ -321,8 +317,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 					SimpleJmColumn column = (SimpleJmColumn) getTableViewer().getElementAt(index);
 					TypeParameterManager typeOptionManager = typeOptionManagers.get(column.toReference());
 					RawTypeDescriptor dataTypeMold = allTypes.get(cmbDataType.getSelectionIndex());
-					Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataTypeMold);
-					Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
+					Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(dataTypeMold).keySet();
 					typeOptionManager.createTypeOptionControl(column, keys);
 				}
 			});
@@ -509,8 +504,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			chkIsDisabled.setEnabled(true);
 			
 			DataType dataType = column.getDataType();
-			Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
-			Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
+			Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor()).keySet();
 			TypeParameterManager manager = typeOptionManagers.get(column.toReference());
 			manager.createTypeOptionControl(column, keys);
 			

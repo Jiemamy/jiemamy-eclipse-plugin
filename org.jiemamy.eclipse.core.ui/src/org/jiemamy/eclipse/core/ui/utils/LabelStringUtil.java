@@ -18,13 +18,12 @@
  */
 package org.jiemamy.eclipse.core.ui.utils;
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
 import org.jiemamy.dialect.Dialect;
-import org.jiemamy.dialect.TypeParameterSpec;
-import org.jiemamy.dialect.TypeParameterSpec.Necessity;
+import org.jiemamy.dialect.Necessity;
 import org.jiemamy.model.datatype.DataType;
 import org.jiemamy.model.datatype.TypeParameterKey;
 
@@ -53,18 +52,18 @@ public class LabelStringUtil {
 		Integer precision = null;
 		Integer scale = null;
 		
-		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
-		for (TypeParameterSpec spec : specs) {
-			if (spec.getNecessity() == Necessity.REQUIRED) {
-				if (spec.getKey().equals(TypeParameterKey.SERIAL)) {
+		Map<TypeParameterKey<?>, Necessity> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
+		for (Map.Entry<TypeParameterKey<?>, Necessity> entry : specs.entrySet()) {
+			if (entry.getValue() == Necessity.REQUIRED) {
+				if (entry.getKey().equals(TypeParameterKey.SERIAL)) {
 					typeName.insert(0, "SERIAL ");
-				} else if (spec.getKey().equals(TypeParameterKey.WITH_TIMEZONE)) {
+				} else if (entry.getKey().equals(TypeParameterKey.WITH_TIMEZONE)) {
 					suffix = " WITH TIMEZONE";
-				} else if (spec.getKey().equals(TypeParameterKey.SIZE)) {
+				} else if (entry.getKey().equals(TypeParameterKey.SIZE)) {
 					size = dataType.getParam(TypeParameterKey.SIZE);
-				} else if (spec.getKey().equals(TypeParameterKey.PRECISION)) {
+				} else if (entry.getKey().equals(TypeParameterKey.PRECISION)) {
 					precision = dataType.getParam(TypeParameterKey.PRECISION);
-				} else if (spec.getKey().equals(TypeParameterKey.SCALE)) {
+				} else if (entry.getKey().equals(TypeParameterKey.SCALE)) {
 					scale = dataType.getParam(TypeParameterKey.SCALE);
 				}
 			}

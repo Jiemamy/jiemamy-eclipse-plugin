@@ -20,8 +20,7 @@ package org.jiemamy.eclipse.core.ui.editor.diagram.node.table;
 
 import java.util.Collection;
 import java.util.Map.Entry;
-
-import com.google.common.collect.Collections2;
+import java.util.Set;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
@@ -39,9 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.dialect.Dialect;
-import org.jiemamy.dialect.TypeParameterSpec;
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
-import org.jiemamy.eclipse.core.ui.utils.SpecsToKeys;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
 import org.jiemamy.model.column.SimpleJmColumn;
@@ -290,8 +287,7 @@ class TypeParameterManager {
 			return;
 		}
 		
-		Collection<TypeParameterSpec> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
-		Collection<TypeParameterKey<?>> keys = Collections2.transform(specs, SpecsToKeys.INSTANCE);
+		Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor()).keySet();
 		
 		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SIZE)) {
 			String text = txtSize.getText();

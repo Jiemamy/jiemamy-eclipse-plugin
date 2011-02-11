@@ -19,6 +19,7 @@
 package org.jiemamy.eclipse.core.ui.editor.diagram.node.table;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jiemamy.dialect.Dialect;
+import org.jiemamy.dialect.Necessity;
 import org.jiemamy.eclipse.core.ui.editor.diagram.EditListener;
 import org.jiemamy.eclipse.core.ui.utils.SwtUtil;
 import org.jiemamy.eclipse.core.ui.utils.TextSelectionAdapter;
@@ -287,7 +289,8 @@ class TypeParameterManager {
 			return;
 		}
 		
-		Set<TypeParameterKey<?>> keys = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor()).keySet();
+		Map<TypeParameterKey<?>, Necessity> specs = dialect.getTypeParameterSpecs(dataType.getRawTypeDescriptor());
+		Set<TypeParameterKey<?>> keys = specs.keySet();
 		
 		if (SwtUtil.isAlive(txtSize) && keys.contains(TypeParameterKey.SIZE)) {
 			String text = txtSize.getText();
@@ -299,7 +302,13 @@ class TypeParameterManager {
 				} catch (NumberFormatException e) {
 					txtSize.setBackground(COLOR_ERROR);
 				}
-				dataType.putParam(TypeParameterKey.SIZE, value);
+				if (value >= 1) {
+					dataType.putParam(TypeParameterKey.SIZE, value);
+				} else {
+					txtSize.setBackground(COLOR_ERROR);
+				}
+			} else if (specs.get(TypeParameterKey.SIZE) == Necessity.REQUIRED) {
+				txtSize.setBackground(COLOR_ERROR);
 			} else {
 				txtSize.setBackground(null);
 				dataType.removeParam(TypeParameterKey.SIZE);
@@ -315,7 +324,13 @@ class TypeParameterManager {
 				} catch (NumberFormatException e) {
 					txtPrecision.setBackground(COLOR_ERROR);
 				}
-				dataType.putParam(TypeParameterKey.PRECISION, value);
+				if (value >= 1) {
+					dataType.putParam(TypeParameterKey.PRECISION, value);
+				} else {
+					txtPrecision.setBackground(COLOR_ERROR);
+				}
+			} else if (specs.get(TypeParameterKey.PRECISION) == Necessity.REQUIRED) {
+				txtPrecision.setBackground(COLOR_ERROR);
 			} else {
 				txtPrecision.setBackground(null);
 				dataType.removeParam(TypeParameterKey.PRECISION);
@@ -331,7 +346,13 @@ class TypeParameterManager {
 				} catch (NumberFormatException e) {
 					txtScale.setBackground(COLOR_ERROR);
 				}
-				dataType.putParam(TypeParameterKey.SCALE, value);
+				if (value >= 0) {
+					dataType.putParam(TypeParameterKey.SCALE, value);
+				} else {
+					txtPrecision.setBackground(COLOR_ERROR);
+				}
+			} else if (specs.get(TypeParameterKey.SCALE) == Necessity.REQUIRED) {
+				txtScale.setBackground(COLOR_ERROR);
 			} else {
 				txtScale.setBackground(null);
 				dataType.removeParam(TypeParameterKey.SCALE);
@@ -339,18 +360,18 @@ class TypeParameterManager {
 		}
 		if (SwtUtil.isAlive(chkWithTimezone) && keys.contains(TypeParameterKey.WITH_TIMEZONE)) {
 			boolean value = chkWithTimezone.getSelection();
-			if (value) {
+			if (specs.get(TypeParameterKey.WITH_TIMEZONE) == Necessity.REQUIRED) {
 				dataType.putParam(TypeParameterKey.WITH_TIMEZONE, value);
-			} else {
+			} else if (value == false) {
 				dataType.removeParam(TypeParameterKey.WITH_TIMEZONE);
 			}
 		}
 		if (SwtUtil.isAlive(chkSerial) && keys.contains(TypeParameterKey.SERIAL)) {
 			boolean value = chkSerial.getSelection();
-			if (value) {
+			if (specs.get(TypeParameterKey.SERIAL) == Necessity.REQUIRED) {
 				dataType.putParam(TypeParameterKey.SERIAL, value);
-			} else {
-				dataType.removeParam(TypeParameterKey.SERIAL);
+			} else if (value == false) {
+				dataType.removeParam(TypeParameterKey.WITH_TIMEZONE);
 			}
 		}
 		if (handler != null) {

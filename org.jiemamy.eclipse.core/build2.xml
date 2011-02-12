@@ -1,33 +1,33 @@
 <?xml version="1.0"?>
 <project
-		name="retrieve.plugin.dependencies"
-		basedir="."
-		default="prepare-lib"
-		xmlns:ivy="antlib:org.apache.ivy.ant">
+    name="retrieve.plugin.dependencies"
+    basedir="."
+    default="prepare-lib"
+    xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <property name="lib.dir" value="${basedir}/lib" />
+  <property name="lib.dir" value="${basedir}/lib" />
 
-    <!-- =================================
-          target: prepare-lib
-         ================================= -->
-	<target name="prepare-lib">
-        <ivy:retrieve pattern="${lib.dir}/[type]/[artifact]-[revision].[ext]" sync="true" />
-	</target>
+  <!-- =================================
+        target: prepare-lib
+       ================================= -->
+  <target name="prepare-lib">
+    <ivy:retrieve pattern="${lib.dir}/[type]/[artifact]-[revision].[ext]" sync="true" />
+  </target>
 
-    <!-- =================================
-          target: clean
-         ================================= -->
-    <target name="clean" description="--> clean the project">
-        <delete includeemptydirs="true" quiet="true">
-            <fileset dir="${lib.dir}" />
-        </delete>
-    </target>
+  <!-- =================================
+        target: clean
+       ================================= -->
+  <target name="clean" description="--> clean the project">
+    <delete includeemptydirs="true" quiet="true">
+      <fileset dir="${lib.dir}" />
+    </delete>
+  </target>
 
-    <!-- =================================
-          target: clean-cache
-         ================================= -->
-    <target name="clean-cache" description="--> clean the ivy cache">
-        <ivy:cleancache />
-    </target>
+  <!-- =================================
+        target: clean-cache
+       ================================= -->
+  <target name="clean-cache" description="--> clean the ivy cache">
+    <ivy:cleancache />
+  </target>
 
 </project>

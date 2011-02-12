@@ -2,7 +2,7 @@
 <project
         name="retrieve.plugin.dependencies"
         basedir="."
-        default="build"
+        default="clean-and-prepare-libs"
         xmlns:antcontrib="antlib:net.sf.antcontrib"
         xmlns:ivy="antlib:org.apache.ivy.ant"
         xmlns:ant4eclipse="antlib:org.ant4eclipse">
@@ -98,6 +98,13 @@
         <delete includeemptydirs="true" quiet="true">
             <fileset dir="${lib.dir}" />
         </delete>
+        <clean-cache/>
+    </target>
+
+    <!-- =================================
+          target: clean-and-prepare-libs
+         ================================= -->
+    <target name="clean-and-prepare-libs" depends="clean-lib,prepare-libs" description="--> clean and prepare dependencies">
     </target>
 
     <!-- =================================

@@ -94,9 +94,9 @@ import org.jiemamy.transaction.StoredEvent;
 import org.jiemamy.transaction.StoredEventListener;
 import org.jiemamy.utils.LogMarker;
 import org.jiemamy.utils.UUIDUtil;
-import org.jiemamy.validator.AllValidator;
 import org.jiemamy.validator.Problem;
 import org.jiemamy.validator.Problem.Severity;
+import org.jiemamy.validator.StandardValidator;
 import org.jiemamy.validator.Validator;
 
 /**
@@ -323,10 +323,10 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 			validator = dialect.getValidator();
 		} catch (IllegalStateException e) {
 			configureSimpleDialect();
-			validator = new AllValidator();
+			validator = new StandardValidator();
 		} catch (ClassNotFoundException e) {
 			configureSimpleDialect();
-			validator = new AllValidator();
+			validator = new StandardValidator();
 		}
 		IResource resource = (IResource) getEditorInput().getAdapter(IResource.class);
 		MarkerUtil.deleteAllMarkers();

@@ -34,8 +34,8 @@ import org.osgi.framework.BundleContext;
 import org.seasar.eclipse.common.util.ImageManager;
 import org.seasar.eclipse.common.util.StatusUtil;
 
-import org.jiemamy.SimpleServiceLocator;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.ServiceLocator;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreference;
 import org.jiemamy.eclipse.core.ui.preference.JiemamyPreferenceImpl;
 import org.jiemamy.eclipse.extension.EclipseDialectServiceLocator;
@@ -106,15 +106,20 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 		plugin.getLog().log(status);
 	}
 	
+
+	private ServiceLocator serviceLocatorBackup;
+	
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 		pref = new JiemamyPreferenceImpl();
 		
+		serviceLocatorBackup = JiemamyContext.getServiceLocator();
 		// FORMAT-OFF
 		JiemamyContext.setServiceLocator(new CompositeServiceLocator(
-				new SimpleServiceLocator(),
+				serviceLocatorBackup,
 				new EclipseDialectServiceLocator(),
 				new EclipseImporterServiceLocator(),
 				new EclipseExporterServiceLocator()
@@ -124,6 +129,7 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 	
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		JiemamyContext.setServiceLocator(serviceLocatorBackup);
 		pref = null;
 		plugin = null;
 		super.stop(context);

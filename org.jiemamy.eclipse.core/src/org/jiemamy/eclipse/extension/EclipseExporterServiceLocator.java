@@ -40,5 +40,4 @@ public class EclipseExporterServiceLocator implements ServiceLocator {
 		}
 		throw new ClassNotFoundException();
 	}
-	
 }

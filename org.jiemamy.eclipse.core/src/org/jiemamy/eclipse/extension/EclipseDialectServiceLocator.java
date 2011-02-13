@@ -40,5 +40,4 @@ public class EclipseDialectServiceLocator implements ServiceLocator {
 		}
 		throw new ClassNotFoundException();
 	}
-	
 }

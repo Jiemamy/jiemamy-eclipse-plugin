@@ -34,6 +34,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.dialect.Dialect;
@@ -49,6 +51,8 @@ import org.jiemamy.eclipse.extension.ExtensionResolver;
  * @author daisuke
  */
 public abstract class JiemamyEditDialog0<T> extends Dialog {
+	
+	private static Logger logger = LoggerFactory.getLogger(JiemamyEditDialog0.class);
 	
 	private static final String X = "x"; //$NON-NLS-1$
 	
@@ -179,11 +183,11 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	protected AbstractTab createAdditionalTab(TabFolder tabFolder, String tabClassName) {
 		AbstractTab tab = null;
 		try {
-			// ここでロードするクラスが入っているバンドルは、Eclipse-RegisterBuddy に
-			// org.jiemamy.eclipse.core.ui を指定しなければならない。さもなければClassNotFoundException
 			Class<?> tabClass = Class.forName(tabClassName);
 			Constructor<?> constructor = tabClass.getConstructor(TabFolder.class, int.class, type);
 			tab = (AbstractTab) constructor.newInstance(tabFolder, SWT.NULL, targetCoreModel);
+		} catch (ClassNotFoundException e) {
+			logger.error("ここでロードするクラスが入っているバンドルで、Eclipse-RegisterBuddy に org.jiemamy.eclipse.core.ui を指定していない");
 		} catch (Exception e) {
 			ExceptionHandler.handleException(e);
 		}

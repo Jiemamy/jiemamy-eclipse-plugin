@@ -19,13 +19,16 @@
 package org.jiemamy.eclipse.core.ui;
 
 /**
- * タスクメモ用クラス。
+ * タスクメモや仮実装用の値を提供するクラス。
+ * 
+ * <p>クライアントからこのクラスにはアクセスすべきではない。</p>
  * 
  * @author daisuke
  */
 //@Deprecated
 public final class TODO {
 	
+	/** マルチタブエディタ実装前に仮に利用する、編集中のダイアグラムのインデックス番号 */
 	public static final int DIAGRAM_INDEX = 0;
 	
 

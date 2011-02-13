@@ -213,12 +213,11 @@ class DbImporterWizardPage extends WizardPage {
 		txtSchema.setLayoutData(gd);
 		txtSchema.setText(StringUtils.defaultIfEmpty(settings.get("txtSchema"), ""));
 		
-		Object dummy = new Label(composite, SWT.NONE); // dummy
-		dummy.toString(); // dummy
+		@SuppressWarnings("unused")
+		Object unused = new Label(composite, SWT.NONE);
 		
 		btnImportDataSet = new Button(composite, SWT.CHECK);
 		btnImportDataSet.setText("DataSetをインポートする"); // RESOURCE
-		btnImportDataSet.setEnabled(false); // TODO 現在サポートしていない
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		btnImportDataSet.setLayoutData(gd);

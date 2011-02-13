@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/jar/commons-beanutils-1.8.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jar/commons-logging-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/msv-20050913.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/relaxngDatatype-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jar/stax2-api-3.1.1.jar"/>

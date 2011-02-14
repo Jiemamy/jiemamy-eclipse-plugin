@@ -46,6 +46,7 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractTab;
 import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.dataset.JmDataSet;
 import org.jiemamy.model.dataset.JmRecord;
+import org.jiemamy.model.dataset.SimpleJmDataSet;
 import org.jiemamy.model.dataset.SimpleJmRecord;
 import org.jiemamy.model.table.JmTable;
 import org.jiemamy.script.ScriptString;
@@ -66,16 +67,18 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	/** 外部の操作によってレコードが変更されたことを通知するイベントを表すコード */
 	public static final int RECORD_CHANGED = 123;
 	
+	private final Table swtTable;
+	
 
 	/**
 	 * インスタンスを生成する。
 	 * 
 	 * @param parentTabFolder 親となるタブフォルダ
 	 * @param style SWTスタイル値
-	 * @param dataSet 編集対象{@link JmDataSet}
-	 * @param table {@link JmDataSet}内での対象テーブル
+	 * @param dataSet 編集対象{@link SimpleJmDataSet}
+	 * @param table {@link SimpleJmDataSet}内での対象テーブル
 	 */
-	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, JmDataSet dataSet, JmTable table) {
+	public DataSetEditDialogTableTab(TabFolder parentTabFolder, int style, SimpleJmDataSet dataSet, JmTable table) {
 		super(parentTabFolder, style, table.getName());
 		getTabItem().setData(table);
 		
@@ -83,7 +86,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		composite.setLayout(new GridLayout(1, false));
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		final Table swtTable = new Table(composite, SWT.BORDER | SWT.MULTI);
+		swtTable = new Table(composite, SWT.BORDER | SWT.MULTI);
 		swtTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 		swtTable.setHeaderVisible(true);
 		swtTable.setLinesVisible(true);
@@ -103,7 +106,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		final TableEditor editor = new TableEditor(swtTable);
 		editor.horizontalAlignment = SWT.LEFT;
 		editor.grabHorizontal = true;
-		swtTable.addListener(SWT.MouseDown, new StartEditListener(editor, swtTable));
+		swtTable.addListener(SWT.MouseDown, new StartEditListener(editor));
 		
 		getTabItem().setControl(composite);
 		getTabItem().addListener(RECORD_CHANGED, new Listener() {
@@ -117,6 +120,10 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	@Override
 	public boolean isTabComplete() {
 		return true;
+	}
+	
+	Table getSwtTable() {
+		return swtTable;
 	}
 	
 	private void refreshTable(final Table swtTable, List<JmRecord> records) {
@@ -145,6 +152,65 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	
 
 	/**
+	 * {@link JmDataSet}編集テーブルにおける編集の終了を検知し、セルエディタの終了＆後処理を行うリスナ。
+	 * 
+	 * @author daisuke
+	 */
+	private final class FinishEditListener implements Listener {
+		
+		private final Text text;
+		
+		private final TableItem item;
+		
+		private final int columnIndex;
+		
+
+		/**
+		 * インスタンスを生成する。
+		 * 
+		 * @param text セルエディタのコンポーネント
+		 * @param item SWTテーブルアイテム
+		 * @param columnIndex SWTテーブル内のカラムインデックス
+		 */
+		private FinishEditListener(Text text, TableItem item, int columnIndex) {
+			this.text = text;
+			this.item = item;
+			this.columnIndex = columnIndex;
+		}
+		
+		public void handleEvent(final Event e) {
+			SimpleJmRecord record;
+			JmColumn column;
+			if (e.type == SWT.FocusOut) {
+				logger.debug(LogMarker.LIFECYCLE, "focus out");
+				item.setText(columnIndex, text.getText());
+				record = (SimpleJmRecord) item.getData();
+				column = (JmColumn) swtTable.getColumn(columnIndex).getData();
+				Map<EntityRef<? extends JmColumn>, ScriptString> values = Maps.newHashMap(record.getValues());
+				values.put(column.toReference(), new ScriptString(text.getText()));
+				item.setData(new SimpleJmRecord(values));
+				text.dispose();
+			} else if (e.type == SWT.Traverse) {
+				if (e.detail == SWT.TRAVERSE_RETURN) {
+					logger.debug(LogMarker.LIFECYCLE, "traverse return");
+					item.setText(columnIndex, text.getText());
+					record = (SimpleJmRecord) item.getData();
+					column = (JmColumn) swtTable.getColumn(columnIndex).getData();
+					Map<EntityRef<? extends JmColumn>, ScriptString> values = Maps.newHashMap(record.getValues());
+					values.put(column.toReference(), new ScriptString(text.getText()));
+					item.setData(new SimpleJmRecord(values));
+				}
+				
+				if (e.detail == SWT.TRAVERSE_RETURN || e.detail == SWT.TRAVERSE_ESCAPE) {
+					logger.debug(LogMarker.LIFECYCLE, "traverse escape (or return fall through)");
+					text.dispose();
+					e.doit = false;
+				}
+			}
+		}
+	}
+	
+	/**
 	 * {@link JmDataSet}編集テーブルにおける編集の開始を検知し、セルエディタの起動を行うリスナ。
 	 * 
 	 * @author daisuke
@@ -153,18 +219,14 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		
 		private final TableEditor editor;
 		
-		private final Table swtTable;
-		
 
 		/**
 		 * インスタンスを生成する。
 		 * 
 		 * @param editor テーブルエディタ
-		 * @param swtTable SWTテーブル
 		 */
-		private StartEditListener(TableEditor editor, Table swtTable) {
+		private StartEditListener(TableEditor editor) {
 			this.editor = editor;
-			this.swtTable = swtTable;
 		}
 		
 		public void handleEvent(Event event) {
@@ -197,66 +259,6 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 					return;
 				}
 				index++;
-			}
-		}
-		
-
-		/**
-		 * {@link JmDataSet}編集テーブルにおける編集の終了を検知し、セルエディタの終了＆後処理を行うリスナ。
-		 * 
-		 * @author daisuke
-		 */
-		private final class FinishEditListener implements Listener {
-			
-			private final Text text;
-			
-			private final TableItem item;
-			
-			private final int columnIndex;
-			
-
-			/**
-			 * インスタンスを生成する。
-			 * 
-			 * @param text セルエディタのコンポーネント
-			 * @param item SWTテーブルアイテム
-			 * @param columnIndex SWTテーブル内のカラムインデックス
-			 */
-			private FinishEditListener(Text text, TableItem item, int columnIndex) {
-				this.text = text;
-				this.item = item;
-				this.columnIndex = columnIndex;
-			}
-			
-			public void handleEvent(final Event e) {
-				SimpleJmRecord record;
-				JmColumn column;
-				if (e.type == SWT.FocusOut) {
-					logger.debug(LogMarker.LIFECYCLE, "focus out");
-					item.setText(columnIndex, text.getText());
-					record = (SimpleJmRecord) item.getData();
-					column = (JmColumn) swtTable.getColumn(columnIndex).getData();
-					Map<EntityRef<? extends JmColumn>, ScriptString> values = Maps.newHashMap(record.getValues());
-					values.put(column.toReference(), new ScriptString(text.getText()));
-					item.setData(new SimpleJmRecord(values));
-					text.dispose();
-				} else if (e.type == SWT.Traverse) {
-					if (e.detail == SWT.TRAVERSE_RETURN) {
-						logger.debug(LogMarker.LIFECYCLE, "traverse return");
-						item.setText(columnIndex, text.getText());
-						record = (SimpleJmRecord) item.getData();
-						column = (JmColumn) swtTable.getColumn(columnIndex).getData();
-						Map<EntityRef<? extends JmColumn>, ScriptString> values = Maps.newHashMap(record.getValues());
-						values.put(column.toReference(), new ScriptString(text.getText()));
-						item.setData(new SimpleJmRecord(values));
-					}
-					
-					if (e.detail == SWT.TRAVERSE_RETURN || e.detail == SWT.TRAVERSE_ESCAPE) {
-						logger.debug(LogMarker.LIFECYCLE, "traverse escape (or return fall through)");
-						text.dispose();
-						e.doit = false;
-					}
-				}
 			}
 		}
 	}

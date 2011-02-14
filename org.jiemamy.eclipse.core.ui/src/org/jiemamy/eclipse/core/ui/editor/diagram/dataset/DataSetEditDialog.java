@@ -27,13 +27,14 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.lang.Validate;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -56,6 +57,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,12 +66,17 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.dddbase.EntityNotFoundException;
 import org.jiemamy.dddbase.EntityRef;
 import org.jiemamy.eclipse.core.ui.CommonMessages;
+import org.jiemamy.eclipse.core.ui.editor.diagram.AbstractTab;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyEditDialog0;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
+import org.jiemamy.model.column.JmColumn;
 import org.jiemamy.model.dataset.JmDataSet;
 import org.jiemamy.model.dataset.JmRecord;
 import org.jiemamy.model.dataset.SimpleJmDataSet;
+import org.jiemamy.model.dataset.SimpleJmRecord;
 import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.table.SimpleJmTable;
+import org.jiemamy.script.ScriptString;
 import org.jiemamy.utils.DataSetUtil;
 
 /**
@@ -103,9 +111,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
 	public DataSetEditDialog(Shell shell, JiemamyContext context, SimpleJmDataSet dataSet) {
-		super(shell, context, dataSet, JmDataSet.class);
-		
-		Validate.notNull(dataSet);
+		super(shell, context, dataSet, SimpleJmDataSet.class);
 		
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
@@ -180,6 +186,38 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 	
 	@Override
 	protected boolean performOk() {
+		JiemamyContext context = getContext();
+		SimpleJmDataSet dataSet = getTargetCoreModel();
+		
+		List<AbstractTab> tabs = getTabs();
+		for (AbstractTab t : tabs) {
+			if (t instanceof DataSetEditDialogTableTab == false) {
+				continue;
+			}
+			DataSetEditDialogTableTab tab = (DataSetEditDialogTableTab) t;
+			SimpleJmTable table = (SimpleJmTable) tab.getTabItem().getData();
+			
+			Table swtTable = tab.getSwtTable();
+			List<EntityRef<? extends JmColumn>> columns = Lists.newArrayList();
+			for (JmColumn column : table.getColumns()) {
+				columns.add(column.toReference());
+			}
+			
+			TableItem[] items = swtTable.getItems();
+			List<JmRecord> records = Lists.newArrayList();
+			for (TableItem item : items) {
+				Map<EntityRef<? extends JmColumn>, ScriptString> map = Maps.newHashMap();
+				for (int i = 0; i < columns.size(); i++) {
+					EntityRef<? extends JmColumn> columnRef = columns.get(i);
+					String text = item.getText(i);
+					map.put(columnRef, new ScriptString(text));
+				}
+				records.add(new SimpleJmRecord(map));
+			}
+			dataSet.putRecord(table.toReference(), records);
+		}
+		
+		context.store(dataSet);
 		return true;
 	}
 	

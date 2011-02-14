@@ -65,10 +65,10 @@ class Messages extends NLS {
 	public static String Label_Domain_DataTypeSize;
 	
 	/** チェック制約ラベル */
-	public static String Label_Domain_JmCheckConstraint;
+	public static String Label_Domain_CheckConstraint;
 	
 	/** 非NULL制約ラベル */
-	public static String Label_Domain_JmNotNullConstraint;
+	public static String Label_Domain_NotNullConstraint;
 	
 	/** 説明ラベル */
 	public static String Label_Domain_Description;
@@ -80,10 +80,10 @@ class Messages extends NLS {
 	public static String Column_Domain_DataType;
 	
 	/** ドメイン一覧テーブル 非NULL制約カラム */
-	public static String Column_Domain_JmNotNullConstraint;
+	public static String Column_Domain_NotNullConstraint;
 	
 	/** ドメイン一覧テーブル チェック制約カラム */
-	public static String Column_Domain_JmCheckConstraint;
+	public static String Column_Domain_CheckConstraint;
 	
 	private static final String BUNDLE_NAME = Messages.class.getName().toLowerCase(Locale.US);
 	

@@ -132,20 +132,27 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		}
 		
 		for (JmRecord record : records) {
-			List<ScriptString> data = Lists.newArrayList();
+			Map<EntityRef<? extends JmColumn>, ScriptString> values = record.getValues();
+			List<String> data = Lists.newArrayList();
 			for (TableColumn tableColumn : swtTable.getColumns()) {
 				JmColumn column = (JmColumn) tableColumn.getData();
 				EntityRef<? extends JmColumn> columnRef = column.toReference();
-				ScriptString string = record.getValues().get(columnRef);
-				data.add(string);
+				
+				// TODO nullケース、不在ケース、空文字ケースの区別をつける
+				if (values.containsKey(columnRef)) {
+					ScriptString string = values.get(columnRef);
+					if (string == null) {
+						data.add(""); // NULLケース
+					} else {
+						data.add(string.getScript());
+					}
+				} else {
+					data.add(""); // 不在ケース
+				}
 			}
 			TableItem item = new TableItem(swtTable, SWT.NONE);
 			
-			List<String> strings = Lists.newArrayList();
-			for (ScriptString scriptString : data) {
-				strings.add(scriptString.getScript());
-			}
-			item.setText(strings.toArray(new String[data.size()]));
+			item.setText(data.toArray(new String[data.size()]));
 			item.setData(record);
 		}
 	}

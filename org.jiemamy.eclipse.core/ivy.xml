@@ -3,9 +3,9 @@
   <info organisation="org.jiemamy" module="eclipse-core" />
   <dependencies>
     <dependency org="org.seasar.eclipsecommon" name="eclipse-common" rev="0.0.4" transitive="false" />
-    <dependency org="org.jiemamy" name="jiemamy-core" rev="0.3.0-SNAPSHOT" />
-    <dependency org="org.jiemamy" name="jiemamy-diagram" rev="0.3.0-SNAPSHOT" />
-    <dependency org="org.jiemamy" name="jiemamy-sql" rev="0.3.0-SNAPSHOT" />
+    <dependency org="org.jiemamy" name="jiemamy-core" rev="0.3.0" />
+    <dependency org="org.jiemamy" name="jiemamy-diagram" rev="0.3.0" />
+    <dependency org="org.jiemamy" name="jiemamy-sql" rev="0.3.0" />
     
     <!-- 以下、推移依存
     <dependency org="commons-beanutils" name="commons-beanutils" rev="1.8.3" />

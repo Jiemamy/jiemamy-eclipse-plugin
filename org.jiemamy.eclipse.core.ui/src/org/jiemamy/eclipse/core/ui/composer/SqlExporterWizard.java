@@ -39,6 +39,7 @@ import org.jiemamy.composer.exporter.SqlExporter;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.eclipse.core.ui.editor.JiemamyEditor;
 import org.jiemamy.eclipse.core.ui.utils.EditorUtil;
+import org.jiemamy.eclipse.core.ui.utils.FileSelectWizardPage;
 import org.jiemamy.model.dataset.JmDataSet;
 
 /**

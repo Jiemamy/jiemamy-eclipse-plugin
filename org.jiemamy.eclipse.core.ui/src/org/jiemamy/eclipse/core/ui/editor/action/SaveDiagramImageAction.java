@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.CommonMessages;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
+import org.jiemamy.eclipse.core.ui.utils.FileSelectWizardPage;
 
 /**
  * ダイアグラム画像保存機能アクション。

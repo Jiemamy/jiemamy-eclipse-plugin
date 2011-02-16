@@ -32,13 +32,13 @@ import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
 import org.jiemamy.model.DbObject;
-import org.jiemamy.model.SimpleDbObjectNode;
-import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.JmNode;
 import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.constraint.JmLocalKeyConstraint;
-import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.model.table.JmTable;
+import org.jiemamy.model.table.SimpleJmTable;
 import org.jiemamy.model.view.JmView;
 import org.jiemamy.utils.LogMarker;
 
@@ -123,8 +123,8 @@ public class CreateConnectionCommand extends Command {
 		
 		// 循環参照の禁止（ターゲットの親に自分がいたら、参照不可）
 		// THINK 違うキー同士で参照してる可能性は？
-		Collection<DbObject> superDbObjectsRecursive =
-				context.findSuperDbObjectsRecursive(targetCore);
+		// ECL-90
+		Collection<DbObject> superDbObjectsRecursive = context.findSuperDbObjectsRecursive(targetCore);
 		if (superDbObjectsRecursive.contains(sourceCore)) {
 			LogUtil.log(JiemamyUIPlugin.getDefault(), Messages.CreateConnectionCommand_log_canExecute_05);
 			return false;

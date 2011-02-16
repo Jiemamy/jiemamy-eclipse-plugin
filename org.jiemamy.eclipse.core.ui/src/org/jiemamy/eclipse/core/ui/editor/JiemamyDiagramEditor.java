@@ -185,15 +185,22 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	
 	@Override
 	public void commandStackChanged(EventObject event) {
-		if (isDirty()) {
-			if (savePreviouslyNeeded == false) {
-				savePreviouslyNeeded = true;
-				firePropertyChange(IEditorPart.PROP_DIRTY);
+		Display display = getEditorSite().getShell().getDisplay();
+		display.syncExec(new Runnable() {
+			
+			public void run() {
+				if (isDirty()) {
+					if (savePreviouslyNeeded == false) {
+						savePreviouslyNeeded = true;
+						firePropertyChange(IEditorPart.PROP_DIRTY);
+					}
+				} else {
+					savePreviouslyNeeded = false;
+					firePropertyChange(IEditorPart.PROP_DIRTY);
+				}
 			}
-		} else {
-			savePreviouslyNeeded = false;
-			firePropertyChange(IEditorPart.PROP_DIRTY);
-		}
+		});
+		
 		super.commandStackChanged(event);
 	}
 	

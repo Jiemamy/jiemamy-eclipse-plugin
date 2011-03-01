@@ -21,7 +21,6 @@ package org.jiemamy.eclipse.core.ui.editor.diagram.node;
 import java.util.Collection;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import org.apache.commons.lang.Validate;
@@ -46,22 +45,19 @@ import org.jiemamy.model.table.SimpleJmTable;
  */
 public class DeleteNodeCommand extends Command {
 	
-	private final DiagramFacet diagramFacet;
-	
-	private final SimpleJmDiagram diagram;
+	/** 削除元 {@link JiemamyContext} */
+	private final JiemamyContext context;
 	
 	/** 削除されるノード */
 	private final JmNode node;
 	
-	/** 削除されるコネクション */
-	private final Collection<JmConnection> connections;
-	
-	/** （主ノードではないノードに属する）削除される外部キー */
-	private final Collection<Entry> outerForeingKeys;
-	
-	private final JiemamyContext context;
-	
 	private DbObject deletedCore;
+	
+	private final int diagramIndex;
+	
+	Collection<JmConnection> connections;
+	
+	Collection<Entry> outerForeingKeys;
 	
 
 	/**
@@ -79,14 +75,21 @@ public class DeleteNodeCommand extends Command {
 		Validate.isTrue(context.hasFacet(DiagramFacet.class));
 		
 		this.context = context;
+		this.diagramIndex = diagramIndex;
 		this.node = node;
-		diagramFacet = context.getFacet(DiagramFacet.class);
-		diagram = (SimpleJmDiagram) diagramFacet.getDiagrams().get(diagramIndex);
+	}
+	
+	@Override
+	public void execute() {
+		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) diagramFacet.getDiagrams().get(diagramIndex);
 		
 		Set<JmTable> tables = context.getTables();
 		
-		Collection<JmConnection> connections = Sets.newHashSet();
-		Collection<Entry> outerForeingKeys = Sets.newHashSet();
+		// ノードにつられて削除されるコネクション
+		connections = Sets.newHashSet();
+		// （主ノードではないノードに属する）削除される外部キー
+		outerForeingKeys = Sets.newHashSet();
 		for (JmConnection connection : diagram.getSourceConnectionsFor(node.toReference())) {
 			connections.add(connection);
 		}
@@ -100,12 +103,7 @@ public class DeleteNodeCommand extends Command {
 				outerForeingKeys.add(new Entry(t, fk));
 			}
 		}
-		this.connections = ImmutableSet.copyOf(connections);
-		this.outerForeingKeys = ImmutableSet.copyOf(outerForeingKeys);
-	}
-	
-	@Override
-	public void execute() {
+		
 		for (JmConnection connection : connections) {
 			diagram.deleteConnection(connection.toReference());
 		}
@@ -129,6 +127,9 @@ public class DeleteNodeCommand extends Command {
 	
 	@Override
 	public void undo() {
+		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
+		SimpleJmDiagram diagram = (SimpleJmDiagram) diagramFacet.getDiagrams().get(diagramIndex);
+		
 		context.store(deletedCore);
 		
 		for (Entry e : outerForeingKeys) {

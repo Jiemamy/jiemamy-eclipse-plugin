@@ -37,6 +37,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.GraphicalViewer;
@@ -53,6 +56,8 @@ import org.eclipse.gef.ui.actions.MatchWidthAction;
 import org.eclipse.gef.ui.actions.SelectAllAction;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
+import org.eclipse.gef.ui.palette.FlyoutPaletteComposite;
+import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
 import org.eclipse.jface.action.IAction;
@@ -532,6 +537,13 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	}
 	
 	@Override
+	protected FlyoutPreferences getPalettePreferences() {
+		IPreferencesService preferencesService = Platform.getPreferencesService();
+		IEclipsePreferences rootNode = preferencesService.getRootNode();
+		return new JiemamyFlyoutPreferences(rootNode);
+	}
+	
+	@Override
 	protected PaletteRoot getPaletteRoot() {
 		if (palette == null) {
 			palette = DiagramEditorPaletteFactory.createPalette();
@@ -595,6 +607,47 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 			((SimpleJmMetadata) metadata).setDialectClassName(GenericDialect.class.getName());
 		}
 		context.setMetadata(metadata);
+	}
+	
+
+	private static class JiemamyFlyoutPreferences implements FlyoutPreferences {
+		
+		private static final String PALETTE_DOCK_LOCATION = "org.jiemamy.eclipse.gef.pdock"; //$NON-NLS-1$
+		
+		private static final String PALETTE_SIZE = "org.jiemamy.eclipse.gef.psize"; //$NON-NLS-1$
+		
+		private static final String PALETTE_STATE = "org.jiemamy.eclipse.gef.pstate"; //$NON-NLS-1$
+		
+		private IEclipsePreferences prefs;
+		
+
+		private JiemamyFlyoutPreferences(IEclipsePreferences preferences) {
+			prefs = preferences;
+		}
+		
+		public int getDockLocation() {
+			return prefs.getInt(PALETTE_DOCK_LOCATION, PositionConstants.EAST);
+		}
+		
+		public int getPaletteState() {
+			return prefs.getInt(PALETTE_STATE, FlyoutPaletteComposite.STATE_PINNED_OPEN);
+		}
+		
+		public int getPaletteWidth() {
+			return prefs.getInt(PALETTE_SIZE, -1);
+		}
+		
+		public void setDockLocation(int location) {
+			prefs.putInt(PALETTE_DOCK_LOCATION, location);
+		}
+		
+		public void setPaletteState(int state) {
+			prefs.putInt(PALETTE_STATE, state);
+		}
+		
+		public void setPaletteWidth(int width) {
+			prefs.putInt(PALETTE_SIZE, width);
+		}
 	}
 	
 //	/**

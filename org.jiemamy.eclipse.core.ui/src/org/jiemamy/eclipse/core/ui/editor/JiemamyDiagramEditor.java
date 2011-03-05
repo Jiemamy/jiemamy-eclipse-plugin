@@ -40,10 +40,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.draw2d.PositionConstants;
+import org.eclipse.draw2d.Viewport;
+import org.eclipse.draw2d.parts.ScrollableThumbnail;
 import org.eclipse.gef.DefaultEditDomain;
+import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyStroke;
+import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.ScalableRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.palette.PaletteRoot;
@@ -60,13 +65,21 @@ import org.eclipse.gef.ui.palette.FlyoutPaletteComposite;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.gef.ui.parts.GraphicalEditorWithFlyoutPalette;
 import org.eclipse.gef.ui.parts.GraphicalViewerKeyHandler;
+import org.eclipse.gef.ui.parts.SelectionSynchronizer;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -78,6 +91,8 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.part.IPageSite;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +104,7 @@ import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.dialect.GenericDialect;
 import org.jiemamy.eclipse.core.ui.editor.diagram.DiagramEditPartFactory;
+import org.jiemamy.eclipse.core.ui.editor.diagram.OutlineTreeEditPartFactory;
 import org.jiemamy.eclipse.core.ui.utils.ExceptionHandler;
 import org.jiemamy.eclipse.core.ui.utils.MarkerUtil;
 import org.jiemamy.model.SimpleJmDiagram;
@@ -120,28 +136,14 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	/** DELキーのキーコード */
 	private static final int KEYCODE_DEL = 127;
 	
+	// FORMAT-OFF
 	/** zoom level */
 	private static final double[] ZOOM_LEVELS = new double[] {
-		0.1,
-		0.3,
-		0.4,
-		0.5,
-		0.6,
-		0.7,
-		0.8,
-		0.9,
-		1.0,
-		1.2,
-		1.5,
-		2.0,
-		2.5,
-		3.0,
-		5.0,
-		7.0,
-		10.0
+			0.1, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0,
+			1.2, 1.5, 2.0, 2.5, 3.0, 5.0, 7.0, 10.0
 	};
+	// FORMAT-ON
 	
-
 	private static int findSeverity(Severity severity) {
 		if (severity == Severity.ERROR || severity == Severity.FATAL) {
 			return IMarker.SEVERITY_ERROR;
@@ -299,8 +301,8 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		// ↑Java1.4対応APIのため、Classに型パラメータをつけることができない
 		if (adapter == ZoomManager.class) {
 			return ((ScalableRootEditPart) getGraphicalViewer().getRootEditPart()).getZoomManager();
-//		} else if (adapter == IContentOutlinePage.class) {
-//			return new DiagramOutlinePage(new org.eclipse.gef.ui.parts.TreeViewer()); // GEFツリービューワを使用
+		} else if (adapter == IContentOutlinePage.class) {
+			return new DiagramOutlinePage(new org.eclipse.gef.ui.parts.TreeViewer()); // GEFツリービューワを使用
 		}
 		return super.getAdapter(adapter);
 	}
@@ -610,6 +612,154 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	}
 	
 
+	/**
+	 * アウトラインビューのページクラス。
+	 * 
+	 * @author daisuke
+	 */
+	private class DiagramOutlinePage extends org.eclipse.gef.ui.parts.ContentOutlinePage {
+		
+		/** ページをアウトラインとサムネイルに分離するコンポーネント */
+		private SashForm sash;
+		
+		/** サムネイル */
+		private Canvas overview;
+		
+		/** サムネイルを表示する為のフィギュア */
+		private ScrollableThumbnail thumbnail;
+		
+		private DisposeListener disposeListener;
+		
+		private final EditPartViewer viewer;
+		
+
+		/**
+		 * インスタンスを生成する。
+		 * 
+		 * @param viewer ビューア
+		 */
+		public DiagramOutlinePage(EditPartViewer viewer) {
+			super(viewer);
+			this.viewer = viewer;
+		}
+		
+		@Override
+		public void createControl(Composite parent) {
+			sash = new SashForm(parent, SWT.VERTICAL);
+			
+			// sash上にコンストラクタで指定したビューワの作成
+			viewer.createControl(sash);
+			
+			configureOutlineViewer();
+			hookOutlineViewer();
+			initializeOutlineViewer();
+			
+			// sash上にサムネイル用のCanvasビューワの作成
+			overview = new Canvas(sash, SWT.BORDER);
+			// サムネイル・フィギュアを配置する為の LightweightSystem
+			LightweightSystem lws = new LightweightSystem(overview);
+			
+			// RootEditPartのビューをソースとしてサムネイルを作成
+			ScalableRootEditPart rep = (ScalableRootEditPart) getGraphicalViewer().getRootEditPart();
+			thumbnail = new ScrollableThumbnail((Viewport) rep.getFigure());
+			thumbnail.setSource(rep.getLayer(LayerConstants.PRINTABLE_LAYERS));
+			
+			lws.setContents(thumbnail);
+			
+			disposeListener = new DisposeListener() {
+				
+				public void widgetDisposed(DisposeEvent e) {
+					// サムネイル・イメージの破棄
+					if (thumbnail != null) {
+						thumbnail.deactivate();
+						thumbnail = null;
+					}
+				}
+			};
+			// グラフィカル・ビューワが破棄されるときにサムネイルも破棄する
+			getGraphicalViewer().getControl().addDisposeListener(disposeListener);
+		}
+		
+		@Override
+		public void dispose() {
+			SelectionSynchronizer selectionSynchronizer = getSelectionSynchronizer();
+			// SelectionSynchronizer からTreeViewerを削除
+			selectionSynchronizer.removeViewer(viewer);
+			
+			Control control = getGraphicalViewer().getControl();
+			if (control != null && control.isDisposed() == false) {
+				control.removeDisposeListener(disposeListener);
+			}
+			
+			super.dispose();
+		}
+		
+		@Override
+		public Control getControl() {
+			return sash;
+		}
+		
+		@Override
+		public void init(IPageSite pageSite) {
+			super.init(pageSite);
+			// グラフィカル・エディタに登録されているアクションを取得
+			ActionRegistry registry = getActionRegistry();
+			// アウトライン・ページで有効にするアクション
+			IActionBars bars = pageSite.getActionBars();
+			
+			// Eclipse 3.0以前では以下のようにしてIDを取得します
+			// String id = IWorkbenchActionConstants.UNDO;
+			String id = ActionFactory.UNDO.getId();
+			bars.setGlobalActionHandler(id, registry.getAction(id));
+			
+			id = ActionFactory.REDO.getId();
+			bars.setGlobalActionHandler(id, registry.getAction(id));
+			
+			id = ActionFactory.DELETE.getId();
+			bars.setGlobalActionHandler(id, registry.getAction(id));
+			bars.updateActionBars();
+		}
+		
+		/**
+		 * ビュアーにコンテンツを設定する。
+		 * @param contents 設定するコンテンツ
+		 */
+		public void setContents(Object contents) {
+			viewer.setContents(contents);
+		}
+		
+		/**
+		 * アウトラインビュアーの設定を行う。
+		 */
+		protected void configureOutlineViewer() {
+			// エディット・ドメインの設定
+			viewer.setEditDomain(getEditDomain());
+			
+			// EditPartFactory の設定
+			viewer.setEditPartFactory(new OutlineTreeEditPartFactory());
+			
+			// THINK アウトラインに対するContextMenuの設定
+			// THINK アウトラインに対するToolBarManagerの設定
+		}
+		
+		/**
+		 * アウトラインビュアー設定用のフックメソッド。
+		 */
+		protected void hookOutlineViewer() {
+			// グラフィカル・エディタとツリー・ビューワとの間で選択を同期させる
+			SelectionSynchronizer selectionSynchronizer = getSelectionSynchronizer();
+			selectionSynchronizer.addViewer(getViewer());
+		}
+		
+		/**
+		 * アウトラインビュアーを初期化する。
+		 */
+		protected void initializeOutlineViewer() {
+			// グラフィカル・エディタのルート・モデルをツリー・ビューワにも設定
+			setContents(context);
+		}
+	}
+	
 	private static class JiemamyFlyoutPreferences implements FlyoutPreferences {
 		
 		private static final String PALETTE_DOCK_LOCATION = "org.jiemamy.eclipse.gef.pdock"; //$NON-NLS-1$
@@ -649,152 +799,4 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 			prefs.putInt(PALETTE_SIZE, width);
 		}
 	}
-	
-//	/**
-//	 * アウトラインビューのページクラス。
-//	 * 
-//	 * @author daisuke
-//	 */
-//	private class DiagramOutlinePage extends org.eclipse.gef.ui.parts.ContentOutlinePage {
-//		
-//		/** ページをアウトラインとサムネイルに分離するコンポーネント */
-//		private SashForm sash;
-//		
-//		/** サムネイル */
-//		private Canvas overview;
-//		
-//		/** サムネイルを表示する為のフィギュア */
-//		private ScrollableThumbnail thumbnail;
-//		
-//		private DisposeListener disposeListener;
-//		
-//		private final EditPartViewer viewer;
-//		
-//
-//		/**
-//		 * インスタンスを生成する。
-//		 * 
-//		 * @param viewer ビューア
-//		 */
-//		public DiagramOutlinePage(EditPartViewer viewer) {
-//			super(viewer);
-//			this.viewer = viewer;
-//		}
-//		
-//		@Override
-//		public void createControl(Composite parent) {
-//			sash = new SashForm(parent, SWT.VERTICAL);
-//			
-//			// sash上にコンストラクタで指定したビューワの作成
-//			viewer.createControl(sash);
-//			
-//			configureOutlineViewer();
-//			hookOutlineViewer();
-//			initializeOutlineViewer();
-//			
-//			// sash上にサムネイル用のCanvasビューワの作成
-//			overview = new Canvas(sash, SWT.BORDER);
-//			// サムネイル・フィギュアを配置する為の LightweightSystem
-//			LightweightSystem lws = new LightweightSystem(overview);
-//			
-//			// RootEditPartのビューをソースとしてサムネイルを作成
-//			ScalableRootEditPart rep = (ScalableRootEditPart) getGraphicalViewer().getRootEditPart();
-//			thumbnail = new ScrollableThumbnail((Viewport) rep.getFigure());
-//			thumbnail.setSource(rep.getLayer(LayerConstants.PRINTABLE_LAYERS));
-//			
-//			lws.setContents(thumbnail);
-//			
-//			disposeListener = new DisposeListener() {
-//				
-//				public void widgetDisposed(DisposeEvent e) {
-//					// サムネイル・イメージの破棄
-//					if (thumbnail != null) {
-//						thumbnail.deactivate();
-//						thumbnail = null;
-//					}
-//				}
-//			};
-//			// グラフィカル・ビューワが破棄されるときにサムネイルも破棄する
-//			getGraphicalViewer().getControl().addDisposeListener(disposeListener);
-//		}
-//		
-//		@Override
-//		public void dispose() {
-//			SelectionSynchronizer selectionSynchronizer = getSelectionSynchronizer();
-//			// SelectionSynchronizer からTreeViewerを削除
-//			selectionSynchronizer.removeViewer(viewer);
-//			
-//			Control control = getGraphicalViewer().getControl();
-//			if (control != null && control.isDisposed() == false) {
-//				control.removeDisposeListener(disposeListener);
-//			}
-//			
-//			super.dispose();
-//		}
-//		
-//		@Override
-//		public Control getControl() {
-//			return sash;
-//		}
-//		
-//		@Override
-//		public void init(IPageSite pageSite) {
-//			super.init(pageSite);
-//			// グラフィカル・エディタに登録されているアクションを取得
-//			ActionRegistry registry = getActionRegistry();
-//			// アウトライン・ページで有効にするアクション
-//			IActionBars bars = pageSite.getActionBars();
-//			
-//			// Eclipse 3.0以前では以下のようにしてIDを取得します
-//			// String id = IWorkbenchActionConstants.UNDO;
-//			String id = ActionFactory.UNDO.getId();
-//			bars.setGlobalActionHandler(id, registry.getAction(id));
-//			
-//			id = ActionFactory.REDO.getId();
-//			bars.setGlobalActionHandler(id, registry.getAction(id));
-//			
-//			id = ActionFactory.DELETE.getId();
-//			bars.setGlobalActionHandler(id, registry.getAction(id));
-//			bars.updateActionBars();
-//		}
-//		
-//		/**
-//		 * ビュアーにコンテンツを設定する。
-//		 * @param contents 設定するコンテンツ
-//		 */
-//		public void setContents(Object contents) {
-//			viewer.setContents(contents);
-//		}
-//		
-//		/**
-//		 * アウトラインビュアーの設定を行う。
-//		 */
-//		protected void configureOutlineViewer() {
-//			// エディット・ドメインの設定
-//			viewer.setEditDomain(getEditDomain());
-//			
-//			// EditPartFactory の設定
-//			viewer.setEditPartFactory(new OutlineTreeEditPartFactory());
-//			
-//			// THINK アウトラインに対するContextMenuの設定
-//			// THINK アウトラインに対するToolBarManagerの設定
-//		}
-//		
-//		/**
-//		 * アウトラインビュアー設定用のフックメソッド。
-//		 */
-//		protected void hookOutlineViewer() {
-//			// グラフィカル・エディタとツリー・ビューワとの間で選択を同期させる
-//			SelectionSynchronizer selectionSynchronizer = getSelectionSynchronizer();
-//			selectionSynchronizer.addViewer(getViewer());
-//		}
-//		
-//		/**
-//		 * アウトラインビュアーを初期化する。
-//		 */
-//		protected void initializeOutlineViewer() {
-//			// グラフィカル・エディタのルート・モデルをツリー・ビューワにも設定
-//			setContents(context);
-//		}
-//	}
 }

@@ -60,13 +60,13 @@ public class EditDbObjectCommand extends Command {
 	public EditDbObjectCommand(JiemamyContext context, DbObject dbObject, JmNode node, int diagramIndex) {
 		Validate.notNull(context);
 		Validate.notNull(dbObject);
-		Validate.notNull(node);
+//		Validate.notNull(node);
 		
 		this.context = context;
 		this.dbObject = dbObject;
 		this.node = node;
 		this.diagramIndex = diagramIndex;
-		oldNode = context.resolve(node.toReference());
+		oldNode = node == null ? null : context.resolve(node.toReference());
 		oldDbObject = context.resolve(dbObject.toReference());
 	}
 	
@@ -74,19 +74,23 @@ public class EditDbObjectCommand extends Command {
 	public void execute() {
 		context.store(dbObject);
 		
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagram.store(node);
-		facet.store(diagram);
+		if (node != null) {
+			DiagramFacet facet = context.getFacet(DiagramFacet.class);
+			SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+			diagram.store(node);
+			facet.store(diagram);
+		}
 	}
 	
 	@Override
 	public void undo() {
 		context.store(oldDbObject);
 		
-		DiagramFacet facet = context.getFacet(DiagramFacet.class);
-		SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
-		diagram.store(oldNode);
-		facet.store(diagram);
+		if (oldNode != null) {
+			DiagramFacet facet = context.getFacet(DiagramFacet.class);
+			SimpleJmDiagram diagram = (SimpleJmDiagram) facet.getDiagrams().get(diagramIndex);
+			diagram.store(oldNode);
+			facet.store(diagram);
+		}
 	}
 }

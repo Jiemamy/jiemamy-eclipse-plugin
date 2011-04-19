@@ -323,7 +323,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 		TabItem item = tabFolder.getItem(tabIndex);
 		JmTable table = (JmTable) item.getData();
 		
-		SimpleJmDataSet dataSet = getTargetCoreModel();
+		JmDataSet dataSet = getTargetCoreModel();
 		
 		try {
 			DataSetUtil.importFromCsv(dataSet, table, new FileInputStream(csv));

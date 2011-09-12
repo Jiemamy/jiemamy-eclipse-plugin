@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.jiemamy.eclipse.core;singleton:=true
-Bundle-Version: 0.3.1.qualifier
+Bundle-Version: 0.3.2.qualifier
 Bundle-Vendor: %providerName
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
@@ -29,9 +29,9 @@ Bundle-ClassPath: .,
  lib/jar/xsdlib-1.5.jar,
  lib/jar/dddbase-1.3.0.jar,
  lib/jar/jiemamy-commons-0.1.6.jar,
- lib/jar/jiemamy-core-0.3.1.jar,
- lib/jar/jiemamy-diagram-0.3.1.jar,
- lib/jar/jiemamy-sql-0.3.1.jar
+ lib/jar/jiemamy-core-0.3.2.jar,
+ lib/jar/jiemamy-diagram-0.3.2.jar,
+ lib/jar/jiemamy-sql-0.3.2.jar
 Eclipse-BuddyPolicy: registered
 Bundle-Activator: org.jiemamy.eclipse.JiemamyCorePlugin
 Require-Bundle: org.eclipse.core.runtime,

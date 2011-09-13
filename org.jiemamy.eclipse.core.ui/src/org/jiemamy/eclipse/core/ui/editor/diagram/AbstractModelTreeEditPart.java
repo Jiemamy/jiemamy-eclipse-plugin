@@ -49,6 +49,7 @@ public abstract class AbstractModelTreeEditPart extends AbstractTreeEditPart imp
 	}
 	
 	public void handleStoredEvent(StoredEvent<?> event) {
-		refreshChildren();
+//		refreshChildren();
+		// comment out for bug fix ECL-116
 	}
 }

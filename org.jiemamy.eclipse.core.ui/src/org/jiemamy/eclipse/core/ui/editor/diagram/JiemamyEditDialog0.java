@@ -86,7 +86,7 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 	
 	private final JiemamyContext context;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -311,7 +311,7 @@ public abstract class JiemamyEditDialog0<T> extends Dialog {
 		s.put(HEIGHT, size.y);
 	}
 	
-
+	
 	/**
 	 * 編集を検知するリスナ。
 	 * 

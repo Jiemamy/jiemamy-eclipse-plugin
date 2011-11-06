@@ -66,7 +66,7 @@ public class ChangeNodeConstraintCommand extends AbstractMovePositionCommand {
 	
 	private final EditPartViewer viewer;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

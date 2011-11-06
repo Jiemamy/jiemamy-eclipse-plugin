@@ -43,7 +43,7 @@ public class CreateNodeCommand extends Command {
 	
 	private NodeCreation creation;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

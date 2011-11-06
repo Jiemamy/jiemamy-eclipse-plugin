@@ -35,8 +35,7 @@ import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
  * 
  * @author daisuke
  */
-public class DbImporterWizard extends Wizard implements ImporterWizard<DbImporter, DbImportConfig>,
-		IWorkbenchWizard {
+public class DbImporterWizard extends Wizard implements ImporterWizard<DbImporter, DbImportConfig>, IWorkbenchWizard {
 	
 	private DbImporterWizardPage page;
 	
@@ -44,7 +43,7 @@ public class DbImporterWizard extends Wizard implements ImporterWizard<DbImporte
 	
 	private IDialogSettings settings;
 	
-
+	
 	/**
 	 * Creates a wizard for exporting SQL to the local file system.
 	 */
@@ -96,5 +95,4 @@ public class DbImporterWizard extends Wizard implements ImporterWizard<DbImporte
 	public void setInput(IFileEditorInput input) {
 		// nothing to do
 	}
-	
 }

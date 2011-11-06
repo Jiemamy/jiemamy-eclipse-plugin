@@ -40,7 +40,7 @@ public class StickyCreation implements NodeCreation {
 	
 	private final JmStickyNode stickyJmNode;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */

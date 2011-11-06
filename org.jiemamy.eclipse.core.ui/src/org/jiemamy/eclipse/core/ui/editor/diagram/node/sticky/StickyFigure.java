@@ -44,7 +44,7 @@ public class StickyFigure extends RoundedRectangle {
 	/** 内容文用Figure */
 	private Label contentsLabel;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */

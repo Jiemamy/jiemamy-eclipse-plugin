@@ -59,7 +59,7 @@ public class TableEditPart extends AbstractJmNodeEditPart {
 	
 	private static Logger logger = LoggerFactory.getLogger(TableEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

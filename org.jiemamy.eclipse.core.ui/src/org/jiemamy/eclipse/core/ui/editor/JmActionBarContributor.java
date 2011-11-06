@@ -77,7 +77,7 @@ public class JmActionBarContributor extends ActionBarContributor {
 	
 	private Combo cmbDisplayStatus;
 	
-
+	
 	@Override
 	public void contributeToToolBar(IToolBarManager toolBarManager) {
 		// コピペ関連アクションの追加
@@ -128,8 +128,7 @@ public class JmActionBarContributor extends ActionBarContributor {
 		DiagramFacet diagramFacet = context.getFacet(DiagramFacet.class);
 		JmDiagram diagram = diagramFacet.getDiagrams().get(TODO.DIAGRAM_INDEX);
 		for (DisplayStatus displayStatus : DisplayStatus.values()) {
-			if (diagram.getMode() == displayStatus.getMode()
-					&& diagram.getLevel() == displayStatus.getLevel()) {
+			if (diagram.getMode() == displayStatus.getMode() && diagram.getLevel() == displayStatus.getLevel()) {
 				cmbDisplayStatus.select(displayStatus.ordinal());
 				return;
 			}
@@ -160,7 +159,7 @@ public class JmActionBarContributor extends ActionBarContributor {
 		addGlobalActionKey(ActionFactory.SELECT_ALL.getId());
 	}
 	
-
+	
 	private class JiemamyDiagramEditorContribution extends ControlContribution {
 		
 		/**
@@ -225,7 +224,7 @@ public class JmActionBarContributor extends ActionBarContributor {
 			return cmbDisplayStatus;
 		}
 		
-
+		
 		private class ComboSelectionListener extends SelectionAdapter {
 			
 			@Override

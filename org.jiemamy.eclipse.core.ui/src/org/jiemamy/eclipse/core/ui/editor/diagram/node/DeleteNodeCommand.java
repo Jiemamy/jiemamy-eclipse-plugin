@@ -59,7 +59,7 @@ public class DeleteNodeCommand extends Command {
 	
 	Collection<Entry> outerForeingKeys;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -146,14 +146,14 @@ public class DeleteNodeCommand extends Command {
 		diagramFacet.store(diagram);
 	}
 	
-
+	
 	private static class Entry {
 		
 		SimpleJmTable table;
 		
 		JmForeignKeyConstraint fk;
 		
-
+		
 		Entry(SimpleJmTable table, JmForeignKeyConstraint fk) {
 			this.table = table;
 			this.fk = fk;

@@ -49,7 +49,7 @@ public class TableFigure extends DbObjectFigure {
 	
 	private CompartmentFigure columnTypeFigure = new CompartmentFigure();
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */
@@ -121,7 +121,7 @@ public class TableFigure extends DbObjectFigure {
 		}
 	}
 	
-
+	
 	private static class ColumnLayoutFigure extends Figure {
 		
 		/**

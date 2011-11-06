@@ -68,7 +68,7 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 	
 	private boolean overwrite;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -145,12 +145,12 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 		return true;
 	}
 	
-
+	
 	private class GraphicWizard extends Wizard {
 		
 		private GraphicWizardPage page;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -180,7 +180,7 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 		
 		private List<ImageFileFormat> formatList = new ArrayList<ImageFileFormat>(6);
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 */
@@ -255,7 +255,7 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 			return formatList.get(cmbFormat.getSelectionIndex()).getFormat();
 		}
 		
-
+		
 		private static class ImageFileFormat {
 			
 			/** ファイルフォーマットの説明文 */
@@ -267,7 +267,7 @@ public class SaveDiagramImageAction extends AbstractJiemamyAction {
 			/** ファイルフォーマット */
 			private int format;
 			
-
+			
 			/**
 			 * インスタンスを生成する。
 			 * 

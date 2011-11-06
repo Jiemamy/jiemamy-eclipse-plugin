@@ -29,7 +29,7 @@ public class DefaultTableEditorConfig implements TableEditorConfig {
 	
 	private final String editorTitle;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

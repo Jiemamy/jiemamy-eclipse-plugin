@@ -46,7 +46,7 @@ class SqlExporterWizardPage extends WizardPage {
 	
 	private final List<String> dataSetNames;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

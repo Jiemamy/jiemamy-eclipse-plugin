@@ -48,7 +48,7 @@ public class CreateBendpointCommand extends AbstractMovePositionCommand {
 	/** ダイアグラムエディタのインデックス（エディタ内のタブインデックス） */
 	private int diagramIndex;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

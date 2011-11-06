@@ -19,6 +19,8 @@
 package org.jiemamy.eclipse;
 
 import org.eclipse.core.runtime.Plugin;
+import org.osgi.framework.BundleContext;
+
 import org.jiemamy.composer.ExportConfig;
 import org.jiemamy.composer.Exporter;
 import org.jiemamy.composer.ImportConfig;
@@ -26,7 +28,6 @@ import org.jiemamy.composer.Importer;
 import org.jiemamy.dialect.Dialect;
 import org.jiemamy.eclipse.extension.ExtensionResolver;
 import org.jiemamy.eclipse.extension.validator.ModelValidator;
-import org.osgi.framework.BundleContext;
 
 /**
  * Jiemamy Eclipse Core PluginのActivatorクラス。
@@ -53,7 +54,7 @@ public class JiemamyCorePlugin extends Plugin {
 	/** 拡張ポイントに設定されたModelValidatorのリゾルバ */
 	private static ExtensionResolver<ModelValidator> validatorResolver;
 	
-
+	
 	/**
 	 * Returns the shared instance
 	 * 

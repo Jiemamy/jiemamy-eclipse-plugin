@@ -50,7 +50,7 @@ public class JiemamyPreferencePage extends PreferencePage implements IWorkbenchP
 	/** プリファレンス */
 	private JiemamyPreference pref = JiemamyUIPlugin.getPreference();
 	
-
+	
 	public void init(IWorkbench workbench) {
 		// nothing to do
 	}

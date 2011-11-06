@@ -114,7 +114,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	
 	private AbstractTableEditor columnTableEditor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -123,7 +123,8 @@ public class TableEditDialogColumnTab extends AbstractTab {
 	 * @param context コンテキスト
 	 * @param table 編集対象{@link JmTable}
 	 */
-	public TableEditDialogColumnTab(TabFolder parentTabFolder, int style, JiemamyContext context, SimpleJmTable table) {
+	public TableEditDialogColumnTab(TabFolder parentTabFolder, int style, final JiemamyContext context,
+			SimpleJmTable table) {
 		super(parentTabFolder, style, Messages.Tab_Table_Columns);
 		
 		this.context = context;
@@ -146,7 +147,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 				new Function<JmDomain, RawTypeDescriptor>() {
 					
 					public RawTypeDescriptor apply(JmDomain domain) {
-						return domain.asType();
+						return domain.asType(context);
 					}
 				}));
 		allTypes = ImmutableList.copyOf(rawTypes);
@@ -167,7 +168,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		return true;
 	}
 	
-
+	
 	/**
 	 * カラム用{@link IContentProvider}実装クラス。
 	 * 
@@ -284,7 +285,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 		
 		private TypeParameterHandler typeOptionHandler;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -756,7 +757,7 @@ public class TableEditDialogColumnTab extends AbstractTab {
 			table.store(column);
 		}
 		
-
+		
 		private class EditListenerImpl extends AbstractEditListener {
 			
 			@Override

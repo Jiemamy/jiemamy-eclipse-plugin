@@ -101,7 +101,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 	/** 前回import/exportしたファイル名 */
 	private String filename;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -340,7 +340,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 		item.notifyListeners(DataSetEditDialogTableTab.RECORD_CHANGED, new Event());
 	}
 	
-
+	
 	/**
 	 * タブを追加・削除するメニューを表示するリスナ。
 	 * 
@@ -352,7 +352,7 @@ public class DataSetEditDialog extends JiemamyEditDialog0<SimpleJmDataSet> {
 		
 		private final Menu menu;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 

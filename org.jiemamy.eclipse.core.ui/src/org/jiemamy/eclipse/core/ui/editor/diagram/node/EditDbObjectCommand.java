@@ -47,7 +47,7 @@ public class EditDbObjectCommand extends Command {
 	
 	private final int diagramIndex;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

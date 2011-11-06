@@ -39,7 +39,7 @@ public class EditForeignKeyCommand extends Command {
 	
 	private final SimpleJmTable oldTable;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

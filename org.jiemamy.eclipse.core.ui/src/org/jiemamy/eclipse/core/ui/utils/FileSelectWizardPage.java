@@ -49,7 +49,7 @@ public class FileSelectWizardPage extends WizardPage {
 	
 	private final String[] filterExtensions;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

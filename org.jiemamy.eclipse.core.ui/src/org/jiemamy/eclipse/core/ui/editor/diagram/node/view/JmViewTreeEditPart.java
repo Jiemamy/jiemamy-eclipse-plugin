@@ -49,7 +49,7 @@ public class JmViewTreeEditPart extends AbstractDbObjectTreeEditPart {
 	
 	private static Logger logger = LoggerFactory.getLogger(JmViewTreeEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

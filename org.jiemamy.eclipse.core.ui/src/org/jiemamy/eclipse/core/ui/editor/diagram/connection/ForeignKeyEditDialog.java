@@ -114,7 +114,7 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<SimpleJmForeignKeyC
 	/** ダイアログエリア全体 */
 	private Composite dialogArea;
 	
-
+	
 	/**
 	 * コンストラクタ。
 	 * 

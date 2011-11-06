@@ -31,7 +31,7 @@ public final class TODO {
 	/** マルチタブエディタ実装前に仮に利用する、編集中のダイアグラムのインデックス番号 */
 	public static final int DIAGRAM_INDEX = 0;
 	
-
+	
 	private TODO() {
 	}
 }

@@ -43,7 +43,7 @@ public class ChangeNodeColorCommand extends Command {
 	
 	private final JmColor oldColor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

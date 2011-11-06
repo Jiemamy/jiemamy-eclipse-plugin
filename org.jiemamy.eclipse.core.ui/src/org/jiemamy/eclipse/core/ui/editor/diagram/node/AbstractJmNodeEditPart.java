@@ -66,7 +66,7 @@ public abstract class AbstractJmNodeEditPart extends AbstractGraphicalEditPart i
 	
 	private DirectEditManager directManager = null;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

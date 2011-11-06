@@ -42,7 +42,7 @@ public class TableCreation implements NodeCreation {
 	
 	private final SimpleJmNode node;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */

@@ -25,10 +25,10 @@ import org.apache.commons.lang.Validate;
 import org.eclipse.gef.commands.Command;
 
 import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.JmNode;
 import org.jiemamy.model.SimpleJmConnection;
 import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.SimpleJmNode;
-import org.jiemamy.model.JmNode;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmRectangle;
 
@@ -41,7 +41,7 @@ public abstract class AbstractMovePositionCommand extends Command {
 	
 	private JmPoint shift;
 	
-
+	
 	/**
 	 * shiftを取得する。
 	 * 

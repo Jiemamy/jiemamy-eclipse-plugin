@@ -31,7 +31,7 @@ public abstract class AbstractJiemamyAction extends Action {
 	/** ビュアー */
 	private GraphicalViewer viewer;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

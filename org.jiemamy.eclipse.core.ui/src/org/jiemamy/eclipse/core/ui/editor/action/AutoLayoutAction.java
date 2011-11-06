@@ -48,9 +48,9 @@ import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.JiemamyContextEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractJmNodeEditPart;
 import org.jiemamy.model.JmConnection;
+import org.jiemamy.model.JmNode;
 import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.SimpleJmNode;
-import org.jiemamy.model.JmNode;
 import org.jiemamy.model.geometory.JmPoint;
 import org.jiemamy.model.geometory.JmRectangle;
 
@@ -62,7 +62,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 	
 	private static final int PADDING = 40;
 	
-
+	
 	private static Node getNode(List<Node> list, EntityRef<? extends JmNode> ref) {
 		for (Node obj : list) {
 			EntityNode node = (EntityNode) obj;
@@ -95,12 +95,12 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		}
 	}
 	
-
+	
 	private static class ConnectionEdge extends Edge {
 		
 		private JmConnection model;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -142,7 +142,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		private Map<JmConnection, List<JmPoint>> oldBendpoints = new HashMap<JmConnection, List<JmPoint>>();
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -197,7 +197,7 @@ public class AutoLayoutAction extends AbstractJiemamyAction {
 		
 		private final GraphicalViewer viewer;
 		
-
+		
 		public Operation(GraphicalViewer viewer) {
 			this.viewer = viewer;
 		}

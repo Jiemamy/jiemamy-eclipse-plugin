@@ -31,7 +31,7 @@ public class TextSelectionAdapter implements FocusListener {
 	
 	private Text text;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

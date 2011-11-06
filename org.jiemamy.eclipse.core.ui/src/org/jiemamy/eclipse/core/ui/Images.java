@@ -101,7 +101,7 @@ public final class Images {
 	/** オンマウスOFF状態のチェックボックス */
 	public static final String CHECK_HOVER_OFF = "CHECK_HOVER_OFF";
 	
-
+	
 	/**
 	 * 定数クラスのため、privateコンストラクタ。
 	 */

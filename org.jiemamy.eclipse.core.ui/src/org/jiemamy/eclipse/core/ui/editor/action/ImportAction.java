@@ -63,7 +63,7 @@ public class ImportAction extends AbstractJiemamyAction {
 	
 	private final JiemamyEditor editor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -73,6 +73,7 @@ public class ImportAction extends AbstractJiemamyAction {
 	 * @param editor エディタ
 	 * @throws IllegalArgumentException 引数に{@code null}を与えた場合
 	 */
+	@SuppressWarnings("null")
 	public ImportAction(Importer<ImportConfig> importer, ImporterWizard<Importer<ImportConfig>, ImportConfig> wizard,
 			GraphicalViewer viewer, JiemamyEditor editor) {
 		super(importer == null ? null : importer.getName(), viewer);

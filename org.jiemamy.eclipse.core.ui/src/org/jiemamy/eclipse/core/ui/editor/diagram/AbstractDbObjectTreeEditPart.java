@@ -36,7 +36,7 @@ public abstract class AbstractDbObjectTreeEditPart extends AbstractModelTreeEdit
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractDbObjectTreeEditPart.class);
 	
-
+	
 	@Override
 	public void performRequest(Request req) {
 		if (req.getType().equals(RequestConstants.REQ_OPEN)) {

@@ -43,7 +43,7 @@ public class DeleteBendpointCommand extends Command {
 	
 	private final JiemamyContext context;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

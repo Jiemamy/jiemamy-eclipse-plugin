@@ -48,7 +48,7 @@ public final class DiagramEditorPaletteFactory {
 	
 	private static ImageRegistry imageRegistry = JiemamyUIPlugin.getDefault().getImageRegistry();
 	
-
+	
 	/**
 	 * エディタパレットを生成する。
 	 * 

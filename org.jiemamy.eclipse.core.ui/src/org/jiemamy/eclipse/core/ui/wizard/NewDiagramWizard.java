@@ -33,9 +33,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.ide.IDE;
 
-import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.DiagramFacet;
 import org.jiemamy.JiemamyContext;
+import org.jiemamy.SimpleJmMetadata;
 import org.jiemamy.SqlFacet;
 import org.jiemamy.dialect.GenericDialect;
 import org.jiemamy.eclipse.core.ui.JiemamyUIPlugin;
@@ -55,7 +55,7 @@ public final class NewDiagramWizard extends Wizard implements INewWizard {
 	
 	private IStructuredSelection selection;
 	
-
+	
 	/**
 	 * Instantiates a new new diagram wizard.
 	 */
@@ -106,7 +106,7 @@ public final class NewDiagramWizard extends Wizard implements INewWizard {
 		return true;
 	}
 	
-
+	
 	/**
 	 * 新規ダイアグラムファイル作成ウィザードのページ。
 	 * 

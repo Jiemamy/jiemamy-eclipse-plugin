@@ -109,7 +109,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 	
 	private AbstractTableEditor constraintTableEditor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -141,7 +141,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		return true;
 	}
 	
-
+	
 	/**
 	 * 制約用{@link IContentProvider}実装クラス。
 	 * 
@@ -274,7 +274,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 		
 		private org.eclipse.swt.widgets.List lstTargetColumn;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -604,7 +604,7 @@ public class TableEditDialogConstraintTab extends AbstractTab {
 			table.store(constraint);
 		}
 		
-
+		
 		private class EditListenerImpl extends AbstractEditListener {
 			
 			@Override

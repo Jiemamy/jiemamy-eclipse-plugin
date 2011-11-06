@@ -40,8 +40,8 @@ import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
 import org.jiemamy.model.DbObjectNode;
 import org.jiemamy.model.SimpleDbObjectNode;
 import org.jiemamy.model.geometory.JmColor;
-import org.jiemamy.model.view.SimpleJmView;
 import org.jiemamy.model.view.JmView;
+import org.jiemamy.model.view.SimpleJmView;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -53,7 +53,7 @@ public class ViewEditPart extends AbstractJmNodeEditPart {
 	
 	private static Logger logger = LoggerFactory.getLogger(ViewEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

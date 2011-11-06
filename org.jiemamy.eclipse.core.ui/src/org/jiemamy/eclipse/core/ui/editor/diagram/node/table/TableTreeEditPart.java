@@ -57,7 +57,7 @@ public class TableTreeEditPart extends AbstractDbObjectTreeEditPart {
 	
 	private static Logger logger = LoggerFactory.getLogger(TableTreeEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

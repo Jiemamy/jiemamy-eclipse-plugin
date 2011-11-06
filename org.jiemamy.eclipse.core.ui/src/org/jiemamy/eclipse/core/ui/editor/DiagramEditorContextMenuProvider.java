@@ -20,6 +20,7 @@ package org.jiemamy.eclipse.core.ui.editor;
 
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.gef.ContextMenuProvider;
@@ -62,22 +63,21 @@ public class DiagramEditorContextMenuProvider extends ContextMenuProvider {
 	/** The editor's action registry. */
 	private final ActionRegistry actionRegistry;
 	
-
+	
 	/**
 	 * Instantiate a new menu context provider for the specified EditPartViewer and
 	 * ActionRegistry.
 	 * 
 	 * @param viewer the editor's graphical viewer
-	 * @param editor the editor
-	 * @param registry the editor's action registry
+	 * @param editorPart the editor
+	 * @param actionRegistry the editor's action registry
 	 */
-	public DiagramEditorContextMenuProvider(EditPartViewer viewer, JiemamyDiagramEditor editor, ActionRegistry registry) {
+	public DiagramEditorContextMenuProvider(EditPartViewer viewer, JiemamyDiagramEditor editorPart,
+			ActionRegistry actionRegistry) {
 		super(viewer);
-		if (registry == null) {
-			throw new IllegalArgumentException();
-		}
-		editorPart = editor;
-		actionRegistry = registry;
+		Validate.notNull(actionRegistry);
+		this.editorPart = editorPart;
+		this.actionRegistry = actionRegistry;
 	}
 	
 	/**

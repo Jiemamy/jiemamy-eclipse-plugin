@@ -31,25 +31,25 @@ enum DisplayStatus {
 	
 	/** 物理モデル：属性/型レベル */
 	PHYSICAL_ATTRTYPE(Mode.PHYSICAL, Level.ATTRTYPE, Messages.Physical_AttrAndType),
-
+	
 	/** 物理モデル：属性レベル */
 	PHYSICAL_ATTR(Mode.PHYSICAL, Level.ATTR, Messages.Physical_Attribute),
-
+	
 	/** 物理モデル：識別子レベル */
 	PHYSICAL_KEY(Mode.PHYSICAL, Level.KEY, Messages.Physical_Key),
-
+	
 	/** 物理モデル：エンティティレベル */
 	PHYSICAL_ENTITY(Mode.PHYSICAL, Level.ENTITY, Messages.Physical_Entity),
-
+	
 	/** 論理モデル：属性/型レベル */
 	LOGICAL_ATTRTYPE(Mode.LOGICAL, Level.ATTRTYPE, Messages.Logical_AttrAndType),
-
+	
 	/** 論理モデル：属性レベル */
 	LOGICAL_ATTR(Mode.LOGICAL, Level.ATTR, Messages.Logical_Attribute),
-
+	
 	/** 論理モデル：識別子レベル */
 	LOGICAL_KEY(Mode.LOGICAL, Level.KEY, Messages.Logical_Key),
-
+	
 	/** 論理モデル：エンティティレベル */
 	LOGICAL_ENTITY(Mode.LOGICAL, Level.ENTITY, Messages.Logical_Entity);
 	
@@ -68,7 +68,7 @@ enum DisplayStatus {
 		return null;
 	}
 	
-
+	
 	/** 論理モデルかどうか */
 	private Mode mode;
 	
@@ -78,7 +78,7 @@ enum DisplayStatus {
 	/** ラベル文字列 */
 	private String label;
 	
-
+	
 	DisplayStatus(Mode mode, Level level, String label) {
 		this.mode = mode;
 		this.level = level;

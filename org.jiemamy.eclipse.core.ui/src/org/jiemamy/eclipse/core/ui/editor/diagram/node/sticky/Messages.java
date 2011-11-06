@@ -45,7 +45,7 @@ class Messages extends NLS {
 		reloadMessages();
 	}
 	
-
+	
 	/**
 	 * load message values from bundle file
 	 */

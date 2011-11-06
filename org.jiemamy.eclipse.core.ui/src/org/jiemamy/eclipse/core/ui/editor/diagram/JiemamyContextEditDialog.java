@@ -78,7 +78,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 	
 	private SimpleJmAroundScript universalAroundScript;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

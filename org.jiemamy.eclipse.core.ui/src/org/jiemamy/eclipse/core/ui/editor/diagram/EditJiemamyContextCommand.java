@@ -48,7 +48,7 @@ public class EditJiemamyContextCommand extends Command {
 	
 	private final JmAroundScript oldUniversalAroundScript;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

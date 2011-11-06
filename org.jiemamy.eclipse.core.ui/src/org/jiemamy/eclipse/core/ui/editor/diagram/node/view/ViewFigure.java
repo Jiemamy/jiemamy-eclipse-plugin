@@ -42,7 +42,7 @@ public class ViewFigure extends DbObjectFigure {
 	
 	private static final Color DEFAULT = new Color(null, 240, 250, 255);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */

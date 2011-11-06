@@ -33,10 +33,10 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.connection.ForeignKeyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.sticky.StickyEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.table.TableEditPart;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.view.ViewEditPart;
-import org.jiemamy.model.JmConnection;
 import org.jiemamy.model.DbObject;
-import org.jiemamy.model.SimpleDbObjectNode;
+import org.jiemamy.model.JmConnection;
 import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.SimpleDbObjectNode;
 import org.jiemamy.model.constraint.JmForeignKeyConstraint;
 import org.jiemamy.model.table.JmTable;
 import org.jiemamy.model.view.JmView;
@@ -53,7 +53,7 @@ public class DiagramEditPartFactory implements EditPartFactory {
 	
 	private final JiemamyEditor editor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

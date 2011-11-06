@@ -34,7 +34,7 @@ public abstract class JiemamyEditDialog<T extends DbObject> extends JiemamyEditD
 	
 	private final SimpleDbObjectNode node;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

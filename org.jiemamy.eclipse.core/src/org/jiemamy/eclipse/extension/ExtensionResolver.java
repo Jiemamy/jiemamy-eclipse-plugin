@@ -48,7 +48,7 @@ public class ExtensionResolver<T> {
 	
 	private List<T> allInstance;
 	
-
+	
 	/**
 	 * リゾルバを初期化する。 以前読み込んだ情報を全て破棄し、拡張ポイントを読み込み直す。
 	 * 

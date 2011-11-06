@@ -79,7 +79,7 @@ public class ViewEditDialog extends JiemamyEditDialog<SimpleJmView> {
 	/** 説明タブ */
 	private TextEditTab tabDescription;
 	
-
+	
 	/**
 	 * コンストラクタ。
 	 * 

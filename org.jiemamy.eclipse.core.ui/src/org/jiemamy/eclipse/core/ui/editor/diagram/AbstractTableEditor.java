@@ -61,7 +61,7 @@ public abstract class AbstractTableEditor extends Composite {
 	/** 下ボタン */
 	private Button btnMoveDown;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

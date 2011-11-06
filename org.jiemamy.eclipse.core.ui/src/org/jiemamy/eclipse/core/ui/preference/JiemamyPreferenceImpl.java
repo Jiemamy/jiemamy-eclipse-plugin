@@ -32,7 +32,7 @@ public class JiemamyPreferenceImpl implements JiemamyPreference {
 	
 	private IPreferenceStore ps = JiemamyUIPlugin.getDefault().getPreferenceStore();
 	
-
+	
 	public ConnectionRouters getConnectionRouter() {
 		return ConnectionRouters.valueOf(ps.getString(PreferenceKey.CONNECTION_ROUTER.toString()));
 	}

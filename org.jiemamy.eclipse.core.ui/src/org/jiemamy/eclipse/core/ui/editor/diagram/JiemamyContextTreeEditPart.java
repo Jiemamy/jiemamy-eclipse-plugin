@@ -51,7 +51,7 @@ public class JiemamyContextTreeEditPart extends AbstractModelTreeEditPart {
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyContextTreeEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

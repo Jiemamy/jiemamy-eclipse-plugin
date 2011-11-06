@@ -51,7 +51,7 @@ public class MoveBendpointCommand extends AbstractMovePositionCommand {
 	
 	private final JmPoint oldLocation;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

@@ -89,7 +89,7 @@ class TypeParameterManager {
 	/** 自動採番コントロール */
 	private Button chkSerial;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

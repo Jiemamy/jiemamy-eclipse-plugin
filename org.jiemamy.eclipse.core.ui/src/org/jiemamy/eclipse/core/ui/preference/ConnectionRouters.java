@@ -76,7 +76,7 @@ public enum ConnectionRouters {
 		}
 	}
 	
-
+	
 	/**
 	 * ラベルからenumインスタンスを取得する。
 	 * 
@@ -108,11 +108,11 @@ public enum ConnectionRouters {
 		return fanRouter;
 	}
 	
-
+	
 	/** ラベル文字列 */
 	private String label;
 	
-
+	
 	ConnectionRouters(String label) {
 		this.label = label;
 	}

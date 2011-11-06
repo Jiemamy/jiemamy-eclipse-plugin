@@ -52,7 +52,7 @@ public class TableSelectDialog extends Dialog {
 	
 	private Table tblColumns;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

@@ -35,7 +35,7 @@ public abstract class AbstractTab extends Composite {
 	
 	private final TabItem tabItem;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

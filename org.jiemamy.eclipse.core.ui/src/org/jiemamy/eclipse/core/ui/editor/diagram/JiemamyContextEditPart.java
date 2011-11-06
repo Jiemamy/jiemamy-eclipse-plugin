@@ -66,7 +66,7 @@ public class JiemamyContextEditPart extends AbstractGraphicalEditPart implements
 	
 	private static Logger logger = LoggerFactory.getLogger(JiemamyContextEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

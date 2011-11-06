@@ -36,7 +36,7 @@ public class TextEditTab extends AbstractTab {
 	
 	private final boolean permitEmpty;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

@@ -69,7 +69,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 	
 	private AbstractTableEditor dataSetTableEditor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -99,7 +99,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		return true;
 	}
 	
-
+	
 	/**
 	 * DataSet用ContentProvider実装クラス。
 	 * 
@@ -164,7 +164,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 		
 		private Button btnEdit;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -361,7 +361,7 @@ public class JiemamyContextEditDialogDataSetTab extends AbstractTab {
 			dataSet.setName(StringUtils.defaultString(txtDataSetName.getText()));
 		}
 		
-
+		
 		private class EditListenerImpl extends AbstractEditListener {
 			
 			@Override

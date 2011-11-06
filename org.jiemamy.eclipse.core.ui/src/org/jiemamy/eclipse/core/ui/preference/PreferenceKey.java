@@ -27,19 +27,19 @@ public enum PreferenceKey {
 	
 	/** FK生成時に参照元テーブルに新規カラムをつくるかどうか */
 	CREATE_COLUMNS_WITH_FK("Jiemamy.Connection.CreateColumnsWithFk", false),
-
+	
 	/** コネクションルータ */
 	CONNECTION_ROUTER("Jiemamy.Connection.ConnectionRouter", ConnectionRouters.BENDPOINT.name()),
-
+	
 	/** データベース接続情報保持領域 */
 	DATABASE_INFORMATONS("Jiemamy.DatabaseInformations"),
-
+	
 	/** Preference ID used to persist the palette location. */
 	PALETTE_DOCK_LOCATION("DiagramEditorPalette.Location"),
-
+	
 	/** Preference ID used to persist the palette size. */
 	PALETTE_SIZE("DiagramEditorPalette.Size"),
-
+	
 	/** Preference ID used to persist the flyout palette's state. */
 	PALETTE_STATE("DiagramEditorPalette.State");
 	
@@ -49,7 +49,7 @@ public enum PreferenceKey {
 	/** デフォルト値 */
 	private Object defaultValue;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

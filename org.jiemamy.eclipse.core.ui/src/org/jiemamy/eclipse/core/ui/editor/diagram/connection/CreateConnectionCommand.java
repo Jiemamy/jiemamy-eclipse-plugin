@@ -72,7 +72,7 @@ public class CreateConnectionCommand extends Command {
 	
 	private final ForeignKeyCreation creation;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

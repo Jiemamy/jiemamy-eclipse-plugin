@@ -11,7 +11,7 @@ public class IllegalImplementationException extends RuntimeException {
 	
 	private final Object obj;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

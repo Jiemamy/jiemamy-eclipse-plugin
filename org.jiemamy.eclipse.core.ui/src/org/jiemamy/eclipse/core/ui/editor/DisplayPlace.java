@@ -27,10 +27,10 @@ public enum DisplayPlace {
 	
 	/** ダイアグラム上のFigureに表示することを表す */
 	FIGURE,
-
+	
 	/** アウトラインツリー上に表示する事を表す */
 	OUTLINE_TREE,
-
+	
 	/** 表中に表示することを表す */
 	TABLE;
 }

@@ -49,7 +49,7 @@ public class ForeignKeyCreation implements Creation {
 	
 	private SimpleJmTable targetTable;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */

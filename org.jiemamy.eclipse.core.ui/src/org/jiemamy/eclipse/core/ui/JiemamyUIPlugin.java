@@ -62,7 +62,7 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 	/** 設定 */
 	private static JiemamyPreference pref;
 	
-
+	
 	/**
 	 * Returns the shared instance
 	 * 
@@ -106,10 +106,10 @@ public class JiemamyUIPlugin extends AbstractUIPlugin {
 		plugin.getLog().log(status);
 	}
 	
-
+	
 	private ServiceLocator serviceLocatorBackup;
 	
-
+	
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);

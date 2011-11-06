@@ -59,7 +59,7 @@ public final class ExceptionHandler {
 	/** ロギング対象プラグイン */
 	private static Plugin plugin = JiemamyUIPlugin.getDefault();
 	
-
+	
 	/**
 	 * 例外を処理する。
 	 * 

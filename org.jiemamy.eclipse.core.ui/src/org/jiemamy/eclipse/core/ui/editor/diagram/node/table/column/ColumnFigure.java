@@ -41,7 +41,7 @@ public class ColumnFigure extends Label {
 	/** アンダーラインを引くかどうか */
 	private boolean underline;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */

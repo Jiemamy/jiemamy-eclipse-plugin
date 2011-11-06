@@ -58,7 +58,7 @@ public class StickyEditDialog extends JiemamyEditDialog0<JmStickyNode> {
 	
 	private final SimpleJmDiagram diagram;
 	
-
+	
 	/**
 	 * コンストラクタ。
 	 * 

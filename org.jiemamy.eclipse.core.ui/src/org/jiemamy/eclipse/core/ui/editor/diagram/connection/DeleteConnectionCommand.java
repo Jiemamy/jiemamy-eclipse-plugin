@@ -45,7 +45,7 @@ public class DeleteConnectionCommand extends Command {
 	
 	private SimpleJmDiagram diagmram;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

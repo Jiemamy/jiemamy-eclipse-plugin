@@ -55,7 +55,7 @@ public class SqlExporterWizard extends Wizard implements ExporterWizard<SqlExpor
 	
 	private SimpleSqlExportConfig config;
 	
-
+	
 	/**
 	 * Creates a wizard for exporting SQL to the local file system.
 	 */

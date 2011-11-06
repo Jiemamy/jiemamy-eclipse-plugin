@@ -39,7 +39,7 @@ public final class MarkerUtil {
 	/** マーカーID */
 	public static final String MARKER_ID = JiemamyUIPlugin.PLUGIN_ID + ".problem";
 	
-
+	
 	/**
 	 * 指定したリソースに対して、指定した（エラー）マーカーを作成する。
 	 * 

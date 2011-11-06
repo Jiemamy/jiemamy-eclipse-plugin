@@ -69,7 +69,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 	
 	private final Table swtTable;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -157,7 +157,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		}
 	}
 	
-
+	
 	/**
 	 * {@link JmDataSet}編集テーブルにおける編集の終了を検知し、セルエディタの終了＆後処理を行うリスナ。
 	 * 
@@ -171,7 +171,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		
 		private final int columnIndex;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -226,7 +226,7 @@ public class DataSetEditDialogTableTab extends AbstractTab {
 		
 		private final TableEditor editor;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 

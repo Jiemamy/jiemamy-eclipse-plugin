@@ -29,7 +29,7 @@ public class SwtColorUtil {
 	
 	private static final int MAX_COLOR_VALUE = 255;
 	
-
+	
 	/**
 	 * 色の明度を調べる。
 	 * 

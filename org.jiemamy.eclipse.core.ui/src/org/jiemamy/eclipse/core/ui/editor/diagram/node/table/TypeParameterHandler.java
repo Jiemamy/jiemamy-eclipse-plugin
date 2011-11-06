@@ -52,13 +52,13 @@ public interface TypeParameterHandler {
 	void enable();
 	
 	/**
-	 * アダプタからコントロールに値を格納する。
-	 */
-	void setParametersToControl();
-	
-	/**
 	 * コントロールからアダプタに値を格納する。
 	 */
 	void setParametersFromControl();
+	
+	/**
+	 * アダプタからコントロールに値を格納する。
+	 */
+	void setParametersToControl();
 	
 }

@@ -46,7 +46,7 @@ public class EditStickyCommand extends Command {
 	
 	private final JmStickyNode oldStickyNode;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

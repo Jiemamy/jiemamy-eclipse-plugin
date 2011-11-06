@@ -65,7 +65,7 @@ public class ExportAction extends AbstractJiemamyAction {
 	
 	private final JiemamyEditor editor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -76,6 +76,7 @@ public class ExportAction extends AbstractJiemamyAction {
 	 * @throws IllegalArgumentException 引数exporterに{@code null}を与えた場合
 	 * @throws IllegalArgumentException その他引数に{@code null}を与えた場合
 	 */
+	@SuppressWarnings("null")
 	public ExportAction(Exporter<ExportConfig> exporter, ExporterWizard<Exporter<ExportConfig>, ExportConfig> wizard,
 			GraphicalViewer viewer, JiemamyEditor editor) {
 		super(exporter == null ? null : exporter.getName(), viewer);

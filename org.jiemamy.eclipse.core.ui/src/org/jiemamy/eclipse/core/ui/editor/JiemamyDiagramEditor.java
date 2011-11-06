@@ -155,7 +155,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		return -1;
 	}
 	
-
+	
 	/** ルートEditPart（コントローラ） */
 	private ScalableRootEditPart rootEditPart = new ScalableRootEditPart();
 	
@@ -167,7 +167,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 	/** このエディタのタブインデックス */
 	private int tabIndex;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 */
@@ -611,7 +611,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		context.setMetadata(metadata);
 	}
 	
-
+	
 	/**
 	 * アウトラインビューのページクラス。
 	 * 
@@ -632,7 +632,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		
 		private final EditPartViewer viewer;
 		
-
+		
 		/**
 		 * インスタンスを生成する。
 		 * 
@@ -770,7 +770,7 @@ public class JiemamyDiagramEditor extends GraphicalEditorWithFlyoutPalette imple
 		
 		private IEclipsePreferences prefs;
 		
-
+		
 		private JiemamyFlyoutPreferences(IEclipsePreferences preferences) {
 			prefs = preferences;
 		}

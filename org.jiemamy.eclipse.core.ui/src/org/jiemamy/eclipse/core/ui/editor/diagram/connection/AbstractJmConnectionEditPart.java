@@ -46,7 +46,7 @@ public abstract class AbstractJmConnectionEditPart extends AbstractConnectionEdi
 	
 	private static Logger logger = LoggerFactory.getLogger(AbstractJmConnectionEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

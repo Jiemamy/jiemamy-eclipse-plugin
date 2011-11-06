@@ -44,8 +44,8 @@ import org.jiemamy.eclipse.core.ui.editor.diagram.EditDialogSupport;
 import org.jiemamy.model.JmConnection;
 import org.jiemamy.model.ModelConsistencyException;
 import org.jiemamy.model.column.JmColumn;
-import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
 import org.jiemamy.model.constraint.JmForeignKeyConstraint;
+import org.jiemamy.model.constraint.SimpleJmForeignKeyConstraint;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -59,7 +59,7 @@ public class ForeignKeyEditPart extends AbstractJmConnectionEditPart implements 
 	
 	private Label label;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

@@ -35,8 +35,8 @@ import org.jiemamy.JiemamyContext;
 import org.jiemamy.eclipse.core.ui.TODO;
 import org.jiemamy.eclipse.core.ui.editor.diagram.node.AbstractJmNodeEditPart;
 import org.jiemamy.eclipse.core.ui.utils.ConvertUtil;
-import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.model.JmStickyNode;
+import org.jiemamy.model.SimpleJmDiagram;
 import org.jiemamy.utils.LogMarker;
 
 /**
@@ -48,7 +48,7 @@ public class StickyEditPart extends AbstractJmNodeEditPart {
 	
 	private static Logger logger = LoggerFactory.getLogger(StickyEditPart.class);
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 

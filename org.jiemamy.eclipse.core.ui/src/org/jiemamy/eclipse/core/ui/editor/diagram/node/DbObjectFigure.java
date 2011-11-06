@@ -45,7 +45,7 @@ public abstract class DbObjectFigure extends Figure {
 	/** デフォルト背景色 */
 	private Color defaultColor;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
 	 * 
@@ -71,21 +71,21 @@ public abstract class DbObjectFigure extends Figure {
 	}
 	
 	/**
-	 * デフォルト背景色を取得する。
-	 * 
-	 * @return デフォルト背景色
-	 */
-	public Color getDefaultColor() {
-		return defaultColor;
-	}
-	
-	/**
 	 * {@link DbObject}名表示部分Figureを取得する。
 	 * 
 	 * @return {@link DbObject}名表示部分Figure
 	 */
 	public Label getDbObjectNameLabel() {
 		return dbObjectNameLabel;
+	}
+	
+	/**
+	 * デフォルト背景色を取得する。
+	 * 
+	 * @return デフォルト背景色
+	 */
+	public Color getDefaultColor() {
+		return defaultColor;
 	}
 	
 	/**

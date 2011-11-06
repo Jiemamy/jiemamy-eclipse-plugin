@@ -101,9 +101,10 @@ class DbImporterWizardPage extends WizardPage {
 	
 	private final IDialogSettings settings;
 	
-
+	
 	/**
 	 * インスタンスを生成する。
+	 * 
 	 * @param settings ダイアログセッティング
 	 */
 	DbImporterWizardPage(IDialogSettings settings) {
@@ -454,6 +455,7 @@ class DbImporterWizardPage extends WizardPage {
 	 * TODO ネスト深くてむちゃくちゃなので、ちょっとリファクタリングすべし。
 	 */
 	private void testConnection() {
+		final Display display = getShell().getDisplay();
 		try {
 			final Driver driver = DriverUtil.getDriverInstance(getDriverJarPaths(), getDriverClassName());
 			final Properties info = new Properties();
@@ -461,7 +463,6 @@ class DbImporterWizardPage extends WizardPage {
 			info.setProperty("password", getPassword());
 			final String uri = getUri();
 			
-			final Display display = getShell().getDisplay();
 			new Thread() {
 				
 				@Override
@@ -478,46 +479,47 @@ class DbImporterWizardPage extends WizardPage {
 								}
 							});
 						} else {
-							display.asyncExec(new Runnable() {
-								
-								public void run() {
-									MessageDialog.openError(getShell(), "接続失敗0", "null connection"); // RESOURCE
-								}
-							});
+							display.asyncExec(new OpenErrorMessageDialog("接続失敗0", "null connection")); // RESOURCE
 						}
 					} catch (SQLException ex) {
 						final String msg = ex.getClass().getName() + " " + ex.getMessage();
-						display.asyncExec(new Runnable() {
-							
-							public void run() {
-								MessageDialog.openError(getShell(), "接続失敗1", msg); // RESOURCE
-							}
-						});
+						display.asyncExec(new OpenErrorMessageDialog("接続失敗1", msg)); // RESOURCE
 					} catch (Exception ex) {
-						ex.printStackTrace();
 						final String msg = ex.getClass().getName() + " " + ex.getMessage();
-						display.asyncExec(new Runnable() {
-							
-							public void run() {
-								MessageDialog.openError(getShell(), "接続失敗2", msg); // RESOURCE
-							}
-						});
+						display.asyncExec(new OpenErrorMessageDialog("接続失敗2", msg)); // RESOURCE
 					} finally {
 						DbUtils.closeQuietly(connection);
 					}
 				}
 			}.start();
-			
 		} catch (DriverNotFoundException ex) {
-			MessageDialog.openError(getShell(), "接続失敗3", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
+			display.asyncExec(new OpenErrorMessageDialog("接続失敗3", ex.getClass().getName() + " " + ex.getMessage())); // RESOURCE
 		} catch (InstantiationException ex) {
-			MessageDialog.openError(getShell(), "接続失敗4", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
+			display.asyncExec(new OpenErrorMessageDialog("接続失敗4", ex.getClass().getName() + " " + ex.getMessage())); // RESOURCE
 		} catch (IllegalAccessException ex) {
-			MessageDialog.openError(getShell(), "接続失敗5", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
+			display.asyncExec(new OpenErrorMessageDialog("接続失敗5", ex.getClass().getName() + " " + ex.getMessage())); // RESOURCE
 		} catch (IOException ex) {
-			MessageDialog.openError(getShell(), "接続失敗6", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
+			display.asyncExec(new OpenErrorMessageDialog("接続失敗6", ex.getClass().getName() + " " + ex.getMessage())); // RESOURCE
 		} catch (Exception ex) {
-			MessageDialog.openError(getShell(), "接続失敗7", ex.getClass().getName() + " " + ex.getMessage()); // RESOURCE
+			display.asyncExec(new OpenErrorMessageDialog("接続失敗7", ex.getClass().getName() + " " + ex.getMessage())); // RESOURCE
+		}
+	}
+	
+	
+	private final class OpenErrorMessageDialog implements Runnable {
+		
+		private final String title;
+		
+		private final String message;
+		
+		
+		private OpenErrorMessageDialog(String title, String message) {
+			this.title = title;
+			this.message = message;
+		}
+		
+		public void run() {
+			MessageDialog.openError(getShell(), title, message); // RESOURCE
 		}
 	}
 }

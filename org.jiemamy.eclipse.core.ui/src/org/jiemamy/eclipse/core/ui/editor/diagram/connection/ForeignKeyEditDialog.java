@@ -384,6 +384,9 @@ public class ForeignKeyEditDialog extends JiemamyEditDialog0<SimpleJmForeignKeyC
 		}
 		
 		int selectionIndex = cmbReferenceKey.getSelectionIndex();
+		if (selectionIndex == -1) {
+			selectionIndex = 0; // ECL-121 の避難的な感じ。
+		}
 		JmLocalKeyConstraint referenceJmKeyConstraint = referenceKeys.get(selectionIndex);
 		
 		if (referenceJmKeyConstraint.getKeyColumns().size() == 0) {

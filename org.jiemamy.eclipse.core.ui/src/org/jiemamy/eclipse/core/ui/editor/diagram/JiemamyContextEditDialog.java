@@ -226,6 +226,7 @@ public class JiemamyContextEditDialog extends JiemamyEditDialog0<JiemamyContext>
 			}
 			universalAroundScript.setScript(Position.BEGIN, beginScript);
 			universalAroundScript.setScript(Position.END, endScript);
+			facet.setUniversalAroundScript(universalAroundScript);
 		}
 		
 		return true;
